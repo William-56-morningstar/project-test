@@ -1,0 +1,14 @@
+{
+  "name": "video-to-mp3-api",
+  "description": "Convert video URL to MP3 and upload",
+  "repository": "https://github.com/yourusername/video-to-mp3-api",
+  "keywords": ["node", "express", "ffmpeg", "mp3"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+    }
+  ]
+}
