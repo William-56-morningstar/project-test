@@ -170,7 +170,7 @@ if (fs.existsSync('./auth_info_baileys')) {
 
 
                         const stringg_session = mega_url.replace('https://mega.nz/file/', '');
-const string_session = 'BEN-BOT~' + stringg_session;
+                        const string_session = 'BEN-BOT~' + stringg_session;
 
 
                         const Scan_Id = string_session;
