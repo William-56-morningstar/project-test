@@ -1,17 +1,20 @@
 {
-    "name": "Gifted Session Generator",
-    "description": "Web Session Generator",
-    "logo": "https://files.catbox.moe/52699c.jpg",
-    "repository": "https://github.com/mauricegift/gifted-pair-code",
-    "keywords": ["Gifted-Tech"],
-    "success_url": "/", 
-    "buildpacks": [{ "url": "https://github.com/heroku/heroku-buildpack-nodejs#latest" } ],
-    "env": {      
-      "PORT": {
-        "description": "Port for web app.4000,5000,3000... any!",
-        "value": "5000",
-        "required": false 
-      }
-    }   
-
+  "name": "qr-code",
+  "description": "Simple pair web and qr code web",
+  "logo": "https://files.catbox.moe/4i7dp7.jpg",
+  "keywords": ["bot", "WhatsApp", "JavaScript"],
+  "success_url": "/",
+  "stack": "heroku-24",
+  "env": {
+    "TECH": {
+      "description": "JUST CLICK DEPOLY",
+      "value": "CLICK",
+      "required": false
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs.git"
+    }
+  ]
 }
