@@ -8,9 +8,9 @@
         "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name davidx",
-    "stop": "pm2 stop davidx",
-    "restart": "pm2 restart davidx",
+    "start": "pm2 start index.js --deep-monitoring --attach --name qasim",
+    "stop": "pm2 stop qasim",
+    "restart": "pm2 restart qasim",
     "dev": "nodemon index.js"
   },
   "keywords": [
@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "6.7.16",
+    "@whiskeysockets/baileys": "6.6.0",
     "awesome-phonenumber": "^2.64.0",
     "fs-extra": "^11.3.0",
     "megajs": "^1.3.3",
