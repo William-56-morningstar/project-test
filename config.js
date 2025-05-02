@@ -23,7 +23,7 @@ ANTI_LINK: process.env.ANTI_LINK || "true",
 // make anti link true,false for groups 
 MENTION_REPLY: process.env.MENTION_REPLY || "false",
 // make true if want auto voice reply if someone menetion you 
-MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/7zfdcq.jpg",
+MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/6vrc2s.jpg",
 // add custom menu and mention reply image url
 PREFIX: process.env.PREFIX || ".",
 // add your prifix for bot   
@@ -41,9 +41,9 @@ OWNER_NUMBER: process.env.OWNER_NUMBER || "93744215959",
 // add your bot owner number
 OWNER_NAME: process.env.OWNER_NAME || "Nothing",
 // add bot owner name
-DESCRIPTION: process.env.DESCRIPTION || "*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing*",
+DESCRIPTION: process.env.DESCRIPTION || "*NOTHING TECH*",
 // add bot owner name    
-ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/y9ysty.jpg",
+ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/6vrc2s.jpg",
 // add img for alive msg
 LIVE_MSG: process.env.LIVE_MSG || "> Zinda Hun Yar *BEN-BOT*⚡",
 // add alive msg here 
