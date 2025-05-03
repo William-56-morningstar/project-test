@@ -1,4 +1,4 @@
-**[SESSION_DOCS](https://benbot-pairweb.onrender.com)**
+**[SESSION_DOCS](https://session.apis-nithing.xyz)**
 
 - After obtaining your session ID, you can now use below depoly bot.
   
