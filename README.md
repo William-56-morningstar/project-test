@@ -6,4 +6,4 @@
 
 **[WA_CHANNEL](https://whatsapp.com/channel/0029Vasu3qP9RZAUkVkvSv32)**
 
-**[HEROKU DEPLOY URL](https://dashboard.heroku.com/new?template=https://github.com/NOTHING-MD420/king-test)**
+**[HEROKU DEPLOY URL](https://dashboard.heroku.com/new?template=https://github.com/NOTHING-MD420/ben-bot-v2)**
