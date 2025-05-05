@@ -11,7 +11,43 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {
-        const menuCaption = `*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*\n\n𝗛𝗲𝗹𝗹𝗼👋🏻\n\n╭━⊱⛲𝗪𝗘𝗟𝗖𝗢𝗠𝗘 𝗧𝗢 𝗠𝗘𝗡𝗨⛲⊱━╮\n┃🤖 *1- ᴀɪᴍᴇɴᴜ*\n┃📥 *2- ᴅᴏᴡɴʟᴏᴀᴅᴍᴇɴᴜ*\n┃🧬 *3- ɢʀᴏᴜᴘᴍᴇɴᴜ*\n┃🧰 *4- ᴛᴏᴏʟsᴍᴇɴᴜ*\n┃🔄 *5- ᴄᴏɴᴠᴇʀᴛᴍᴇɴᴜ*\n┃🔍 *6- ꜱᴇᴀʀᴄʜᴍᴇɴᴜ*\n┃🕌 *7- ǫᴜʀᴀɴᴇᴍɴᴜ*\n┃📚 *8- sᴛᴜᴅʏᴍᴇɴᴜ*\n┃🕵️‍♂️ *9- sᴛᴀʟkᴍᴇɴᴜ*\n┃👾 *10- ʙᴜɢᴍᴇɴᴜ*\n┃🎮 *11- ɢᴀᴍᴇꜱᴍᴇɴᴜ*\n┃💰 *12- ᴄʀʏᴘᴛᴏᴍᴇɴᴜ*\n┃🎉 *13- ғᴜɴᴍᴇɴᴜ*\n┃🔞 *14- ɴsғᴡᴍᴇɴᴜ*\n┃🪄 *15- ᴘʜᴏᴛᴏᴏxʏᴍᴇɴᴜ*\n┃🖼️ *16- ᴇᴘʜᴏᴛᴏᴍᴇɴᴜ*\n┃🎥 *17- ᴀɴɪᴍᴇᴍᴇɴᴜ*\n┃🛡️ *18- ᴏᴡɴᴇʀᴍᴇɴᴜ*\n┃⚙️ *19- sʏsᴛᴇᴍᴍᴇɴᴜ*\n┃📜 *20- ᴀʟʟᴍᴇɴᴜ*\n╰━━━━━━━━━━━━━━━━━━━━╯\n> 🎗️ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴍᴇɴᴜ🎗️`;
+        const menuCaption = `╭━━━〔 *${config.BOT_NAME}* 〕━━━┈⊷
+┃★╭──────────────
+┃★│ 👑 Owner : *${config.OWNER_NAME}*
+┃★│ 🤖 Baileys : *Multi Device*
+┃★│ 💻 Type : *NodeJs*
+┃★│ 🚀 Platform : *Heroku*
+┃★│ ⚙️ Mode : *[${config.MODE}]*
+┃★│ 🔣 Prefix : *[${config.PREFIX}]*
+┃★│ 🏷️ Version : *4.0.0 Bᴇᴛᴀ*
+┃★╰──────────────
+╰━━━━━━━━━━━━━━━┈⊷
+╭━━〔 *Menu List* 〕━━┈⊷
+┃◈╭─────────────·๏
+┃◈│1️⃣  📥 *Download Menu*
+┃◈│2️⃣  👥 *Group Menu*
+┃◈│3️⃣  😄 *Fun Menu*
+┃◈│4️⃣  👑 *Owner Menu*
+┃◈│5️⃣  🤖 *AI Menu*
+┃◈│6️⃣  🎎 *Anime Menu*
+┃◈│7️⃣  🔄 *Convert Menu*
+┃◈│8️⃣  📌 *Other Menu*
+┃◈│9️⃣  💞 *Reactions Menu*
+┃◈│🔟  🏠 *Main Menu*
+┃◈╰───────────┈⊷
+╰──────────────┈⊷
+> ${config.DESCRIPTION}`;
+
+        const contextInfo = {
+            mentionedJid: [m.sender],
+            forwardingScore: 999,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: '120363354023106228@newsletter',
+                newsletterName: config.OWNER_NAME,
+                serverMessageId: 143
+            }
+        };
 
         // Function to send menu image with timeout
         const sendMenuImage = async () => {
@@ -19,8 +55,9 @@ cmd({
                 return await conn.sendMessage(
                     from,
                     {
-                        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/6vrc2s.jpg' },
-                        caption: menuCaption
+                        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/7zfdcq.jpg' },
+                        caption: menuCaption,
+                        contextInfo: contextInfo
                     },
                     { quoted: mek }
                 );
@@ -28,13 +65,25 @@ cmd({
                 console.log('Image send failed, falling back to text');
                 return await conn.sendMessage(
                     from,
-                    { text: menuCaption },
+                    { text: menuCaption, contextInfo: contextInfo },
                     { quoted: mek }
                 );
             }
         };
 
-        
+        // Function to send menu audio with timeout
+        const sendMenuAudio = async () => {
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Small delay after image
+                await conn.sendMessage(from, {
+                    audio: { url: 'https://github.com/JawadYT36/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a' },
+                    mimetype: 'audio/mp4',
+                    ptt: true,
+                }, { quoted: mek });
+            } catch (e) {
+                console.log('Audio send failed, continuing without it');
+            }
+        };
 
         // Send image first, then audio sequentially
         let sentMsg;
@@ -45,12 +94,17 @@ cmd({
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Image send timeout')), 10000))
             ]);
             
+            // Then send audio with 1s delay and 8s timeout
+            await Promise.race([
+                sendMenuAudio(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Audio send timeout')), 8000))
+            ]);
         } catch (e) {
             console.log('Menu send error:', e);
             if (!sentMsg) {
                 sentMsg = await conn.sendMessage(
                     from,
-                    { text: menuCaption },
+                    { text: menuCaption, contextInfo: contextInfo },
                     { quoted: mek }
                 );
             }
@@ -370,14 +424,15 @@ cmd({
                                     senderID,
                                     {
                                         image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/7zfdcq.jpg' },
-                                        caption: selectedMenu.content
+                                        caption: selectedMenu.content,
+                                        contextInfo: contextInfo
                                     },
                                     { quoted: receivedMsg }
                                 );
                             } else {
                                 await conn.sendMessage(
                                     senderID,
-                                    { text: selectedMenu.content },
+                                    { text: selectedMenu.content, contextInfo: contextInfo },
                                     { quoted: receivedMsg }
                                 );
                             }
@@ -390,7 +445,7 @@ cmd({
                             console.log('Menu reply error:', e);
                             await conn.sendMessage(
                                 senderID,
-                                { text: selectedMenu.content },
+                                { text: selectedMenu.content, contextInfo: contextInfo },
                                 { quoted: receivedMsg }
                             );
                         }
@@ -400,6 +455,7 @@ cmd({
                             senderID,
                             {
                                 text: `❌ *Invalid Option!* ❌\n\nPlease reply with a number between 1-10 to select a menu.\n\n*Example:* Reply with "1" for Download Menu\n\n> ${config.DESCRIPTION}`,
+                                contextInfo: contextInfo
                             },
                             { quoted: receivedMsg }
                         );
