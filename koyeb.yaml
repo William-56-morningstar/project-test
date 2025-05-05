@@ -1,6 +1,6 @@
-name: ben-bot
+name: khan-md
 services:
-  - name: ben-bot-service
+  - name: khan-md-service
     type: web
     ports:
       - 5000
