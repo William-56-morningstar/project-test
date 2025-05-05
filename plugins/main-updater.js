@@ -54,17 +54,7 @@ cmd({
         fs.unlinkSync(zipPath);
         fs.rmSync(extractPath, { recursive: true, force: true });
 
-        await reply("✅ Update complete! Restarting BEN-BOT...");
-
-        // Restart via PM2
-        exec("pm2 restart BEN-BOT", (err, stdout, stderr) => {
-            if (err) {
-                console.error("PM2 Restart Error:", stderr);
-                reply("⚠️ Update applied but PM2 restart failed. Restart manually.");
-                return;
-            }
-            console.log("PM2 Restarted:", stdout);
-        });
+        await reply("✅ Update complete!");
 
     } catch (error) {
         console.error("Update error:", error);
