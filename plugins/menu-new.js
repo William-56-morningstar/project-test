@@ -28,7 +28,7 @@ cmd({
                 console.log('Image send failed, falling back to text');
                 return await conn.sendMessage(
                     from,
-                    { text: menuCaption, contextInfo: contextInfo },
+                    { text: menuCaption },
                     { quoted: mek }
                 );
             }
@@ -50,7 +50,7 @@ cmd({
             if (!sentMsg) {
                 sentMsg = await conn.sendMessage(
                     from,
-                    { text: menuCaption, contextInfo: contextInfo },
+                    { text: menuCaption },
                     { quoted: mek }
                 );
             }
@@ -370,15 +370,14 @@ cmd({
                                     senderID,
                                     {
                                         image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/7zfdcq.jpg' },
-                                        caption: selectedMenu.content,
-                                        contextInfo: contextInfo
+                                        caption: selectedMenu.content
                                     },
                                     { quoted: receivedMsg }
                                 );
                             } else {
                                 await conn.sendMessage(
                                     senderID,
-                                    { text: selectedMenu.content, contextInfo: contextInfo },
+                                    { text: selectedMenu.content },
                                     { quoted: receivedMsg }
                                 );
                             }
@@ -391,7 +390,7 @@ cmd({
                             console.log('Menu reply error:', e);
                             await conn.sendMessage(
                                 senderID,
-                                { text: selectedMenu.content, contextInfo: contextInfo },
+                                { text: selectedMenu.content },
                                 { quoted: receivedMsg }
                             );
                         }
@@ -401,7 +400,6 @@ cmd({
                             senderID,
                             {
                                 text: `❌ *Invalid Option!* ❌\n\nPlease reply with a number between 1-10 to select a menu.\n\n*Example:* Reply with "1" for Download Menu\n\n> ${config.DESCRIPTION}`,
-                                contextInfo: contextInfo
                             },
                             { quoted: receivedMsg }
                         );
