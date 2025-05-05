@@ -35,18 +35,7 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         const text = `> *BEN-BOT SPEED: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
 
         await conn.sendMessage(from, {
-            text,
-            contextInfo: {
-                mentionedJid: [sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '12036333358997@newsletter',
-                    newsletterName: "JawadTechX",
-                    serverMessageId: 143
-                }
-            }
-        }, { quoted: mek });
+            text}, { quoted: mek });
 
     } catch (e) {
         console.error("Error in ping command:", e);
@@ -69,7 +58,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         const message = await conn.sendMessage(from, { text: '*PINGING...*' })
         const endTime = Date.now()
         const ping = endTime - startTime
-        await conn.sendMessage(from, { text: `*🔥 BEN-BOT SPEED : ${ping}ms*` }, { quoted: message })
+        await conn.sendMessage(from, { text: `*X-MD SPEED : ${ping}ms*` }, { quoted: message })
     } catch (e) {
         console.log(e)
         reply(`${e}`)

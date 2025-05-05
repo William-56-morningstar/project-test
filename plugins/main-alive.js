@@ -7,39 +7,28 @@ cmd({
     pattern: "alive",
     alias: ["status", "online", "a"],
     desc: "Check bot is alive or not",
-    category: "main",
+    category: "system",
     react: "⚡",
     filename: __filename
 },
 async (conn, mek, m, { from, sender, reply }) => {
-    try {
+    try { 
+        const start = new Date().getTime();
+        const end = new Date().getTime();
+        const responseTime = (end - start) / 1000;
+        const uptime = runtime(process.uptime());
+        const startTime = new Date(Date.now() - process.uptime() * 1000);
         const status = `
-╭───〔 *🤖 ${config.BOT_NAME} STATUS* 〕───◉
-│✨ *Bot is Active & Online!*
-│
-│🧠 *Owner:* ${config.OWNER_NAME}
-│⚡ *Version:* 4.0.0
-│📝 *Prefix:* [${config.PREFIX}]
-│📳 *Mode:* [${config.MODE}]
-│💾 *RAM:* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
-│🖥️ *Host:* ${os.hostname()}
-│⌛ *Uptime:* ${runtime(process.uptime())}
-╰────────────────────◉
-> ${config.DESCRIPTION}`;
+*BEN BOT IS RUNNING!!*
+*BOT UPTIME INFO:*
+*╭═════════════════⊷*
+*┃❍ ${uptime}*
+*╰═════════════════⊷*
+      `;
 
         await conn.sendMessage(from, {
             image: { url: config.MENU_IMAGE_URL },
             caption: status,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 1000,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363354023106228@newsletter',
-                    newsletterName: 'JawadTechX',
-                    serverMessageId: 143
-                }
-            }
         }, { quoted: mek });
 
     } catch (e) {
