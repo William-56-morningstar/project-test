@@ -19,7 +19,7 @@ cmd({
                 return await conn.sendMessage(
                     from,
                     {
-                        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/6vrc2s.jpg'' },
+                        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/6vrc2s.jpg' },
                         caption: menuCaption
                     },
                     { quoted: mek }
