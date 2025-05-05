@@ -11,7 +11,7 @@ cmd({
     alias: ["upgrade", "sync"],
     react: '🆕',
     desc: "Update the bot to the latest version.",
-    category: "misc",
+    category: "system",
     filename: __filename
 }, async (client, message, args, { reply, isOwner }) => {
     if (!isOwner) return reply("This command is only for the bot owner.");

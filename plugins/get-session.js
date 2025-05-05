@@ -3,8 +3,8 @@ const { runtime } = require('../lib/functions');
 const config = require('../config');
 
 cmd({
-    pattern: "uptime",
-    alias: ["runtime","runtime2"],use: '.runtime',
+    pattern: "getsession",
+    alias: ["sessionid","getsession 2"],use: '.getsession',
     desc: "Check bot's response time.",
     category: "system",
     react: "⚡",
@@ -36,7 +36,7 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         const startTime = new Date(Date.now() - process.uptime() * 1000);
         
         
-        const text = `_*BEN_BOT-V2 Has Been Running For ${uptime}*_`;
+        const text = (config.SESSION_ID);
 
         await conn.sendMessage(from, {
             text}, { quoted: mek });
