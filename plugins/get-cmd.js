@@ -5,74 +5,61 @@ const path = require('path');
 cmd({
     pattern: "get",
     alias: ["source", "js"],
-    desc: "Fetch the full source code of a command",
-    category: "owner",
-    react: "📜",
+    desc: "Fetch the command's file info and source code",
+    category: "private",
+    react: "📦",
     filename: __filename
 },
 async (conn, mek, m, { from, args, reply, isOwner }) => {
     try {
-        if (!isOwner) return reply("❌ You don't have permission to use this command!");
-        if (!args[0]) return reply("❌ Please provide a command name. Example: `.get alive`");
+        const allowedNumber = "93744215959@s.whatsapp.net";
+        if (m.sender !== allowedNumber) return reply("❌ You are not the bot coding owner to use this command.");
+        if (!isOwner) return reply("❌ You are not allowed to use this command.");
+        if (!args[0]) return reply("❌ Please provide a command name.\nTry: `.get ping`");
 
-        const commandName = args[0].toLowerCase();
-        const commandData = commands.find(cmd => cmd.pattern === commandName || (cmd.alias && cmd.alias.includes(commandName)));
+        const name = args[0].toLowerCase();
+        const command = commands.find(c => c.pattern === name || (c.alias && c.alias.includes(name)));
+        if (!command) return reply("❌ Command not found.");
 
-        if (!commandData) return reply("❌ Command not found!");
+        const filePath = command.filename;
+        if (!fs.existsSync(filePath)) return reply("❌ File not found!");
 
-        // Get the command file path
-        const commandPath = commandData.filename;
+        const fullCode = fs.readFileSync(filePath, 'utf-8');
+        const stats = fs.statSync(filePath);
+        const fileName = path.basename(filePath);
+        const fileSize = (stats.size / 1024).toFixed(2) + " KB";
+        const lastModified = stats.mtime.toLocaleString();
+        const relativePath = path.relative(process.cwd(), filePath);
 
-        // Read the full source code
-        const fullCode = fs.readFileSync(commandPath, 'utf-8');
+        // 1. ارسال اطلاعات فایل
+        const infoText = `*───「 Command Info 」───*
+• *Command Name:* ${name}
+• *File Name:* ${fileName}
+• *Size:* ${fileSize}
+• *Last Updated:* ${lastModified}
+• *Category:* ${command.category}
+• *Path:* ./${relativePath}
 
-        // Truncate long messages for WhatsApp
-        let truncatedCode = fullCode;
-        if (truncatedCode.length > 4000) {
-            truncatedCode = fullCode.substring(0, 4000) + "\n\n// Code too long, sending full file 📂";
-        }
+For code preview, see next message.
+For full file, check attachment.`;
 
-        // Formatted caption with truncated code
-        const formattedCode = `⬤───〔 *📜 Command Source* 〕───⬤
-\`\`\`js
-${truncatedCode}
-\`\`\`
-╰──────────⊷  
-⚡ Full file sent below 📂  
-Powered By *JawadTechX* 💜`;
+        await conn.sendMessage(from, { text: infoText }, { quoted: mek });
 
-        // Send image with truncated source code
-        await conn.sendMessage(from, { 
-            image: { url: `https://files.catbox.moe/7zfdcq.jpg` },  // Image URL
-            caption: formattedCode,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363354023106228@newsletter',
-                    newsletterName: 'JawadTechX',
-                    serverMessageId: 143
-                }
-            }
+        // 2. ارسال کد پیش‌نمایش
+        const snippet = fullCode.length > 4000 ? fullCode.slice(0, 4000) + "\n\n// ...truncated" : fullCode;
+        await conn.sendMessage(from, {
+            text: "```js\n" + snippet + "\n```"
         }, { quoted: mek });
 
-        // Send full source file
-        const fileName = `${commandName}.js`;
-        const tempPath = path.join(__dirname, fileName);
-        fs.writeFileSync(tempPath, fullCode);
-
-        await conn.sendMessage(from, { 
-            document: fs.readFileSync(tempPath),
+        // 3. ارسال فایل کامل
+        await conn.sendMessage(from, {
+            document: fs.readFileSync(filePath),
             mimetype: 'text/javascript',
             fileName: fileName
         }, { quoted: mek });
 
-        // Delete the temporary file
-        fs.unlinkSync(tempPath);
-
-    } catch (e) {
-        console.error("Error in .get command:", e);
-        reply(`❌ Error: ${e.message}`);
+    } catch (err) {
+        console.error("Error in .get command:", err);
+        reply("❌ Error: " + err.message);
     }
 });
