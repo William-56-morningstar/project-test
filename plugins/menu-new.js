@@ -14,12 +14,12 @@ cmd({
         const menuCaption = `╭━━━〔 *${config.BOT_NAME}* 〕━━━┈⊷
 ┃★╭──────────────
 ┃★│ 👑 Owner : *${config.OWNER_NAME}*
-┃★│ 🤖 Baileys : *Multi Device*
+┃★│ 🤖 Baileys : * NOTHING APIS*
 ┃★│ 💻 Type : *NodeJs*
 ┃★│ 🚀 Platform : *Heroku*
 ┃★│ ⚙️ Mode : *[${config.MODE}]*
 ┃★│ 🔣 Prefix : *[${config.PREFIX}]*
-┃★│ 🏷️ Version : *4.0.0 Bᴇᴛᴀ*
+┃★│ 🏷️ Version : *2.0.0*
 ┃★╰──────────────
 ╰━━━━━━━━━━━━━━━┈⊷
 ╭━━〔 *Menu List* 〕━━┈⊷
@@ -39,15 +39,9 @@ cmd({
 > ${config.DESCRIPTION}`;
 
         const contextInfo = {
-            mentionedJid: [m.sender],
-            forwardingScore: 999,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-                newsletterJid: '1206333358997689@newsletter',
-                newsletterName: config.OWNER_NAME,
-                serverMessageId: 143
-            }
-        };
+    forwardingScore: 999,
+    isForwarded: true
+};
 
         // Function to send menu image with timeout
         const sendMenuImage = async () => {

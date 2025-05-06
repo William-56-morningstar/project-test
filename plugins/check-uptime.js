@@ -6,7 +6,7 @@ cmd({
     pattern: "uptime",
     alias: ["runtime","runtime2"],use: '.runtime',
     desc: "Check bot's response time.",
-    category: "system",
+    category: "main",
     react: "⚡",
     filename: __filename
 },

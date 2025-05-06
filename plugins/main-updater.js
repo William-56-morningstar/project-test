@@ -11,7 +11,7 @@ cmd({
     alias: ["upgrade", "sync"],
     react: '🆕',
     desc: "Update the bot to the latest version.",
-    category: "system",
+    category: "misc",
     filename: __filename
 }, async (client, message, args, { reply, isOwner }) => {
     if (!isOwner) return reply("This command is only for the bot owner.");
@@ -54,7 +54,17 @@ cmd({
         fs.unlinkSync(zipPath);
         fs.rmSync(extractPath, { recursive: true, force: true });
 
-        await reply("✅ Update complete!");
+        await reply("✅ Update complete! Restarting BEN-BOT...");
+
+        // Restart via PM2
+        exec("pm2 restart BEN-BOT", (err, stdout, stderr) => {
+            if (err) {
+                console.error("PM2 Restart Error:", stderr);
+                reply("⚠️ Update applied but PM2 restart failed. Restart manually.");
+                return;
+            }
+            console.log("PM2 Restarted:", stdout);
+        });
 
     } catch (error) {
         console.error("Update error:", error);
