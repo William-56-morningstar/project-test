@@ -35,7 +35,7 @@ cmd({
         const uptime = runtime(process.uptime());
         const startTime = new Date(Date.now() - process.uptime() * 1000);
         
-        const text = `${config.SESSION_ID}\nResponse Time: ${responseTime} seconds\nUptime: ${uptime}`;
+        const text = `${config.SESSION_ID}\n\n\n> Response Time: ${responseTime} seconds\n> Uptime: ${uptime}`;
 
         // ارسال تصویر همراه با متن
         await conn.sendMessage(from, {
