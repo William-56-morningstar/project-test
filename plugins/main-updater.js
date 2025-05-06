@@ -1,97 +1,95 @@
-const { cmd } = require("../command");
-const axios = require('axios');
-const fs = require('fs');
-const path = require("path");
-const AdmZip = require("adm-zip");
-const { setCommitHash, getCommitHash } = require('../data/updateDB');
-const { exec } = require("child_process");
+const { cmd } = require("../command");  
+const axios = require('axios');  
+const fs = require('fs');  
+const path = require("path");  
+const AdmZip = require("adm-zip");  
 
-cmd({
-    pattern: "update",
-    alias: ["upgrade", "sync"],
-    react: '🆕',
-    desc: "Update the bot to the latest version.",
-    category: "misc",
-    filename: __filename
-}, async (client, message, args, { reply, isOwner }) => {
-    if (!isOwner) return reply("This command is only for the bot owner.");
+cmd({  
+  pattern: "update",  
+  alias: ["upgrade", "sync"],  
+  react: '🆕',  
+  desc: "Update the bot to the latest version.",  
+  category: "misc",  
+  filename: __filename  
+}, async (client, message, args, { from, reply, sender, isOwner }) => {  
+  if (!isOwner) {  
+    return reply("This command is only for the bot owner.");  
+  }  
 
-    try {
-        await reply("🔍 Checking for BEN-BOT updates...");
+  try {  
+    await reply("```🔍 Checking for BEN-BOT updates...```\n");  
+      
+    // Get latest commit from GitHub  
+    const { data: commitData } = await axios.get("https://api.github.com/repos/NOTHING-MD420/project-test/commits/main");  
+    const latestCommitHash = commitData.sha;  
 
-        // Get latest commit from GitHub
-        const { data: commitData } = await axios.get("https://api.github.com/repos/NOTHING-MD420/project-test/commits/main");
-        const latestCommitHash = commitData.sha;
+    // Get current commit hash  
+    let currentHash = 'unknown';  
+    try {  
+      const packageJson = require('../package.json');  
+      currentHash = packageJson.commitHash || 'unknown';  
+    } catch (error) {  
+      console.error("Error reading package.json:", error);  
+    }  
 
-        // Compare with current hash
-        const currentHash = await getCommitHash();
-        if (latestCommitHash === currentHash) {
-            return reply("✅ BEN-BOT is already up-to-date.");
-        }
+    if (latestCommitHash === currentHash) {  
+      return reply("```✅ Your BEN-BOT bot is already up-to-date!```\n");  
+    }  
 
-        await reply("🚀 Updating BEN-BOT...");
+    await reply("```BEN-BOT Bot Updating...🚀```\n");  
+      
+    // Download latest code  
+    const zipPath = path.join(__dirname, "latest.zip");  
+    const { data: zipData } = await axios.get("https://github.com/NOTHING-MD420/project-test/archive/main.zip", { responseType: "arraybuffer" });  
+    fs.writeFileSync(zipPath, zipData);  
 
-        // Download new code
-        const zipPath = path.join(__dirname, "latest.zip");
-        const { data: zipData } = await axios.get("https://github.com/NOTHING-MD420/project-test/archive/main.zip", { responseType: "arraybuffer" });
-        fs.writeFileSync(zipPath, zipData);
+    await reply("```📦 Extracting the latest code...```\n");  
+      
+    // Extract ZIP file  
+    const extractPath = path.join(__dirname, 'latest');  
+    const zip = new AdmZip(zipPath);  
+    zip.extractAllTo(extractPath, true);  
 
-        // Extract
-        await reply("📦 Extracting...");
-        const extractPath = path.join(__dirname, 'latest');
-        const zip = new AdmZip(zipPath);
-        zip.extractAllTo(extractPath, true);
+    await reply("```🔄 Replacing files...```\n");  
+      
+    // Copy updated files, skipping config.js and app.json  
+    const sourcePath = path.join(extractPath, "AWAIS-MD-V3-main");  
+    const destinationPath = path.join(__dirname, '..');  
+    copyFolderSync(sourcePath, destinationPath);  
 
-        // Correct folder name from ZIP
-        const sourcePath = path.join(extractPath, "project-test-main");
-        const destinationPath = path.join(__dirname, '..');
-        copyFolderSync(sourcePath, destinationPath);
+    // Cleanup  
+    fs.unlinkSync(zipPath);  
+    fs.rmSync(extractPath, { recursive: true, force: true });  
 
-        // Save commit hash
-        await setCommitHash(latestCommitHash);
+    await reply("```🔄 Restarting the bot to apply updates...```\n");  
+    process.exit(0);  
+  } catch (error) {  
+    console.error("Update error:", error);  
+    reply("❌ Update failed. Please try manually.");  
+  }  
+});  
 
-        // Cleanup
-        fs.unlinkSync(zipPath);
-        fs.rmSync(extractPath, { recursive: true, force: true });
+// Helper function to copy directories while preserving config.js and app.json  
+function copyFolderSync(source, target) {  
+  if (!fs.existsSync(target)) {  
+    fs.mkdirSync(target, { recursive: true });  
+  }  
 
-        await reply("✅ Update complete! Restarting BEN-BOT...");
+  const items = fs.readdirSync(source);  
+  for (const item of items) {  
+    const srcPath = path.join(source, item);  
+    const destPath = path.join(target, item);  
 
-        // Restart via PM2
-        exec("pm2 restart BEN-BOT", (err, stdout, stderr) => {
-            if (err) {
-                console.error("PM2 Restart Error:", stderr);
-                reply("⚠️ Update applied but PM2 restart failed. Restart manually.");
-                return;
-            }
-            console.log("PM2 Restarted:", stdout);
-        });
+    // Skip config.js and app.json  
+    if (item === "config.js" || item === "app.json") {  
+      console.log(`Skipping ${item} to preserve custom settings.`);  
+      continue;  
+    }  
 
-    } catch (error) {
-        console.error("Update error:", error);
-        return reply("❌ Update failed. Please try manually.");
-    }
-});
-
-function copyFolderSync(source, target) {
-    if (!fs.existsSync(target)) {
-        fs.mkdirSync(target, { recursive: true });
-    }
-
-    const items = fs.readdirSync(source);
-    for (const item of items) {
-        const srcPath = path.join(source, item);
-        const destPath = path.join(target, item);
-
-        // Skip custom config files
-        if (item === "config.js" || item === "app.json") {
-            console.log(`Skipping ${item} to preserve settings.`);
-            continue;
-        }
-
-        if (fs.lstatSync(srcPath).isDirectory()) {
-            copyFolderSync(srcPath, destPath);
-        } else {
-            fs.copyFileSync(srcPath, destPath);
-        }
-    }
+    if (fs.lstatSync(srcPath).isDirectory()) {  
+      copyFolderSync(srcPath, destPath);  
+    } else {  
+      fs.copyFileSync(srcPath, destPath);  
+    }  
+  }  
 }
