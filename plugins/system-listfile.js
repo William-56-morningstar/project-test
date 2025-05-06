@@ -12,26 +12,30 @@ cmd({
 },
 async (conn, mek, m, { from, args, reply, isOwner }) => {
     try {
-        
+        let targetPath = './'; // مسیر پیش‌فرض به پوشه جاری
 
-        let targetPath = './'; // مسیر پیش‌فرض
-
+        // اگر آرگومان وجود داشته باشد (مثل lib یا هر پوشه دیگر)
         if (args.length >= 1) {
+            // مسیر دقیق دایرکتوری را مشخص می‌کنیم
             targetPath = path.join('./', args[0]);
         }
 
+        // چک می‌کنیم که دایرکتوری مورد نظر وجود دارد
         if (!fs.existsSync(targetPath)) {
             return reply(`⚠️ The directory "${targetPath}" does not exist.`);
         }
 
+        // لیست کردن فایل‌ها در دایرکتوری
         const files = fs.readdirSync(targetPath);
 
         if (files.length === 0) {
             return reply(`📂 No files found in the directory: "${targetPath}"`);
         }
 
+        // آماده کردن لیست فایل‌ها
         const fileList = files.map((file, index) => `${index + 1}. ${file}`).join('\n');
 
+        // ارسال پیام با لیست فایل‌ها
         await conn.sendMessage(from, {
             text: `📂 Files in directory *${targetPath}*:\n\n${fileList}`,
             quoted: mek
