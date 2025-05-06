@@ -40,10 +40,6 @@ ${uptimeFormatted}
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
     }, { quoted: message });
-    
-    await client.sendMessage(message.chat, {
-            react: { text: "✅", key: m.key }
-        });
         
   } catch (err) {
     console.error("Alive Command Error:", err);
