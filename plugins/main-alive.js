@@ -1,49 +1,42 @@
-const { cmd } = require('../command');
+const axios = require("axios");
+const fs = require("fs");
 const os = require("os");
-const { runtime } = require('../lib/functions');
-const config = require('../config');
+const path = require("path");
+const FormData = require("form-data");
+const { cmd } = require("../command");
 
 cmd({
-    pattern: "alive",
-    alias: ["status", "online", "a"],
-    desc: "Check bot is alive or not",
-    category: "main",
-    react: "⚡",
-    filename: __filename
-},
-async (conn, mek, m, { from, sender, reply }) => {
-    try {
-        const status = `
-╭───〔 *🤖 ${config.BOT_NAME} STATUS* 〕───◉
-│✨ *Bot is Active & Online!*
-│
-│🧠 *Owner:* ${config.OWNER_NAME}
-│⚡ *Version:* 4.0.0
-│📝 *Prefix:* [${config.PREFIX}]
-│📳 *Mode:* [${config.MODE}]
-│💾 *RAM:* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
-│🖥️ *Host:* ${os.hostname()}
-│⌛ *Uptime:* ${runtime(process.uptime())}
-╰────────────────────◉
-> ${config.DESCRIPTION}`;
+  pattern: "alive",
+  alias: ["alive2", "zindaa", "heee"],
+  react: "⏳",
+  desc: "Upload media to cdn.apis-nothing.xyz and get stream/download links",
+  category: "system",
+  filename: __filename
+}, async (client, message, args, { reply }) => {
+  try {
+    const quoted = message.quoted || message;
+    const mime = quoted?.mimetype;
+    const start = new Date().getTime();
+    const end = new Date().getTime();
+    const responseTime = (end - start) / 1000;
+    const uptime = runtime(process.uptime());
+    const startTime = new Date(Date.now() - process.uptime() * 1000);
+        
+    const status = `
+*BEN BOT IS RUNNING!!*
+*BOT UPTIME INFO:*
+*╭═════════════════⊷*
+*┃❍ ${uptime}*
+*╰═════════════════⊷*
+      `;
 
-        await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL },
-            caption: status,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 1000,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363354023106228@newsletter',
-                    newsletterName: 'JawadTechX',
-                    serverMessageId: 143
-                }
-            }
-        }, { quoted: mek });
+    await client.sendMessage(message.chat, {
+      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+      caption: status,
+    }, { quoted: message });
 
-    } catch (e) {
-        console.error("Alive Error:", e);
-        reply(`An error occurred: ${e.message}`);
-    }
+  } catch (err) {
+    console.error("Upload Error:", err);
+    await reply(`❌ Error: ${err.message || err}`);
+  }
 });
