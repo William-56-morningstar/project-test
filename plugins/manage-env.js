@@ -19,7 +19,7 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     if (status === "on") {
@@ -41,7 +41,7 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     if (status === "on") {
@@ -83,7 +83,7 @@ cmd({
     category: "settings",
     filename: __filename,
 }, async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply(config.ONLYOWNER);
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     if (!args[0]) {
         const text = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n\n╭────────────────◆\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
@@ -151,7 +151,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     if (!["on", "off"].includes(status)) {
@@ -173,7 +173,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -200,7 +200,7 @@ cmd({
     filename: __filename
 },
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     if (status === "on") {
@@ -225,7 +225,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     if (!["on", "off"].includes(status)) {
@@ -252,7 +252,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Default value for AUTO_VIEW_STATUS is "false"
@@ -277,7 +277,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Default value for AUTO_LIKE_STATUS is "false"
@@ -303,7 +303,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -328,7 +328,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -355,7 +355,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -380,7 +380,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -405,7 +405,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -431,7 +431,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
@@ -456,7 +456,7 @@ cmd({
     filename: __filename
 },    
 async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const status = args[0]?.toLowerCase();
     // Check the argument for enabling or disabling the anticall feature
