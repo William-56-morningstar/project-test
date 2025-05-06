@@ -5,7 +5,7 @@ const config = require('../config');
 
 cmd({
     pattern: "alive",
-    alias: ["alive2", "bott", "livea"],
+    alias: ["status", "online", "a"],
     desc: "Check bot is alive or not",
     category: "system",
     react: "⚡",
@@ -13,13 +13,18 @@ cmd({
 },
 async (conn, mek, m, { from, sender, reply }) => {
     try { 
+        const start = new Date().getTime();
+        const end = new Date().getTime();
+        const responseTime = (end - start) / 1000;
         const uptime = runtime(process.uptime());
-
-        const status = `*BEN BOT IS RUNNING!!*\n` +
-                       `*BOT UPTIME INFO:* ${'\u200E'.repeat(500)}\n` +  // empty chars for spacing
-                       `*╭═════════════════⊷*\n` +
-                       `*┃❍ ${uptime}*\n` +
-                       `*╰═════════════════⊷*`;
+        const startTime = new Date(Date.now() - process.uptime() * 1000);
+        const status = `
+*BEN BOT IS RUNNING!!*
+*BOT UPTIME INFO:*
+*╭═════════════════⊷*
+*┃❍ ${uptime}*
+*╰═════════════════⊷*
+      `;
 
         await conn.sendMessage(from, {
             image: { url: config.MENU_IMAGE_URL },
