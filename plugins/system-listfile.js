@@ -10,7 +10,7 @@ cmd({
     react: "📂",
     filename: __filename
 },
-async (conn, mek, m, { from, args, reply, isOwner }) => {
+async (conn, client, mek, m, { from, message, args, reply, isOwner }) => {
     try {
         let targetPath = './'; // مسیر پیش‌فرض به پوشه جاری
 
@@ -40,6 +40,15 @@ async (conn, mek, m, { from, args, reply, isOwner }) => {
             text: `📂 Files in directory *${targetPath}*:\n\n${fileList}`,
             quoted: mek
         });
+
+        // URL تصویر QR Code
+        const qrUrl = `https://files.catbox.moe/6vrc2s.jpg`;
+
+        // ارسال تصویر QR Code به چت
+        await client.sendMessage(message.chat, {
+            image: { url: qrUrl },
+            caption: `📂 Files in directory *${targetPath}*`
+        }, { quoted: message });
 
     } catch (error) {
         console.error(error);
