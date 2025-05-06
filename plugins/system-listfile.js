@@ -63,6 +63,8 @@ ${fileList}
 *╰═════════════════⊷*
 
 📊 *Total Size:* ${sizeInMB} MB
+
+For get gitfile ${targetPath}
     `;
 
     // ارسال پیام با لیست فایل‌ها و اندازه دایرکتوری

@@ -39,7 +39,7 @@ cmd({
 
         // ارسال تصویر همراه با متن
         await conn.sendMessage(from, {
-            image: { url: "https://example.com/path_to_image.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
             caption: text
         }, { quoted: mek });
 
