@@ -85,7 +85,7 @@ admin: process.env.MESSAGE_ADMIN || "_*❗This Command Can Only Be Used By Group
 botAdmin: process.env.MESSAGE_BOT_ADMIN || "_*❗This Command Can Only Be Used When Bot Becomes Group Admin !*_",
 OnlyOwner: process.env.MESSAGE_OWNER || "_*❗This Command Can Only Be Used By My Owner !*_",
 OnlyGrup: process.env.MESSAGE_GROUP || "_*❗This Command Can Only Be Used In Group Chat !*_",
-private: process.env.MESSAGE_PRIVATE || "_*❗This Command Can Only Be Used In Private Chat !*_",
+privatee: process.env.MESSAGE_PRIVATE || "_*❗This Command Can Only Be Used In Private Chat !*_",
 notregist: process.env.MESSAGE_NOT_REGIST || "_*You are not registered in the Bot Database. Please register first*_",
 premium: process.env.MESSAGE_PREMIUM || "_*Premium only" Want Premium? Chat Owner*_",
 endLimit: process.env.MESSAGE_END_LIMIT || "_*Your Daily Limit Has Been Used Up, The Limit Will Be Reset Every 00:00 AM_*.",
