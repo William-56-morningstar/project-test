@@ -74,6 +74,7 @@ cmd({
     return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
 });
 
+
 cmd({
     pattern: "mode",
     alias: ["setmode"],
@@ -84,11 +85,53 @@ cmd({
 }, async (conn, mek, m, { from, args, isCreator, reply }) => {
     if (!isCreator) return reply("*📛 Only the owner can use this command!*");
 
-    // Si aucun argument n'est fourni, afficher le mode actuel et l'usage
+    // اگر هیچ آرگومان داده نشد، نمایش منوی تعاملی با گزینه‌ها
     if (!args[0]) {
-        return reply(`📌 Current mode: *${config.MODE}*\n\nUsage: .mode private OR .mode public`);
+        const modeCaption = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n\n╭────────────────◆\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
+
+        const sentMsg = await conn.sendMessage(from, { text: modeCaption }, { quoted: mek });
+        const messageID = sentMsg.key.id;
+
+        // هندلر پاسخ
+        const handler = async (msgData) => {
+            try {
+                const receivedMsg = msgData.messages[0];
+                if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
+
+                const isReply = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === messageID;
+                if (!isReply) return;
+
+                const replyText = receivedMsg.message?.conversation || receivedMsg.message?.extendedTextMessage?.text;
+                const sender = receivedMsg.key.remoteJid;
+
+                if (replyText === "1") {
+                    config.MODE = "public";
+                    await conn.sendMessage(sender, { text: "✅ Bot mode is now set to *PUBLIC*." }, { quoted: receivedMsg });
+                } else if (replyText === "2") {
+                    config.MODE = "private";
+                    await conn.sendMessage(sender, { text: "✅ Bot mode is now set to *PRIVATE*." }, { quoted: receivedMsg });
+                } else {
+                    await conn.sendMessage(sender, { text: "❌ Invalid option. Please reply with *1* or *2*." }, { quoted: receivedMsg });
+                }
+
+                // پاک کردن لیسنر پس از پاسخ
+                conn.ev.off("messages.upsert", handler);
+            } catch (e) {
+                console.log("Mode handler error:", e);
+            }
+        };
+
+        conn.ev.on("messages.upsert", handler);
+
+        // بعد از 2 دقیقه حذف شود
+        setTimeout(() => {
+            conn.ev.off("messages.upsert", handler);
+        }, 120000);
+
+        return;
     }
 
+    // اگر آرگومان مستقیم داده شد
     const modeArg = args[0].toLowerCase();
 
     if (modeArg === "private") {
