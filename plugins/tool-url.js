@@ -50,7 +50,7 @@ cmd({
       caption: msg,
     }, { quoted: message });
     
-    await conn.sendMessage(from, {
+    await client.sendMessage(message.chat, {
             react: { text: "✅", key: m.key }
         });
         
