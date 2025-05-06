@@ -25,8 +25,9 @@ cmd({
 
     // Get current commit hash
     let currentHash = 'unknown';
+    const packagePath = path.join(__dirname, '..', 'package.json');
     try {
-      const packageJson = require('../package.json');
+      const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
       currentHash = packageJson.commitHash || 'unknown';
     } catch (error) {
       console.error("Error reading package.json:", error);
@@ -48,7 +49,6 @@ cmd({
     const zip = new AdmZip(zipPath);
     zip.extractAllTo(extractPath, true);
 
-    // Dynamically find the extracted folder (project-test-main)
     const extractedDir = fs.readdirSync(extractPath).find(d => fs.lstatSync(path.join(extractPath, d)).isDirectory());
     if (!extractedDir) throw new Error("Extraction failed.");
 
@@ -57,6 +57,15 @@ cmd({
 
     await reply("```🔄 Applying updates...```");
     copyFolderSync(sourcePath, destinationPath);
+
+    // Update commitHash in package.json
+    try {
+      const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+      packageData.commitHash = latestCommitHash;
+      fs.writeFileSync(packagePath, JSON.stringify(packageData, null, 2));
+    } catch (error) {
+      console.error("Failed to update commitHash:", error);
+    }
 
     // Cleanup
     fs.unlinkSync(zipPath);
