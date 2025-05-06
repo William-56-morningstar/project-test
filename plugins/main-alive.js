@@ -1,6 +1,7 @@
 const axios = require("axios");
 const fs = require("fs");
 const os = require("os");
+const { runtime } = require('../lib/functions');
 const path = require("path");
 const FormData = require("form-data");
 const { cmd } = require("../command");
