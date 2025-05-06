@@ -41,7 +41,7 @@ ${uptimeFormatted}
       caption: status.trim(),
     }, { quoted: message });
     
-    await conn.sendMessage(from, {
+    await client.sendMessage(from, {
             react: { text: "✅", key: m.key }
         });
         
