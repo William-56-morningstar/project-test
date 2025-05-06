@@ -4,13 +4,13 @@ const config = require('../config');
 
 cmd({
     pattern: "getsession",
-    alias: ["sessionid","getsession 2"],use: '.getsession',
+    alias: ["sessionid", "getsession 2"],
+    use: '.getsession',
     desc: "Check bot's response time.",
     category: "system",
     react: "⚡",
     filename: __filename
-},
-async (conn, mek, m, { from, quoted, sender, reply }) => {
+}, async (conn, mek, m, { from, quoted, sender, reply }) => {
     try {
         const start = new Date().getTime();
 
@@ -35,14 +35,16 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         const uptime = runtime(process.uptime());
         const startTime = new Date(Date.now() - process.uptime() * 1000);
         
-        
-        const text = (config.SESSION_ID);
+        const text = `${config.SESSION_ID}\nResponse Time: ${responseTime} seconds\nUptime: ${uptime}`;
 
+        // ارسال تصویر همراه با متن
         await conn.sendMessage(from, {
-            text}, { quoted: mek });
+            image: { url: "https://example.com/path_to_image.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+            caption: text
+        }, { quoted: mek });
 
     } catch (e) {
         console.error("Error in ping command:", e);
         reply(`An error occurred: ${e.message}`);
     }
-})
+});
