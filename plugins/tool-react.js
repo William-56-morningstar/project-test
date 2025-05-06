@@ -5,10 +5,10 @@ cmd({
     desc: "React with ❤️ to a message from a specific group or channel using URL",
     category: "tools",
     filename: __filename
-}, async (conn, m, { from, args, reply }) => {
+}, async (client, message, m, { args, reply }) => {
     try {
-        // بررسی اینکه آیا URL ارائه شده است
-        if (!args[0]) {
+        // بررسی اینکه آیا آرگومان وارد شده است
+        if (!args || args.length === 0) {
             return reply("❌ Please provide the message URL.");
         }
 
@@ -16,7 +16,7 @@ cmd({
         const reactionEmoji = '❤️'; // ایموجی ریکشن
 
         // ارسال ریکشن به پیام با استفاده از URL
-        await conn.sendMessage(from, {
+        await client.sendMessage(message.chat, {
             'reaction': {
                 text: reactionEmoji,
                 key: { remoteJid: messageUrl }
