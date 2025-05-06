@@ -285,10 +285,20 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
     m.react(randomReaction);
 }
         
-  //==========WORKTYPE============ 
+  /*//==========WORKTYPE============ 
   if(!isOwner && config.MODE === "private") return
   if(!isOwner && isGroup && config.MODE === "inbox") return
   if(!isOwner && !isGroup && config.MODE === "groups") return
+   */
+   
+  const ownerFile = JSON.parse(fs.readFileSync('./plugins/owner.json', 'utf-8'))
+  const isFileOwner = ownerFile.includes(sender)
+  const isRealOwner = isOwner && isFileOwner
+// TERMS AND CONDITIONS 
+  if (!isRealOwner && config.MODE === "private") return
+  if (!isRealOwner && isGroup && config.MODE === "inbox") return
+  if (!isRealOwner && !isGroup && config.MODE === "groups") return
+   
    
   // take commands 
                  
