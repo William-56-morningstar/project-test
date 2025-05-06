@@ -40,7 +40,11 @@ ${uptimeFormatted}
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
     }, { quoted: message });
-
+    
+    await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+        
   } catch (err) {
     console.error("Alive Command Error:", err);
     await reply(`❌ Error: ${err.message || err}`);

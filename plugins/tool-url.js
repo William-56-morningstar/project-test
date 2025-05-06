@@ -49,7 +49,11 @@ cmd({
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: msg,
     }, { quoted: message });
-
+    
+    await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+        
   } catch (err) {
     console.error("Upload Error:", err);
     await reply(`❌ Error: ${err.message || err}`);
