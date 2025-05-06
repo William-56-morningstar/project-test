@@ -11,39 +11,43 @@ cmd({
     filename: __filename,
 },
 async (conn, mek, m, { from, reply }) => {
-    const githubRepoURL = 'https://github.com/NOTHING-MD420/Ben-bot-v2';
+    const githubRepoURL = 'https://github.com/NOTHING-MD420/project-test';
 
     try {
-        const [, username, repoName] = githubRepoURL.match(/github\.com\/([^/]+)\/([^/]+)/);
+        const match = githubRepoURL.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (!match) throw new Error("Invalid GitHub repository URL.");
+
+        const [, username, repoName] = match;
+
         const response = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
-        
         if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
+
         const repoData = await response.json();
 
-        // Format 1: Classic Box
         const style1 = `Hey there👋,
-You are chatting with *BEN BOT,* A powerful Whatsapp bot created by *Nothing Tech,*
- Packed with smart features to elevate your WhatsApp experience like never before!
+You are chatting with *BEN BOT,* A powerful WhatsApp bot created by *Nothing Tech,*
+Packed with smart features to elevate your WhatsApp experience like never before!
 
-*ʀᴇᴘᴏ ʟɪɴᴋ:* https://github.com/NOTHING-MD420/Ben-bot-v2
+*ʀᴇᴘᴏ ʟɪɴᴋ:* ${githubRepoURL}
 
-*❲❒❳ ɴᴀᴍᴇ:* BEN-BOT
+*❲❒❳ ɴᴀᴍᴇ:* ${repoData.name || "BEN-BOT"}
 *❲❒❳ sᴛᴀʀs:* ${repoData.stargazers_count}
 *❲❒❳ ғᴏʀᴋs:* ${repoData.forks_count}
-*❲❒❳ ᴄʀᴇᴀᴛᴇᴅ ᴏɴ:* 1/1/2025
+*❲❒❳ ᴄʀᴇᴀᴛᴇᴅ ᴏɴ:* ${new Date(repoData.created_at).toLocaleDateString()}
 *❲❒❳ ʟᴀsᴛ ᴜᴘᴅᴀᴛᴇᴅ:* ${new Date(repoData.updated_at).toLocaleDateString()}
-*❲❒❳ ᴏᴡɴᴇʀ:* 𝐍𝐨𝐭𝐡𝐢𝐧𝐠 𝐓𝐞𝐜𝐡 `;
+*❲❒❳ ᴏᴡɴᴇʀ:* ${repoData.owner?.login || "Nothing Tech"}`;
 
-        // Send image with repo info
         await conn.sendMessage(from, {
             image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/6vrc2s.jpg' },
             caption: style1,
         }, { quoted: mek });
-        
-        await conn.sendMessage(from, {
-      react: { text: "✅", key: m.key }
-    });
-    
+
+        if (conn.sendMessage) {
+            await conn.sendMessage(from, {
+                react: { text: "✅", key: m.key }
+            });
+        }
+
     } catch (error) {
         console.error("Repo command error:", error);
         reply(`❌ Error: ${error.message}`);
