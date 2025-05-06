@@ -7,11 +7,11 @@ cmd({
     alias: ["sc", "script", "info"],
     desc: "Fetch GitHub repository information",
     react: "📂",
-    category: "info",
+    category: "system",
     filename: __filename,
 },
 async (conn, mek, m, { from, reply }) => {
-    const githubRepoURL = 'https://github.com/JawadYT36/KHAN-MD';
+    const githubRepoURL = 'https://github.com/NOTHING-MD420/Ben-bot-v2';
 
     try {
         const [, username, repoName] = githubRepoURL.match(/github\.com\/([^/]+)\/([^/]+)/);
@@ -21,183 +21,29 @@ async (conn, mek, m, { from, reply }) => {
         const repoData = await response.json();
 
         // Format 1: Classic Box
-        const style1 = `╭───『 ${config.BOT_NAME} REPO 』───⳹
-│
-│ 📦 *Repository*: ${repoData.name}
-│ 👑 *Owner*: ${repoData.owner.login}
-│ ⭐ *Stars*: ${repoData.stargazers_count}
-│ ⑂ *Forks*: ${repoData.forks_count}
-│ 🔗 *URL*: ${repoData.html_url}
-│
-│ 📝 *Description*:
-│ ${repoData.description || 'No description'}
-│
-╰────────────────⳹
-> ${config.DESCRIPTION}`;
+        const style1 = `Hey there👋,
+You are chatting with *BEN BOT,* A powerful Whatsapp bot created by *Nothing Tech,*
+ Packed with smart features to elevate your WhatsApp experience like never before!
 
-        // Format 2: Minimalist
-        const style2 = `•——[ GITHUB INFO ]——•
-  │
-  ├─ 🏷️ ${repoData.name}
-  ├─ 👤 ${repoData.owner.login}
-  ├─ ✨ ${repoData.stargazers_count} Stars
-  ├─ ⑂ ${repoData.forks_count} Forks
-  │
-  •——[ ${config.BOT_NAME} ]——•
-  > ${config.DESCRIPTION}`;
+*ʀᴇᴘᴏ ʟɪɴᴋ:* https://github.com/NOTHING-MD420/Ben-bot-v2
 
-        // Format 3: Fancy Borders
-        const style3 = `▄▀▄▀▄ REPOSITORY INFO ▄▀▄▀▄
-
-  ♢ *Project*: ${repoData.name}
-  ♢ *Author*: ${repoData.owner.login}
-  ♢ *Stars*: ${repoData.stargazers_count} ✨
-  ♢ *Forks*: ${repoData.forks_count} ⑂
-  ♢ *Updated*: ${new Date(repoData.updated_at).toLocaleDateString()}
-  
-  🔗 ${repoData.html_url}
-  
-  > ${config.DESCRIPTION}`;
-
-        // Format 4: Code Style
-        const style4 = `┌──────────────────────┐
-│  ⚡ ${config.BOT_NAME} REPO  ⚡  │
-├──────────────────────┤
-│ • Name: ${repoData.name}
-│ • Owner: ${repoData.owner.login}
-│ • Stars: ${repoData.stargazers_count}
-│ • Forks: ${repoData.forks_count}
-│ • URL: ${repoData.html_url}
-│ • Desc: ${repoData.description || 'None'}
-└──────────────────────┘
-> ${config.DESCRIPTION}`;
-
-        // Format 5: Modern Blocks
-        const style5 = `▰▰▰▰▰ REPO INFO ▰▰▰▰▰
-
-  🏷️  *${repoData.name}*
-  👨‍💻  ${repoData.owner.login}
-  
-  ⭐ ${repoData.stargazers_count}  ⑂ ${repoData.forks_count}
-  🔗 ${repoData.html_url}
-  
-  📜 ${repoData.description || 'No description'}
-  
-  > ${config.DESCRIPTION}`;
-
-        // Format 6: Retro Terminal
-        const style6 = `╔══════════════════════╗
-║   ${config.BOT_NAME} REPO    ║
-╠══════════════════════╣
-║ > NAME: ${repoData.name}
-║ > OWNER: ${repoData.owner.login}
-║ > STARS: ${repoData.stargazers_count}
-║ > FORKS: ${repoData.forks_count}
-║ > URL: ${repoData.html_url}
-║ > DESC: ${repoData.description || 'None'}
-╚══════════════════════╝
-> ${config.DESCRIPTION}`;
-
-        // Format 7: Elegant
-        const style7 = `┌───────────────┐
-│  📂  REPO  │
-└───────────────┘
-│
-│ *Project*: ${repoData.name}
-│ *Author*: ${repoData.owner.login}
-│
-│ ✨ ${repoData.stargazers_count} Stars
-│ ⑂ ${repoData.forks_count} Forks
-│
-│ 🔗 ${repoData.html_url}
-│
-┌───────────────┐
-│  📝  DESC  │
-└───────────────┘
-${repoData.description || 'No description'}
-
-> ${config.DESCRIPTION}`;
-
-        // Format 8: Social Media Style
-        const style8 = `✦ ${config.BOT_NAME} Repository ✦
-
-📌 *${repoData.name}*
-👤 @${repoData.owner.login}
-
-⭐ ${repoData.stargazers_count} Stars | ⑂ ${repoData.forks_count} Forks
-🔄 Last updated: ${new Date(repoData.updated_at).toLocaleDateString()}
-
-🔗 GitHub: ${repoData.html_url}
-
-${repoData.description || 'No description available'}
-
-> ${config.DESCRIPTION}`;
-
-        // Format 9: Fancy List
-        const style9 = `╔♫═🎧═♫══════════╗
-   ${config.BOT_NAME} REPO
-╚♫═🎧═♫══════════╝
-
-•・゜゜・* ✧  *・゜゜・•
- ✧ *Name*: ${repoData.name}
- ✧ *Owner*: ${repoData.owner.login}
- ✧ *Stars*: ${repoData.stargazers_count}
- ✧ *Forks*: ${repoData.forks_count}
-•・゜゜・* ✧  *・゜゜・•
-
-🔗 ${repoData.html_url}
-
-${repoData.description || 'No description'}
-
-> ${config.DESCRIPTION}`;
-
-        // Format 10: Professional
-        const style10 = `┏━━━━━━━━━━━━━━━━━━┓
-┃  REPOSITORY REPORT  ┃
-┗━━━━━━━━━━━━━━━━━━┛
-
-◈ Project: ${repoData.name}
-◈ Maintainer: ${repoData.owner.login}
-◈ Popularity: ★ ${repoData.stargazers_count} | ⑂ ${repoData.forks_count}
-◈ Last Update: ${new Date(repoData.updated_at).toLocaleDateString()}
-◈ URL: ${repoData.html_url}
-
-Description:
-${repoData.description || 'No description provided'}
-
-> ${config.DESCRIPTION}`;
-
-        const styles = [style1, style2, style3, style4, style5, style6, style7, style8, style9, style10];
-        const selectedStyle = styles[Math.floor(Math.random() * styles.length)];
+*❲❒❳ ɴᴀᴍᴇ:* BEN-BOT
+*❲❒❳ sᴛᴀʀs:* ${repoData.stargazers_count}
+*❲❒❳ ғᴏʀᴋs:* ${repoData.forks_count}
+*❲❒❳ ᴄʀᴇᴀᴛᴇᴅ ᴏɴ:* 1/1/2025
+*❲❒❳ ʟᴀsᴛ ᴜᴘᴅᴀᴛᴇᴅ:* ${new Date(repoData.updated_at).toLocaleDateString()}
+*❲❒❳ ᴏᴡɴᴇʀ:* 𝐍𝐨𝐭𝐡𝐢𝐧𝐠 𝐓𝐞𝐜𝐡 `;
 
         // Send image with repo info
         await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/7zfdcq.jpg' },
-            caption: selectedStyle,
-            contextInfo: { 
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363354023106228@newsletter',
-                    newsletterName: config.OWNER_NAME || 'JawadTechX',
-                    serverMessageId: 143
-                }
-            }
+            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/6vrc2s.jpg' },
+            caption: style1,
         }, { quoted: mek });
-
-        // Send audio
+        
         await conn.sendMessage(from, {
-            audio: { url: 'https://github.com/JawadYT36/KHAN-DATA/raw/refs/heads/main/autovoice/menunew.m4a' },
-            mimetype: 'audio/mp4',
-            ptt: true,
-            contextInfo: { 
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true
-            }
-        }, { quoted: mek });
-
+      react: { text: "✅", key: m.key }
+    });
+    
     } catch (error) {
         console.error("Repo command error:", error);
         reply(`❌ Error: ${error.message}`);
