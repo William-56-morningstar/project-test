@@ -764,8 +764,62 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
   }
   
   app.get("/", (req, res) => {
-  res.send("BEN BOT STARTED ✅");
-  });
+  const htmlResponse = `
+    <!DOCTYPE html>
+    <html lang="fa">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WhatsApp Bot Status</title>
+        <style>
+            body {
+                background: linear-gradient(45deg, #ff00cc, #3333ff);
+                font-family: 'Arial', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                overflow: hidden;
+            }
+
+            .status-container {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(10px);
+                color: #fff;
+                font-size: 24px;
+            }
+
+            .status-container h1 {
+                font-size: 36px;
+                color: #fff;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 20px;
+            }
+
+            .status-container p {
+                font-size: 18px;
+                margin-bottom: 20px;
+                color: #4CAF50;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="status-container">
+            <h1>BEN BOT V2 Status</h1>
+            <p>WhatsApp Bot is running! ✅</p>
+        </div>
+    </body>
+    </html>
+  `;
+  res.send(htmlResponse);
+});
   app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));
   setTimeout(() => {
   connectToWA()
