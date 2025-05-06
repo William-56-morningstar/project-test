@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { cmd } = require("../command");
 
-const OWNER_PATH = path.join(__dirname, "owner.json");
+const OWNER_PATH = path.join(__dirname, "plugins/owner.json");
 
 // مطمئن شو فایل owner.json هست
 const ensureOwnerFile = () => {
@@ -18,20 +18,22 @@ cmd({
   category: "owner",
   filename: __filename
 }, async (conn, m, args, { reply, isCreator }) => {
-  if (!isCreator) return reply("⛔ فقط مالک اصلی می‌تونه این دستور رو بزنه.");
+  if (!isCreator) return reply("⛔ Only the main owner can use this command.");
 
   ensureOwnerFile();
 
   const ownerList = JSON.parse(fs.readFileSync(OWNER_PATH));
   const number = args[0]?.replace(/[^0-9]/g, "");
-  if (!number) return reply("⚠️ شماره را وارد کن: `.addsudo 923001234567`");
+
+  // Check if the phone number is valid
+  if (!number || number.length < 10) return reply("⚠️ Please enter a valid phone number: `.addsudo 923001234567`");
 
   const jid = `${number}@s.whatsapp.net`;
-  if (ownerList.includes(jid)) return reply("✅ این شماره قبلاً اضافه شده.");
+  if (ownerList.includes(jid)) return reply("✅ This number is already in the owner list.");
 
   ownerList.push(jid);
   fs.writeFileSync(OWNER_PATH, JSON.stringify(ownerList, null, 2));
-  reply(`✅ شماره ${jid} با موفقیت به لیست مالکین افزوده شد.`);
+  reply(`✅ The number ${jid} has been successfully added to the owner list.`);
 });
 
 // حذف شماره از owner.json
