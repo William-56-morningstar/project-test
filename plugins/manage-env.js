@@ -85,14 +85,16 @@ cmd({
 }, async (conn, mek, m, { from, args, isCreator, reply }) => {
     if (!isCreator) return reply("*📛 Only the owner can use this command!*");
 
-    // اگر هیچ آرگومان داده نشد، نمایش منوی تعاملی با گزینه‌ها
     if (!args[0]) {
-        const modeCaption = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n\n╭────────────────◆\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
+        const text = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n\n╭────────────────◆\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
-        const sentMsg = await conn.sendMessage(from, { text: modeCaption }, { quoted: mek });
+        const sentMsg = await conn.sendMessage(from, {
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // تصویر منوی مد
+            caption: text
+        }, { quoted: mek });
+
         const messageID = sentMsg.key.id;
 
-        // هندلر پاسخ
         const handler = async (msgData) => {
             try {
                 const receivedMsg = msgData.messages[0];
@@ -114,7 +116,6 @@ cmd({
                     await conn.sendMessage(sender, { text: "❌ Invalid option. Please reply with *1* or *2*." }, { quoted: receivedMsg });
                 }
 
-                // پاک کردن لیسنر پس از پاسخ
                 conn.ev.off("messages.upsert", handler);
             } catch (e) {
                 console.log("Mode handler error:", e);
@@ -123,15 +124,13 @@ cmd({
 
         conn.ev.on("messages.upsert", handler);
 
-        // بعد از 2 دقیقه حذف شود
         setTimeout(() => {
             conn.ev.off("messages.upsert", handler);
-        }, 120000);
+        }, 600000);
 
         return;
     }
 
-    // اگر آرگومان مستقیم داده شد
     const modeArg = args[0].toLowerCase();
 
     if (modeArg === "private") {
