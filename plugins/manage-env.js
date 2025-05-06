@@ -83,7 +83,7 @@ cmd({
     category: "settings",
     filename: __filename,
 }, async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply(global.mess.OnlyOwner);
+    if (!isCreator) return reply(config.OnlyOwner);
 
     if (!args[0]) {
         const text = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n\n╭────────────────◆\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
