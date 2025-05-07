@@ -13,71 +13,100 @@ const ensureOwnerFile = () => {
 
 // افزودن شماره به owner.json
 cmd({
-  pattern: "addsudo",
-  desc: "Add a user to owner list.",
-  category: "owner",
-  filename: __filename
-}, async (conn, m, args, { reply, isCreator }) => {
-  if (!isCreator) return reply("⛔ Only the main owner can use this command.");
+    pattern: "sudo",
+    alias: [],
+    desc: "Add a temporary owner",
+    category: "admin",
+    react: "✅",
+    filename: __filename
+}, async (conn, mek, m, { from, args, reply, isOwner }) => {
+    try {
+        
 
-  ensureOwnerFile();
+        let target = m.mentionedJid?.[0] 
+            || (m.quoted?.sender ?? null)
+            || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
-  const ownerList = JSON.parse(fs.readFileSync(OWNER_PATH));
-  const number = args[0]?.replace(/[^0-9]/g, "");
+        if (!target) return reply("Example: tag/reply/number");
 
-  // Check if the phone number is valid
-  if (!number || number.length < 10) return reply("⚠️ Please enter a valid phone number: `.addsudo 923001234567`");
+        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
-  const jid = `${number}@s.whatsapp.net`;
-  if (ownerList.includes(jid)) return reply("✅ This number is already in the owner list.");
+        if (own.includes(target)) {
+            return reply("❌ This user is already a temporary owner.");
+        }
 
-  ownerList.push(jid);
-  fs.writeFileSync(OWNER_PATH, JSON.stringify(ownerList, null, 2));
-  reply(`✅ The number ${jid} has been successfully added to the owner list.`);
+        own.push(target);
+        const uniqueOwners = [...new Set(own)];
+        fs.writeFileSync("./lib/owner.json", JSON.stringify(uniqueOwners, null, 2));
+
+        reply("✅ Successfully Added User As Temporary Owner");
+    } catch (err) {
+        console.error(err);
+        reply("❌ Error: " + err.message);
+    }
 });
 
 // حذف شماره از owner.json
 cmd({
-  pattern: "delsudo",
-  desc: "Remove a user from owner list.",
-  category: "owner",
-  filename: __filename
-}, async (conn, m, args, { reply, isCreator }) => {
-  if (!isCreator) return reply("⛔ Only the main owner can use this command.");
+    pattern: "delsudo",
+    alias: [],
+    desc: "Remove a temporary owner",
+    category: "admin",
+    react: "❌",
+    filename: __filename
+}, async (conn, mek, m, { from, args, reply, isOwner }) => {
+    try {
 
-  ensureOwnerFile();
 
-  const ownerList = JSON.parse(fs.readFileSync(OWNER_PATH));
-  const number = args[0]?.replace(/[^0-9]/g, "");
-  if (!number) return reply("⚠️ Please provide a number: `.delsudo 923001234567`");
+        let target = m.mentionedJid?.[0] 
+            || (m.quoted?.sender ?? null)
+            || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
-  const jid = `${number}@s.whatsapp.net`;
-  if (!ownerList.includes(jid)) return reply("⚠️ This number is not in the owner list.");
+        if (!target) return reply("Example: tag/reply/number");
 
-  const updatedList = ownerList.filter(x => x !== jid);
-  fs.writeFileSync(OWNER_PATH, JSON.stringify(updatedList, null, 2));
-  reply(`✅ The number ${jid} has been removed from the owner list.`);
+        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
+
+        if (!own.includes(target)) {
+            return reply("❌ User not found in owner list.");
+        }
+
+        const updated = own.filter(x => x !== target);
+        fs.writeFileSync("./lib/owner.json", JSON.stringify(updated, null, 2));
+
+        reply("✅ Successfully Removed User As Temporary Owner");
+    } catch (err) {
+        console.error(err);
+        reply("❌ Error: " + err.message);
+    }
 });
 
 cmd({
-  pattern: "listsudo",
-  desc: "Show the list of owners.",
-  category: "owner",
-  filename: __filename
-}, async (conn, m, args, { reply, isCreator }) => {
-  if (!isCreator) return reply("⛔ Only the main owner can use this command.");
+    pattern: "listsudo",
+    alias: [],
+    desc: "List all temporary owners",
+    category: "admin",
+    react: "📋",
+    filename: __filename
+}, async (conn, mek, m, { from, args, reply, isOwner }) => {
+    try {
+        if (!isOwner) return reply(global.mess.OnlyOwner);
 
-  ensureOwnerFile();
-  const ownerList = JSON.parse(fs.readFileSync(OWNER_PATH));
+        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
-  if (ownerList.length === 0) {
-    return reply("📭 The owner list is empty.");
-  }
+        own = [...new Set(own)]; // حذف تکراری‌ها
 
-  const formatted = ownerList.map((jid, i) => {
-    const number = jid.split("@")[0];
-    return `${i + 1}. wa.me/${number}`;
-  }).join("\n");
+        if (own.length === 0) {
+            return reply("❌ No Owners Found.");
+        }
 
-  reply(`👑 Owner List:\n\n${formatted}`);
+        let listMessage = "*List of Temporary Owners:*\n\n";
+        own.forEach((owner, index) => {
+            listMessage += `${index + 1}. ${owner.replace("@s.whatsapp.net", "")}\n`;
+        });
+
+        reply(listMessage);
+    } catch (err) {
+        console.error(err);
+        reply("❌ Error: " + err.message);
+    }
 });
