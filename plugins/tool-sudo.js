@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { cmd } = require("../command");
 
-const OWNER_PATH = path.join(__dirname, "plugins/owner.json");
+const OWNER_PATH = path.join(__dirname, "../lib/owner.json");
 
 // مطمئن شو فایل owner.json هست
 const ensureOwnerFile = () => {
@@ -43,20 +43,20 @@ cmd({
   category: "owner",
   filename: __filename
 }, async (conn, m, args, { reply, isCreator }) => {
-  if (!isCreator) return reply("⛔ فقط مالک اصلی می‌تونه این دستور رو بزنه.");
+  if (!isCreator) return reply("⛔ Only the main owner can use this command.");
 
   ensureOwnerFile();
 
   const ownerList = JSON.parse(fs.readFileSync(OWNER_PATH));
   const number = args[0]?.replace(/[^0-9]/g, "");
-  if (!number) return reply("⚠️ شماره را وارد کن: `.delsudo 923001234567`");
+  if (!number) return reply("⚠️ Please provide a number: `.delsudo 923001234567`");
 
   const jid = `${number}@s.whatsapp.net`;
-  if (!ownerList.includes(jid)) return reply("⚠️ این شماره در لیست نیست.");
+  if (!ownerList.includes(jid)) return reply("⚠️ This number is not in the owner list.");
 
   const updatedList = ownerList.filter(x => x !== jid);
   fs.writeFileSync(OWNER_PATH, JSON.stringify(updatedList, null, 2));
-  reply(`✅ شماره ${jid} از لیست مالکین حذف شد.`);
+  reply(`✅ The number ${jid} has been removed from the owner list.`);
 });
 
 cmd({
@@ -64,14 +64,14 @@ cmd({
   desc: "Show the list of owners.",
   category: "owner",
   filename: __filename
-}, async (conn, m, args, { reply }) => {
-  if (!isCreator) return reply("⛔ فقط مالک اصلی می‌تونه این دستور رو بزنه.");
+}, async (conn, m, args, { reply, isCreator }) => {
+  if (!isCreator) return reply("⛔ Only the main owner can use this command.");
 
   ensureOwnerFile();
   const ownerList = JSON.parse(fs.readFileSync(OWNER_PATH));
 
   if (ownerList.length === 0) {
-    return reply("📭 لیست مالکین خالی است.");
+    return reply("📭 The owner list is empty.");
   }
 
   const formatted = ownerList.map((jid, i) => {
@@ -79,5 +79,5 @@ cmd({
     return `${i + 1}. wa.me/${number}`;
   }).join("\n");
 
-  reply(`👑 لیست مالکین:\n\n${formatted}`);
+  reply(`👑 Owner List:\n\n${formatted}`);
 });

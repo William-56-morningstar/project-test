@@ -86,7 +86,7 @@ cmd({
     if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     if (!args[0]) {
-        const text = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n\n╭────────────────◆\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
+        const text = `> *BEN-BOT MODE SETTINGS*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* Public Mode\n*2.* Private Mode\n*3.* Inbox Only\n*4.* Groups Only\n\n╭────◆\n│ Powered by Nothing Tech\n╰────◆`;
 
         const sentMsg = await conn.sendMessage(from, {
             image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // تصویر منوی مد
@@ -100,20 +100,34 @@ cmd({
                 const receivedMsg = msgData.messages[0];
                 if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
 
-                const isReply = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === messageID;
+                const quoted = receivedMsg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+                const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+
+                const isReply = quotedId === messageID;
                 if (!isReply) return;
 
-                const replyText = receivedMsg.message?.conversation || receivedMsg.message?.extendedTextMessage?.text;
+                const replyText =
+                    receivedMsg.message?.conversation ||
+                    receivedMsg.message?.extendedTextMessage?.text ||
+                    "";
+
                 const sender = receivedMsg.key.remoteJid;
 
-                if (replyText === "1") {
-                    config.MODE = "public";
-                    await conn.sendMessage(sender, { text: "✅ Bot mode is now set to *PUBLIC*." }, { quoted: receivedMsg });
-                } else if (replyText === "2") {
-                    config.MODE = "private";
-                    await conn.sendMessage(sender, { text: "✅ Bot mode is now set to *PRIVATE*." }, { quoted: receivedMsg });
+                let newMode = "";
+                if (replyText === "1") newMode = "public";
+                else if (replyText === "2") newMode = "private";
+                else if (replyText === "3") newMode = "inbox";
+                else if (replyText === "4") newMode = "groups";
+
+                if (newMode) {
+                    config.MODE = newMode;
+                    await conn.sendMessage(sender, {
+                        text: `✅ Bot mode is now set to *${newMode.toUpperCase()}*.`
+                    }, { quoted: receivedMsg });
                 } else {
-                    await conn.sendMessage(sender, { text: "❌ Invalid option. Please reply with *1* or *2*." }, { quoted: receivedMsg });
+                    await conn.sendMessage(sender, {
+                        text: "❌ Invalid option. Please reply with *1*, *2*, *3* or *4*."
+                    }, { quoted: receivedMsg });
                 }
 
                 conn.ev.off("messages.upsert", handler);
@@ -133,14 +147,11 @@ cmd({
 
     const modeArg = args[0].toLowerCase();
 
-    if (modeArg === "private") {
-        config.MODE = "private";
-        return reply("✅ Bot mode is now set to *PRIVATE*.");
-    } else if (modeArg === "public") {
-        config.MODE = "public";
-        return reply("✅ Bot mode is now set to *PUBLIC*.");
+    if (["public", "private", "inbox", "groups"].includes(modeArg)) {
+      config.MODE = modeArg;
+      return reply(`✅ Bot mode is now set to *${modeArg.toUpperCase()}*.`);
     } else {
-        return reply("❌ Invalid mode. Please use `.mode private` or `.mode public`.");
+      return reply("❌ Invalid mode. Please use `.mode public`, `.mode private`, `.mode inbox`, or `.mode groups`.");
     }
 });
 
