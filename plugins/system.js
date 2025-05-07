@@ -603,3 +603,39 @@ cmd({
     reply('❌ An error occurred while checking the bot version.');
   }
 });
+
+
+cmd({
+  pattern: "checkcmd",
+  react: "🔎",
+  desc: "Check how many times a command keyword appears in plugins",
+  category: "owner",
+  filename: __filename
+}, async (client, message, args, { reply, isOwner }) => {
+  if (!isOwner) return reply("❌ Owner only command.");
+  if (!args[0]) return reply("❌ Please provide a keyword to check.\nExample: `.checkcmd qr`");
+
+  const keyword = args[0].toLowerCase();
+  const pluginsDir = path.join(__dirname);
+  const pluginFiles = fs.readdirSync(pluginsDir).filter(file => file.endsWith('.js'));
+
+  let totalCount = 0;
+  let details = "";
+
+  for (const file of pluginFiles) {
+    const filePath = path.join(pluginsDir, file);
+    const content = fs.readFileSync(filePath, 'utf-8').toLowerCase();
+
+    const matches = content.split(keyword).length - 1;
+    if (matches > 0) {
+      totalCount += matches;
+      details += `📂 *${file}* → ${matches} times\n`;
+    }
+  }
+
+  if (totalCount === 0) {
+    await reply(`❌ No usage of *${keyword}* found in plugins.`);
+  } else {
+    await reply(`✅ *${keyword}* found ${totalCount} times in ${pluginFiles.length} files.\n\n${details}`);
+  }
+});
