@@ -292,15 +292,15 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
    */
    
   const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  // خواندن فایل owner.json
-  const sender = m.sender || m.from;
+  const senderr = m.sender || m.from;
   const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
 
   // بررسی اینکه آیا فرستنده در owner.json موجود است
-  const isFileOwner = ownerFile.includes(sender);
+  const isFileOwner = ownerFile.includes(senderr);
 
   // بررسی مالک بودن
-  const isMe = botNumber.includes(sender.split('@')[0]);  // بررسی اینکه آیا فرستنده شماره ربات است
-  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
+  const isMe = botNumber.includes(senderr.split('@')[0]);  // بررسی اینکه آیا فرستنده شماره ربات است
+  const isRealOwner = senderr === ownerNumberFormatted || isMe || isFileOwner;
   
   // اعمال شرایط بر اساس وضعیت مالک
   if (!isRealOwner && config.MODE === "private") return;
