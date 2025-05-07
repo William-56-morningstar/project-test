@@ -291,15 +291,21 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
   if(!isOwner && !isGroup && config.MODE === "groups") return
    */
    
-  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'))
-  const isFileOwner = ownerFile.includes(sender)
-  const isRealOwner = isOwner && isFileOwner
-// TERMS AND CONDITIONS 
-  if (!isRealOwner && config.MODE === "private") return
-  if (!isRealOwner && isGroup && config.MODE === "inbox") return
-  if (!isRealOwner && !isGroup && config.MODE === "groups") return
-   
-   
+  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  // خواندن فایل owner.json
+  const sender = m.sender || m.from;
+  const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
+
+  // بررسی اینکه آیا فرستنده در owner.json موجود است
+  const isFileOwner = ownerFile.includes(sender);
+
+  // بررسی مالک بودن
+  const isMe = botNumber.includes(sender.split('@')[0]);  // بررسی اینکه آیا فرستنده شماره ربات است
+  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
+  
+  // اعمال شرایط بر اساس وضعیت مالک
+  if (!isRealOwner && config.MODE === "private") return;
+  if (!isRealOwner && isGroup && config.MODE === "inbox") return;
+  if (!isRealOwner && !isGroup && config.MODE === "groups") return;
   // take commands 
                  
   const events = require('./command')
