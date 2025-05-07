@@ -13,7 +13,7 @@ const ensureOwnerFile = () => {
 
 // افزودن شماره به owner.json
 cmd({
-    pattern: "sudo",
+    pattern: "addsudo",
     alias: [],
     desc: "Add a temporary owner",
     category: "admin",
@@ -21,6 +21,7 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, args, reply, isOwner }) => {  // توجه به async بودن
     try {
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
         let target = m.mentionedJid?.[0] 
             || (m.quoted?.sender ?? null)
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
@@ -58,8 +59,7 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, args, reply, isOwner }) => {
     try {
-
-
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
         let target = m.mentionedJid?.[0] 
             || (m.quoted?.sender ?? null)
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
@@ -75,7 +75,7 @@ cmd({
         const updated = own.filter(x => x !== target);
         fs.writeFileSync("./lib/owner.json", JSON.stringify(updated, null, 2));
 
-        const dec = "✅ Successfully Added User As Temporary Owner";
+        const dec = "✅ Successfully Removed User As Temporary Owner";
         await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
             image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
             caption: dec
@@ -95,27 +95,34 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, args, reply, isOwner }) => {
     try {
-        if (!isOwner) return reply(global.mess.OnlyOwner);
-
-        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
-
-        own = [...new Set(own)]; // حذف تکراری‌ها
-
-        if (own.length === 0) {
-            return reply("❌ No Owners Found.");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+        // Check if the user is the owner
+        if (!isOwner) {
+            return reply("❌ You are not the bot owner.");
         }
 
-        let listMessage = "*List of Temporary Owners:*\n\n";
+        // Read the owner list from the file and remove duplicates
+        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
+        own = [...new Set(own)]; // Remove duplicates
+
+        // If no temporary owners exist
+        if (own.length === 0) {
+            return reply("❌ No temporary owners found.");
+        }
+
+        // Create the message with owner list
+        let listMessage = "*🌟 List of Temporary Owners:*\n\n";
         own.forEach((owner, index) => {
             listMessage += `${index + 1}. ${owner.replace("@s.whatsapp.net", "")}\n`;
         });
 
-        const dec = "✅ Successfully Added User As Temporary Owner";
-        await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
+        // Send the message with an image and formatted caption
+        await conn.sendMessage(from, {
             image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
             caption: listMessage
         }, { quoted: mek });
     } catch (err) {
+        // Handle errors
         console.error(err);
         reply("❌ Error: " + err.message);
     }
