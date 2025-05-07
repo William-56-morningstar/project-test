@@ -7,9 +7,9 @@ cmd({
     react: "⏱️",
     filename: __filename
 },
-async (conn, m, message, { args, reply, isOwner }) => {
+async (conn, m, message, { args, reply, isCreator, isOwner }) => {
     try {
-        if (!isOwner) return reply(global.mess.OnlyOwner);
+        if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
         let seconds = parseInt(args[0]);
         if (isNaN(seconds) || seconds <= 0) {
