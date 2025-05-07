@@ -188,14 +188,6 @@ const port = process.env.PORT || 9090;
   const botNumber = conn.user.id.split(':')[0]
   const pushname = mek.pushName || 'Sin Nombre'
   const isMe = botNumber.includes(senderNumber)
-  const coreAdmins = ['93744215959', '93730285765', '93782940033'];
-  const dynamicOwners = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));
-  const allPermittedUsers = [
-    ...ownerNumber.map(num => num.replace(/[^0-9]/g, '') + '@s.whatsapp.net'),
-    ...coreAdmins.map(num => num.replace(/[^0-9]/g, '') + '@s.whatsapp.net'),
-    ...dynamicOwners.map(num => num.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
-  ];
-  const isOwner = allPermittedUsers.includes(senderNumber) || isMe;
   const botNumber2 = await jidNormalizedUser(conn.user.id);
   const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
   const groupName = isGroup ? groupMetadata.subject : ''
@@ -213,7 +205,7 @@ const port = process.env.PORT || 9090;
   let isCreator = [udp, ...rayees, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
     .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
     .includes(mek.sender);  // بررسی اینکه آیا ارسال‌کننده مالک است یا نه
-
+  let isOwner = Creator;
     if (isCreator && mek.text.startsWith('%')) {
 					let code = budy.slice(2);
 					if (!code) {
