@@ -40,9 +40,7 @@ cmd({
       console.log("Old plugins folder removed.");
     }
 
-    await reply("```✅ Plugins updated successfully. Restarting bot...```");
-
-    process.exit(0);
+    await reply("```✅ Plugins updated successfully. bot...```");
 
   } catch (error) {
     console.error("Update error:", error);
