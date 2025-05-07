@@ -21,13 +21,12 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
             case 'on':
                 await setAnti('gc', true);
                 await setAnti('dm', true);
-                await setAnti('dm_mode', false);
-                return reply('_✅ AntiDelete is now enabled in same chats for Group & DM._');
+                return reply('_✅ AntiDelete is now enabled for Group Chats and Direct Messages._');
 
             case 'off':
                 await setAnti('gc', false);
                 await setAnti('dm', false);
-                return reply('_❌ AntiDelete is now disabled for Group Chats and DMs._');
+                return reply('_❌ AntiDelete is now disabled for Group Chats and Direct Messages._');
 
             case 'off gc':
                 await setAnti('gc', false);
@@ -43,28 +42,22 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
                 return reply(`_Group Chat AntiDelete is now ${!gcStatus ? '✅ Enabled' : '❌ Disabled'}._`);
 
             case 'set dm':
-                await setAnti('dm_mode', true);
-                return reply('_✅ AntiDelete for DM is now in "Private Bot Chat" mode._');
-
-            case 'set dm back':
-                await setAnti('dm_mode', false);
-                return reply('_✅ AntiDelete for DM is now in "Same Chat" mode._');
+                const dmStatus = await getAnti('dm');
+                await setAnti('dm', !dmStatus);
+                return reply(`_DM AntiDelete is now ${!dmStatus ? '✅ Enabled' : '❌ Disabled'}._`);
 
             case 'set all':
                 await setAnti('gc', true);
                 await setAnti('dm', true);
-                await setAnti('dm_mode', false);
-                return reply('_✅ AntiDelete enabled for all chats in same chat mode._');
+                return reply('_✅ AntiDelete has been enabled for all chats._');
 
             case 'status':
                 const currentDmStatus = await getAnti('dm');
                 const currentGcStatus = await getAnti('gc');
-                const currentDmMode = await getAnti('dm_mode');
                 const statusMsg = `╭───[ *AntiDelete Status* ]
 │
 │ • *Group Chats:* ${currentGcStatus ? '✅ ON' : '❌ OFF'}
 │ • *Direct Messages:* ${currentDmStatus ? '✅ ON' : '❌ OFF'}
-│ • *DM Mode:* ${currentDmMode ? '🟢 Bot Chat' : '🟡 Same Chat'}
 │
 ╰───────────────`;
                 return reply(statusMsg);
@@ -72,12 +65,13 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
             default:
                 return reply(`╭───[ *AntiDelete Guide* ]
 │
-│ • .antidelete on – Enable for all (in same chat)
-│ • .antidelete off – Disable all
+│ • .antidelete on – Enable for all
+│ • .antidelete off – Disable for all
 │ • .antidelete set gc – Toggle Group
-│ • .antidelete set dm – DM → Bot Chat
-│ • .antidelete set dm back – DM → Same Chat
-│ • .antidelete set all – Enable all in same chat
+│ • .antidelete set dm – Toggle DM
+│ • .antidelete set all – Enable for all
+│ • .antidelete off gc – Disable Group
+│ • .antidelete off dm – Disable DM
 │ • .antidelete status – Show status
 │
 ╰──────────────`);
@@ -87,3 +81,4 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
         return reply("An error occurred while processing your request.");
     }
 });
+
