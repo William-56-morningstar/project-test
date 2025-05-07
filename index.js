@@ -291,17 +291,11 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
   if(!isOwner && !isGroup && config.MODE === "groups") return
    */
    
-  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  // خواندن فایل owner.json
-  const senderr = m.sender || m.from;
+  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  // خواندن فایل
   const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
-
   // بررسی اینکه آیا فرستنده در owner.json موجود است
-  const isFileOwner = ownerFile.includes(senderr);
-
-  // بررسی مالک بودن
-  const isMe = botNumber.includes(senderr.split('@')[0]);  // بررسی اینکه آیا فرستنده شماره ربات است
-  const isRealOwner = senderr === ownerNumberFormatted || isMe || isFileOwner;
-  
+  const isFileOwner = ownerFile.includes(sender);
+  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
   // اعمال شرایط بر اساس وضعیت مالک
   if (!isRealOwner && config.MODE === "private") return;
   if (!isRealOwner && isGroup && config.MODE === "inbox") return;
