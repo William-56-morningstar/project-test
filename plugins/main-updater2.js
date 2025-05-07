@@ -39,7 +39,7 @@ cmd({
 
     await reply("```✅ Plugins updated. Restarting bot...```");
 
-    process.exit(0); // ریستارت
+    
 
   } catch (err) {
     console.error("Update error:", err);
