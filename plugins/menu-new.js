@@ -5,16 +5,6 @@ const path = require("path");
 const FormData = require("form-data");
 const { cmd } = require("../command");
 
-function formatRemainingTime(ms) {
-  let totalSeconds = Math.floor(ms / 1000);
-  let days = Math.floor(totalSeconds / (3600 * 24));
-  let hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-  let minutes = Math.floor((totalSeconds % 3600) / 60);
-  let seconds = totalSeconds % 60;
-
-  return `*┃❍ ${days} Day(s)*\n*┃❍ ${hours} Hour(s)*\n*┃❍ ${minutes} Minute(s)*\n*┃❍ ${seconds} Second(s)*`;
-}
-
 cmd({
   pattern: "menu",
   alias: ["menu21", "manu", "munu"],
@@ -22,12 +12,9 @@ cmd({
   desc: "Menu bot alive status and menu",
   category: "menu",
   filename: __filename
-}, async (client, message, args, pushname, { reply }) => {
+}, async (client, message, args, pushname, { reply } = {}) => {
   try {
-    const start = Date.now();
-    const uptimeMs = process.uptime() * 1000;
-    const uptimeFormatted = formatRemainingTime(uptimeMs);
-
+    
     const status = `
 *🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*
 
