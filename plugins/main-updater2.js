@@ -10,40 +10,39 @@ cmd({
   desc: "Update the bot's plugins folder from ZIP.",
   category: "owner",
   filename: __filename
-}, async (client, message, args, { from, reply, sender, isOwner }) => {
-  if (!isOwner) {
-    return reply("This command is only for the bot owner.");
-  }
+}, async (client, message, args, { reply, isOwner }) => {
+  if (!isOwner) return reply("❌ Owner only command.");
 
   try {
-    await reply("```🔍 Checking for plugin updates...```");
+    await reply("```🔍 Downloading update...```");
 
-    const zipUrl = "https://file.apis-nothing.xyz/plugins.zip"; // آدرس فایل zip خودت را اینجا بگذار
-    const zipPath = path.join(__dirname, "update.zip");
+    const zipUrl = "https://file.apis-nothing.xyz/plugins.zip"; // آدرس درستت
+    const zipPath = path.join(__dirname, "plugins.zip");
 
-    // دانلود فایل ZIP
-    const { data: zipData } = await axios.get(zipUrl, { responseType: "arraybuffer" });
-    fs.writeFileSync(zipPath, zipData);
-    await reply("```📦 Extracting update...```");
+    // دانلود فایل
+    const { data } = await axios.get(zipUrl, { responseType: "arraybuffer" });
+    fs.writeFileSync(zipPath, data);
 
-    // استخراج فایل ZIP به همان پوشه `dirname` (مسیر اصلی)
+    // حذف پوشه plugins قبلی
+    const pluginsPath = path.join(__dirname, "plugins");
+    if (fs.existsSync(pluginsPath)) {
+      fs.rmSync(pluginsPath, { recursive: true, force: true });
+      console.log("✅ Old plugins folder deleted.");
+    }
+
+    // استخراج فایل zip
     const zip = new AdmZip(zipPath);
     zip.extractAllTo(__dirname, true);
 
-    // حذف فایل ZIP بعد از استخراج
+    // حذف فایل zip
     fs.unlinkSync(zipPath);
 
-    // حذف پوشه `plugins` قبلی قبل از استخراج
-    const pluginsDestPath = path.join(__dirname, "plugins");
-    if (fs.existsSync(pluginsDestPath)) {
-      fs.rmSync(pluginsDestPath, { recursive: true, force: true });
-      console.log("Old plugins folder removed.");
-    }
+    await reply("```✅ Plugins updated. Restarting bot...```");
 
-    await reply("```✅ Plugins updated successfully. bot...```");
+    process.exit(0); // ریستارت
 
-  } catch (error) {
-    console.error("Update error:", error);
-    reply("❌ Update failed. Please check logs or try manually.");
+  } catch (err) {
+    console.error("Update error:", err);
+    reply("❌ Update failed: " + err.message);
   }
 });
