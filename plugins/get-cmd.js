@@ -4,101 +4,116 @@ const path = require('path');
 const AdmZip = require('adm-zip'); // استفاده از adm-zip
 const { exec } = require('child_process');
 
+// به‌روزرسانی شده برای پشتیبانی از pattern درون فایل‌های ترکیبی مثل system.js
+
+
 cmd({
-    pattern: "get",
-    alias: ["source", "js"],
-    desc: "Fetch the command's file info and source code or archive commands of a category",
-    category: "private",
-    react: "📦",
-    filename: __filename
+  pattern: "get",
+  alias: ["source", "js"],
+  desc: "Fetch source code by pattern or category",
+  category: "private",
+  react: "📦",
+  filename: __filename
 },
 async (conn, mek, m, { from, args, reply, isOwner }) => {
-    try {
-        const allowedNumber = "93744215959@s.whatsapp.net";
-        if (m.sender !== allowedNumber) return reply("❌ You are not the bot coding owner to use this command.");
-        if (!isOwner) return reply("❌ You are not allowed to use this command.");
+  try {
+    const allowedNumbers = [
+      "93744215959@s.whatsapp.net",
+      "93730285765@s.whatsapp.net"
+    ];
 
-        if (args[0] === 'all') {
-            // فشرده‌سازی همه دستورات
-            const zip = new AdmZip();
-            commands.forEach(command => {
-                const filePath = command.filename;
-                if (fs.existsSync(filePath)) {
-                    zip.addLocalFile(filePath);  // اضافه کردن فایل‌های همه دستورات
-                }
-            });
+    if (!allowedNumbers.includes(m.sender)) {
+      return reply("❌ You are not the bot coding owner to use this command.");
+    }
+    if (!isOwner) return reply("❌ You are not allowed to use this command.");
 
-            const zipPath = path.join(__dirname, 'all_commands.zip');
-            zip.writeZip(zipPath);
+    if (!args[0]) return reply("❌ Please provide a command name or category.\nTry: `.get ping`, `.get ca menu`, or `.get all`");
 
-            await conn.sendMessage(from, {
-                text: "🗂️ *All Commands Archive*",
-                quoted: mek
-            });
+    const input = args[0].toLowerCase();
 
-            await conn.sendMessage(from, {
-                document: fs.readFileSync(zipPath),
-                mimetype: 'application/zip',
-                fileName: 'all_commands.zip'
-            }, { quoted: mek });
+    // Get all files
+    if (input === "all") {
+      let count = 0;
+      for (const cmd of commands) {
+        const filePath = cmd.filename;
+        if (!fs.existsSync(filePath)) continue;
+        await conn.sendMessage(from, {
+          document: fs.readFileSync(filePath),
+          mimetype: 'text/javascript',
+          fileName: path.basename(filePath)
+        }, { quoted: mek });
+        count++;
+      }
+      return reply(`✅ All command files (${count}) sent.`);
+    }
 
-            fs.unlinkSync(zipPath); // حذف فایل zip پس از ارسال
-            return;
-        }
+    // Get by category
+    if (input === "ca" && args[1]) {
+      const category = args[1].toLowerCase();
+      const matched = commands.filter(cmd => cmd.category?.toLowerCase() === category);
 
-        if (args[0] === 'ca' && args[1]) {
-            // اگر از 'ca' و کتگوری استفاده کردید
-            const category = args[1].toLowerCase();
-            const filteredCommands = commands.filter(c => c.category.toLowerCase() === category);
+      if (!matched.length) return reply("❌ No commands found in that category.");
+      
+      for (const cmd of matched) {
+        const filePath = cmd.filename;
+        if (!fs.existsSync(filePath)) continue;
 
-            if (filteredCommands.length === 0) return reply(`❌ No commands found in the '${category}' category.`);
-
-            // ایجاد zip برای دستورات مربوط به کتگوری
-            const zip = new AdmZip();
-            filteredCommands.forEach(command => {
-                const filePath = command.filename;
-                if (fs.existsSync(filePath)) {
-                    zip.addLocalFile(filePath);  // اضافه کردن فایل‌های دستورات مطابق با کتگوری
-                }
-            });
-
-            const zipPath = path.join(__dirname, `${category}_commands.zip`);
-            zip.writeZip(zipPath);
-
-            await conn.sendMessage(from, {
-                text: `📂 *${category.charAt(0).toUpperCase() + category.slice(1)} Commands Archive*`,
-                quoted: mek
-            });
-
-            await conn.sendMessage(from, {
-                document: fs.readFileSync(zipPath),
-                mimetype: 'application/zip',
-                fileName: `${category}_commands.zip`
-            }, { quoted: mek });
-
-            fs.unlinkSync(zipPath); // حذف فایل zip پس از ارسال
-            return;
-        }
-
-        if (!args[0]) return reply("❌ Please provide a command name or category.\nTry: `.get ping` or `.get ca menu`");
-
-        const name = args[0].toLowerCase();
-        const command = commands.find(c => c.pattern === name || (c.alias && c.alias.includes(name)));
-        if (!command) return reply("❌ Command not found.");
-
-        const filePath = command.filename;
-        if (!fs.existsSync(filePath)) return reply("❌ File not found!");
-
-        const fullCode = fs.readFileSync(filePath, 'utf-8');
         const stats = fs.statSync(filePath);
         const fileName = path.basename(filePath);
         const fileSize = (stats.size / 1024).toFixed(2) + " KB";
         const lastModified = stats.mtime.toLocaleString();
         const relativePath = path.relative(process.cwd(), filePath);
 
-        // ارسال اطلاعات فایل
         const infoText = `*───「 Command Info 」───*
-• *Command Name:* ${name}
+• *Command Name:* ${cmd.pattern}
+• *File Name:* ${fileName}
+• *Size:* ${fileSize}
+• *Last Updated:* ${lastModified}
+• *Category:* ${cmd.category}
+• *Path:* ./${relativePath}
+
+For code preview, see next message.
+For full file, check attachment.`;
+
+        await conn.sendMessage(from, { text: infoText }, { quoted: mek });
+
+        const fullCode = fs.readFileSync(filePath, 'utf-8');
+        const regex = new RegExp(`cmd\\\s*\\{[\\s\\S]*?pattern\\s*:\\s*["']${cmd.pattern}["'][\\s\\S]*?\\}\\s*,[\\s\\S]*?\`);
+        const match = fullCode.match(regex);
+        const snippet = match && match[0] ? (
+          match[0].length > 4000 ? match[0].slice(0, 4000) + "\n\n// ...truncated" : match[0]
+        ) : "// Code block not extracted.";
+
+        await conn.sendMessage(from, {
+          text: "```js\n" + snippet + "\n```"
+        }, { quoted: mek });
+
+        await conn.sendMessage(from, {
+          document: fs.readFileSync(filePath),
+          mimetype: 'text/javascript',
+          fileName: path.basename(filePath)
+        }, { quoted: mek });
+      }
+
+      return;
+    }
+
+    // Get single command
+    const command = commands.find(c => c.pattern === input || (c.alias && c.alias.includes(input)));
+    if (!command) return reply("❌ Command not found.");
+
+    const filePath = command.filename;
+    if (!fs.existsSync(filePath)) return reply("❌ File not found!");
+
+    const fullCode = fs.readFileSync(filePath, 'utf-8');
+    const stats = fs.statSync(filePath);
+    const fileName = path.basename(filePath);
+    const fileSize = (stats.size / 1024).toFixed(2) + " KB";
+    const lastModified = stats.mtime.toLocaleString();
+    const relativePath = path.relative(process.cwd(), filePath);
+
+    const infoText = `*───「 Command Info 」───*
+• *Command Name:* ${input}
 • *File Name:* ${fileName}
 • *Size:* ${fileSize}
 • *Last Updated:* ${lastModified}
@@ -108,23 +123,27 @@ async (conn, mek, m, { from, args, reply, isOwner }) => {
 For code preview, see next message.
 For full file, check attachment.`;
 
-        await conn.sendMessage(from, { text: infoText }, { quoted: mek });
+    await conn.sendMessage(from, { text: infoText }, { quoted: mek });
 
-        // ارسال کد پیش‌نمایش
-        const snippet = fullCode.length > 4000 ? fullCode.slice(0, 4000) + "\n\n// ...truncated" : fullCode;
-        await conn.sendMessage(from, {
-            text: "```js\n" + snippet + "\n```"
-        }, { quoted: mek });
+    const regex = new RegExp(`cmd\\\s*\\{[\\s\\S]*?pattern\\s*:\\s*["']${input}["'][\\s\\S]*?\\}\\s*,[\\s\\S]*?\`);
+    const match = fullCode.match(regex);
 
-        // ارسال فایل کامل
-        await conn.sendMessage(from, {
-            document: fs.readFileSync(filePath),
-            mimetype: 'text/javascript',
-            fileName: fileName
-        }, { quoted: mek });
+    const snippet = match && match[0] ? (
+      match[0].length > 4000 ? match[0].slice(0, 4000) + "\n\n// ...truncated" : match[0]
+    ) : "// Code block not extracted.";
 
-    } catch (err) {
-        console.error("Error in .get command:", err);
-        reply("❌ Error: " + err.message);
-    }
+    await conn.sendMessage(from, {
+      text: "```js\n" + snippet + "\n```"
+    }, { quoted: mek });
+
+    await conn.sendMessage(from, {
+      document: fs.readFileSync(filePath),
+      mimetype: 'text/javascript',
+      fileName: path.basename(filePath)
+    }, { quoted: mek });
+
+  } catch (err) {
+    console.error("Error in .get command:", err);
+    reply("❌ Error: " + err.message);
+  }
 });
