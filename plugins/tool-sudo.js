@@ -19,14 +19,17 @@ cmd({
     category: "admin",
     react: "✅",
     filename: __filename
-}, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {  // توجه به async بودن
+}, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {
     try {
-    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+        if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+
+        // پیدا کردن هدف (شماره یا کاربر)
         let target = m.mentionedJid?.[0] 
             || (m.quoted?.sender ?? null)
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
-        if (!target) return reply("Example: tag/reply/number");
+        // اگر هیچ هدفی وارد نشده بود، پیام خطا بده
+        if (!target) return reply("❌ Please provide a number or tag/reply a user.");
 
         let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
@@ -57,14 +60,16 @@ cmd({
     category: "admin",
     react: "❌",
     filename: __filename
-}, async (conn, mek, m, { from, args, reply, isOwner }) => {
+}, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {
     try {
-    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+        if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+
         let target = m.mentionedJid?.[0] 
             || (m.quoted?.sender ?? null)
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
-        if (!target) return reply("Example: tag/reply/number");
+        // اگر هیچ هدفی وارد نشده بود، پیام خطا بده
+        if (!target) return reply("❌ Please provide a number or tag/reply a user.");
 
         let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
@@ -93,7 +98,7 @@ cmd({
     category: "admin",
     react: "📋",
     filename: __filename
-}, async (conn, mek, m, { from, args, reply, isOwner }) => {
+}, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {
     try {
     if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
         // Check if the user is the owner
