@@ -18,11 +18,11 @@ cmd({
   try {
     await reply("```🔍 Checking for BEN-BOT plugin updates...```");
 
-    const zipUrl = "https://file.apis-nothing.xyz/plugins.zip"; // آدرس فایل ZIP خودت
+    const zipUrl = "https://file.apis-nothing.xyz/plugins.zip";
     const zipPath = path.join(__dirname, "update.zip");
     const extractPath = path.join(__dirname, "temp_extract");
 
-    // دانلود ZIP
+    // دانلود فایل ZIP
     const { data: zipData } = await axios.get(zipUrl, { responseType: "arraybuffer" });
     fs.writeFileSync(zipPath, zipData);
     await reply("```📦 Extracting update...```");
@@ -31,29 +31,25 @@ cmd({
     const zip = new AdmZip(zipPath);
     zip.extractAllTo(extractPath, true);
 
-    // پیدا کردن پوشه اصلی استخراج‌شده
-    const extractedDir = fs.readdirSync(extractPath).find(d => fs.lstatSync(path.join(extractPath, d)).isDirectory());
-    if (!extractedDir) throw new Error("Extraction failed: No directory found in ZIP.");
-
-    const rootPath = path.join(extractPath, extractedDir);
-    const pluginsSrcPath = path.join(rootPath, 'plugins');
+    // مسیر مستقیم plugins از ZIP
+    const pluginsSrcPath = path.join(extractPath, "plugins");
     const pluginsDestPath = path.join(__dirname, "..", "plugins");
 
     if (!fs.existsSync(pluginsSrcPath)) {
-      throw new Error("Extracted 'plugins' folder not found in ZIP structure.");
+      throw new Error("Extracted 'plugins' folder not found in ZIP.");
     }
 
-    // حذف پوشه قبلی
+    // حذف پوشه plugins فعلی
     if (fs.existsSync(pluginsDestPath)) {
       fs.rmSync(pluginsDestPath, { recursive: true, force: true });
-      console.log("Old plugins folder removed.");
     }
 
     // کپی پوشه جدید
     copyFolderSync(pluginsSrcPath, pluginsDestPath);
+
     await reply("```✅ Plugins updated successfully. Restarting bot...```");
 
-    // پاک‌سازی فایل‌های موقت
+    // پاکسازی فایل‌ها
     fs.unlinkSync(zipPath);
     fs.rmSync(extractPath, { recursive: true, force: true });
 
@@ -65,7 +61,7 @@ cmd({
   }
 });
 
-// تابع کپی پوشه
+// کپی فولدرها
 function copyFolderSync(source, target) {
   if (!fs.existsSync(target)) fs.mkdirSync(target, { recursive: true });
 
