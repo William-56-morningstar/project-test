@@ -1,7 +1,13 @@
 const config = require('../config');
 const fs = require('fs');
-const { cmd } = require('../command');
 const { getAnti, setAnti } = require('../data/antidel');
+const { cmd, commands } = require('../command');
+const axios = require('axios');
+const prefix = config.PREFIX;
+const AdmZip = require("adm-zip");
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson } = require('../lib/functions2');
+const { writeFileSync } = require('fs');
+const path = require('path');
 
 cmd({
     pattern: "antidelete",
@@ -80,3 +86,4 @@ Reply with:
     conn.ev.on("messages.upsert", handler);
     setTimeout(() => conn.ev.off("messages.upsert", handler), 5 * 60 * 1000);
 });
+
