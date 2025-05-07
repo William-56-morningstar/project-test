@@ -181,7 +181,7 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
 cmd({
     pattern: "ping2",
     desc: "Check bot's response time.",
-    category: "main",
+    category: "system",
     react: "🍂",
     filename: __filename
 },
@@ -191,7 +191,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         const message = await conn.sendMessage(from, { text: '*PINGING...*' })
         const endTime = Date.now()
         const ping = endTime - startTime
-        await conn.sendMessage(from, { text: `*X-MD SPEED : ${ping}ms*` }, { quoted: message })
+        await conn.sendMessage(from, { text: `*BEN-BOT SPEED : ${ping}ms*` }, { quoted: message })
     } catch (e) {
         console.log(e)
         reply(`${e}`)

@@ -260,7 +260,7 @@ cmd({
   alias: ["upload", "url", "geturl"],
   react: "✅",
   desc: "Upload media to cdn.apis-nothing.xyz and get stream/download links",
-  category: "utility",
+  category: "tools",
   filename: __filename
 }, async (client, message, args, { reply }) => {
   try {
