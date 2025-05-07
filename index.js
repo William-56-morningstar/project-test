@@ -291,7 +291,7 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
   if(!isOwner && !isGroup && config.MODE === "groups") return
    */
    
-  const ownerFile = JSON.parse(fs.readFileSync('./plugins/owner.json', 'utf-8'))
+  const ownerFile = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'))
   const isFileOwner = ownerFile.includes(sender)
   const isRealOwner = isOwner && isFileOwner
 // TERMS AND CONDITIONS 
