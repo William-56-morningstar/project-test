@@ -29,7 +29,7 @@ cmd({
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
         // اگر هیچ هدفی وارد نشده بود، پیام خطا بده
-        if (!target) return reply("❌ Please provide a number or tag/reply a user.");
+        if (!args[0]) return reply("❌ Please provide a number or tag/reply a user.");
 
         let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
@@ -69,7 +69,7 @@ cmd({
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
         // اگر هیچ هدفی وارد نشده بود، پیام خطا بده
-        if (!target) return reply("❌ Please provide a number or tag/reply a user.");
+        if (!args[0]) return reply("❌ Please provide a number or tag/reply a user.");
 
         let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
