@@ -7,40 +7,34 @@ const AdmZip = require("adm-zip");
 cmd({
   pattern: "update2",
   react: '🆕',
-  desc: "Update the bot's plugins folder from ZIP.",
+  desc: "Download and extract ZIP to plugins folder.",
   category: "owner",
   filename: __filename
 }, async (client, message, args, { reply, isOwner }) => {
   if (!isOwner) return reply("❌ Owner only command.");
 
   try {
-    await reply("```🔍 Downloading update...```");
+    await reply("```⬇️ Downloading update...```");
 
-    const zipUrl = "https://file.apis-nothing.xyz/plugins.zip"; // آدرس درستت
+    const zipUrl = "https://file.apis-nothing.xyz/plugins.zip";
     const zipPath = path.join(__dirname, "plugins.zip");
+    const pluginsDir = path.join(__dirname, "plugins");
 
-    // دانلود فایل
+    // دانلود فایل ZIP
     const { data } = await axios.get(zipUrl, { responseType: "arraybuffer" });
     fs.writeFileSync(zipPath, data);
 
-    // حذف پوشه plugins قبلی
-    const pluginsPath = path.join(__dirname, "plugins");
-    if (fs.existsSync(pluginsPath)) {
-      fs.rmSync(pluginsPath, { recursive: true, force: true });
-      console.log("✅ Old plugins folder deleted.");
-    }
-
-    // استخراج فایل zip
+    // استخراج به پوشه plugins (بدون پاک کردن چیزی)
     const zip = new AdmZip(zipPath);
-    zip.extractAllTo(__dirname, true);
+    zip.extractAllTo(pluginsDir, true);
 
-    // حذف فایل zip
+    // حذف فایل zip بعد از استخراج
     fs.unlinkSync(zipPath);
 
-    await reply("```✅ Plugins updated. Restarting bot...```");
-
+    await reply("```✅ Plugins updated successfully!```");
     
-
+    process.exit(0); // ریستارت
+    
   } catch (err) {
     console.error("Update error:", err);
     reply("❌ Update failed: " + err.message);
