@@ -288,7 +288,7 @@ cmd({
     }
 
     const msg = 
-  `Hey, here are your media URL:\n\n` +
+  `Hey, here are your media URLs:\n\n` +
   `Stream URL: ${file.streamLink}\n` +
   `Download URL: ${file.downloadLink}\n` +
   `File Size: ${file.size} MB\n` +
