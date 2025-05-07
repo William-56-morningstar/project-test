@@ -16,7 +16,7 @@ cmd({
     pattern: "addsudo",
     alias: [],
     desc: "Add a temporary owner",
-    category: "admin",
+    category: "owner",
     react: "✅",
     filename: __filename
 }, async (conn, mek, m, { from, args, q, isCreator, reply, isOwner }) => {
@@ -57,10 +57,10 @@ cmd({
     pattern: "delsudo",
     alias: [],
     desc: "Remove a temporary owner",
-    category: "admin",
+    category: "owner",
     react: "❌",
     filename: __filename
-}, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {
+}, async (conn, mek, m, { from, args, q, isCreator, reply, isOwner }) => {
     try {
         if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
@@ -69,7 +69,7 @@ cmd({
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
 
         // اگر هیچ هدفی وارد نشده بود، پیام خطا بده
-        if (!args[0]) return reply("❌ Please provide a number or tag/reply a user.");
+        if (!q) return reply("❌ Please provide a number or tag/reply a user.");
 
         let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
 
@@ -95,7 +95,7 @@ cmd({
     pattern: "listsudo",
     alias: [],
     desc: "List all temporary owners",
-    category: "admin",
+    category: "owner",
     react: "📋",
     filename: __filename
 }, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {

@@ -37,15 +37,14 @@ cmd({
     }
     
     // Extract JIDs (supports comma or space separated)
-    const rawJids = jidInput.split(/[\s,]+/).filter(jid => jid.trim().length > 0);
-    
-    // Process JIDs (accepts with or without @g.us)
     const validJids = rawJids
       .map(jid => {
-        // Remove existing @g.us if present
-        const cleanJid = jid.replace(/@g\.us$/i, "");
-        // Only keep if it's all numbers
-        return /^\d+$/.test(cleanJid) ? `${cleanJid}@g.us` : null;
+        const cleanJid = jid.replace(/(@g\.us|@s\.whatsapp\.net)$/i, "");
+        if (!/^\d+$/.test(cleanJid)) return null;
+
+        // تصمیم‌گیری براساس طول شماره: گروه یا شخصی
+        if (cleanJid.length > 15) return `${cleanJid}@g.us`;  // group JID
+        return `${cleanJid}@s.whatsapp.net`;                 // personal JID
       })
       .filter(jid => jid !== null)
       .slice(0, SAFETY.MAX_JIDS);
@@ -55,7 +54,7 @@ cmd({
         "❌ No valid group JIDs found\n" +
         "Examples:\n" +
         ".fwd 120363411055156472@g.us,120363333939099948@g.us\n" +
-        ".fwd 120363411055156472 120363333939099948"
+        ".fwd 93744215959,93730285435"
       );
     }
 
