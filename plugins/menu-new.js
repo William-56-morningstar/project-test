@@ -12,7 +12,7 @@ cmd({
   desc: "Menu bot alive status and menu",
   category: "menu",
   filename: __filename
-}, async (client, message, args,, { reply, pushname } = {}) => {
+}, async (client, message, args, { reply, pushname } = {}) => {
   try {
     
     const status = `
