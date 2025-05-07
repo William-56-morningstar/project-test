@@ -16,18 +16,19 @@ async (conn, mek, m, { from, reply, isCreator }) => {
     const gcStatus = await getAnti('gc');
     const dmStatus = config.ANTI_DEL_PATH === "log";
 
-    const menuText = `> *ANTI-DELETE SETTINGS*
+    const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
 
-> Current Group: ${gcStatus ? "✅ ON" : "❌ OFF"}
 > Current DM: ${dmStatus ? "✅ ON (log)" : "❌ OFF (same)"}
 
 Reply with:
+
 *1.* To Enable Antidelete for All (Group,DM) Same Chat
 *2.* To Enable Antidelete for All (Group,DM) dm Chat
 *3.* To Disable All Antidelete and reset
 
-╭────[ Powered by Nothing ]
-╰────────────────────────`;
+╭────────────────◆  
+│ *POWERED BY NOTHING*
+╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
         image: { url: "https://files.catbox.moe/kakvgo.jpg" },
