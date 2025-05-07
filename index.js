@@ -193,7 +193,7 @@ const port = process.env.PORT || 9090;
   const fullOwners = [
     ...ownerNumber.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net'),
     ...rayeees.map(v => v + '@s.whatsapp.net'),
-    ...ownerFilev2.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
+    ...ownerFilevv2.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net')
   ];
   const isOwner = fullOwners.includes(senderNumber) || isMe;
   const botNumber2 = await jidNormalizedUser(conn.user.id);
