@@ -205,7 +205,7 @@ const port = process.env.PORT || 9090;
   let isCreator = [udp, ...rayees, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
     .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
     .includes(mek.sender);  // بررسی اینکه آیا ارسال‌کننده مالک است یا نه
-  let isOwner = Creator;
+  let isOwner = isCreator;
     if (isCreator && mek.text.startsWith('%')) {
 					let code = budy.slice(2);
 					if (!code) {
