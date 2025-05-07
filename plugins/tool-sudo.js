@@ -39,7 +39,11 @@ cmd({
         const uniqueOwners = [...new Set(own)];
         fs.writeFileSync("./lib/owner.json", JSON.stringify(uniqueOwners, null, 2));
 
-        reply("✅ Successfully Added User As Temporary Owner");
+        const dec = "✅ Successfully Added User As Temporary Owner",
+        await conn.sendMessage(from, {
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+            caption: dec
+        }, { quoted: mek });
     } catch (err) {
         console.error(err);
         reply("❌ Error: " + err.message);
@@ -73,7 +77,11 @@ cmd({
         const updated = own.filter(x => x !== target);
         fs.writeFileSync("./lib/owner.json", JSON.stringify(updated, null, 2));
 
-        reply("✅ Successfully Removed User As Temporary Owner");
+        const dec = "✅ Successfully Removed User As Temporary Owner",
+        await conn.sendMessage(from, {
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+            caption: dec
+        }, { quoted: mek });
     } catch (err) {
         console.error(err);
         reply("❌ Error: " + err.message);
@@ -104,7 +112,10 @@ cmd({
             listMessage += `${index + 1}. ${owner.replace("@s.whatsapp.net", "")}\n`;
         });
 
-        reply(listMessage);
+        await conn.sendMessage(from, {
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+            caption: listMessage
+        }, { quoted: mek });
     } catch (err) {
         console.error(err);
         reply("❌ Error: " + err.message);

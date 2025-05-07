@@ -86,7 +86,7 @@ cmd({
     if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     if (!args[0]) {
-        const text = `> *BEN-BOT MODE SETTINGS*\n\n> Current mode: *${config.MODE}*\n\nReply With:\n\n*1.* Public Mode\n*2.* Private Mode\n*3.* Inbox Only\n*4.* Groups Only\n\n╭────◆\n│ Powered by Nothing Tech\n╰────◆`;
+        const text = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *public*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n*3.* To Enable Inbox Mode\n*4.* To Enable Groups Mode\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
         const sentMsg = await conn.sendMessage(from, {
             image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // تصویر منوی مد
