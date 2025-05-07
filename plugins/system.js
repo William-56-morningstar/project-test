@@ -558,3 +558,48 @@ cmd({
     }
 });
 
+cmd({
+  pattern: 'version',
+  alias: ["changelog", "cupdate", "checkupdate"],
+  react: '🚀',
+  desc: "Check bot's version, system stats, and update info.",
+  category: 'system',
+  filename: __filename
+}, async (conn, mek, m, {
+  from, sender, pushname, reply
+}) => {
+  try {
+    // Read local version data
+    const localVersionPath = path.join(__dirname, '../data/version.json');
+    let localVersion = 'Unknown';
+    let changelog = 'No changelog available.';
+    if (fs.existsSync(localVersionPath)) {
+      const localData = JSON.parse(fs.readFileSync(localVersionPath));
+      localVersion = localData.version;
+      changelog = localData.changelog;
+    }
+
+    // System info
+    const pluginPath = path.join(__dirname, '../plugins');
+    const pluginCount = fs.readdirSync(pluginPath).filter(file => file.endsWith('.js')).length;
+    const totalCommands = commands.length;
+    const uptime = runtime(process.uptime());
+    const ramUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+    const totalRam = (os.totalmem() / 1024 / 1024).toFixed(2);
+    const hostName = os.hostname();
+    const lastUpdate = fs.statSync(localVersionPath).mtime.toLocaleString();
+
+    const statusMessage = `🌟 *Hello ${pushname}!* 🌟\n\n` +
+      `📌 *Bot Name:* BEN-BOT\n🔖 *Current Version:* ${localVersion}\n📂 *Total Plugins:* ${pluginCount}\n🔢 *Total Commands:* ${totalCommands}\n\n` +
+      `💾 *System Info:*\n⏳ *Uptime:* ${uptime}\n📟 *RAM Usage:* ${ramUsage}MB / ${totalRam}MB\n⚙️ *Host Name:* ${hostName}\n📅 *Last Update:* ${lastUpdate}\n\n` +
+      `📝 *Changelog:*\n${changelog}`;
+
+    await conn.sendMessage(from, {
+      text: statusMessage
+    }, { quoted: mek });
+
+  } catch (error) {
+    console.error('Error fetching version info:', error);
+    reply('❌ An error occurred while checking the bot version.');
+  }
+});

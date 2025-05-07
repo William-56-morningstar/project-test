@@ -12,13 +12,13 @@ cmd({
   desc: "Menu bot alive status and menu",
   category: "menu",
   filename: __filename
-}, async (client, message, args, pushname, { reply } = {}) => {
+}, async (client, message, args,, { reply, pushname } = {}) => {
   try {
     
     const status = `
 *🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*
 
-𝗛𝗲𝗹𝗹𝗼👋🏻
+𝗛𝗲𝗹𝗹𝗼 ${pushname}👋🏻
 
 ╭━⊱⛲𝗪𝗘𝗟𝗖𝗢𝗠𝗘 𝗧𝗢 𝗠𝗘𝗡𝗨⛲⊱━╮
 ┃🤖 *.ᴀɪᴍᴇɴᴜ*

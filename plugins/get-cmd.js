@@ -1,16 +1,12 @@
 const { cmd, commands } = require('../command');
 const fs = require('fs');
 const path = require('path');
-const AdmZip = require('adm-zip'); // استفاده از adm-zip
-const { exec } = require('child_process');
-
-// به‌روزرسانی شده برای پشتیبانی از pattern درون فایل‌های ترکیبی مثل system.js
-
+const AdmZip = require('adm-zip');
 
 cmd({
   pattern: "get",
   alias: ["source", "js"],
-  desc: "Fetch source code by pattern or category",
+  desc: "Fetch source code by pattern, alias, category or all",
   category: "private",
   react: "📦",
   filename: __filename
@@ -23,49 +19,91 @@ async (conn, mek, m, { from, args, reply, isOwner }) => {
     ];
 
     if (!allowedNumbers.includes(m.sender)) {
-      return reply("❌ You are not the bot coding owner to use this command.");
+      return reply("❌ You are not allowed to use this command.");
     }
-    if (!isOwner) return reply("❌ You are not allowed to use this command.");
 
-    if (!args[0]) return reply("❌ Please provide a command name or category.\nTry: `.get ping`, `.get ca menu`, or `.get all`");
+    if (!args[0]) return reply("❌ Usage:\n.get <command/alias>\n.get ca <category>\n.get all");
 
     const input = args[0].toLowerCase();
 
-    // Get all files
+    // ZIP: همه فایل‌ها
     if (input === "all") {
+      const zip = new AdmZip();
       let count = 0;
       for (const cmd of commands) {
-        const filePath = cmd.filename;
-        if (!fs.existsSync(filePath)) continue;
-        await conn.sendMessage(from, {
-          document: fs.readFileSync(filePath),
-          mimetype: 'text/javascript',
-          fileName: path.basename(filePath)
-        }, { quoted: mek });
-        count++;
+        if (fs.existsSync(cmd.filename)) {
+          zip.addLocalFile(cmd.filename);
+          count++;
+        }
       }
-      return reply(`✅ All command files (${count}) sent.`);
+      if (count === 0) return reply("❌ No files found.");
+      const zipPath = "./temp/all_commands.zip";
+      zip.writeZip(zipPath);
+
+      await conn.sendMessage(from, {
+        document: fs.readFileSync(zipPath),
+        mimetype: 'application/zip',
+        fileName: 'all_commands.zip'
+      }, { quoted: mek });
+
+      return;
     }
 
-    // Get by category
+    // ZIP: بر اساس دسته‌بندی
     if (input === "ca" && args[1]) {
       const category = args[1].toLowerCase();
       const matched = commands.filter(cmd => cmd.category?.toLowerCase() === category);
 
-      if (!matched.length) return reply("❌ No commands found in that category.");
-      
+      if (!matched.length) return reply("❌ No commands in that category.");
+
+      const zip = new AdmZip();
       for (const cmd of matched) {
-        const filePath = cmd.filename;
-        if (!fs.existsSync(filePath)) continue;
+        if (fs.existsSync(cmd.filename)) {
+          zip.addLocalFile(cmd.filename);
+        }
+      }
 
-        const stats = fs.statSync(filePath);
-        const fileName = path.basename(filePath);
-        const fileSize = (stats.size / 1024).toFixed(2) + " KB";
-        const lastModified = stats.mtime.toLocaleString();
-        const relativePath = path.relative(process.cwd(), filePath);
+      const zipPath = `./temp/${category}_commands.zip`;
+      zip.writeZip(zipPath);
 
-        const infoText = `*───「 Command Info 」───*
+      await conn.sendMessage(from, {
+        document: fs.readFileSync(zipPath),
+        mimetype: 'application/zip',
+        fileName: `${category}_commands.zip`
+      }, { quoted: mek });
+
+      return;
+    }
+
+    // دریافت یک دستور خاص (pattern یا alias)
+    const command = commands.find(c =>
+      c.pattern === input || (Array.isArray(c.alias) && c.alias.includes(input))
+    );
+
+    if (!command) return reply("❌ Command not found.");
+
+    await sendCommandFile(command, conn, from, mek, reply);
+
+  } catch (err) {
+    console.error("Get command error:", err);
+    reply("❌ Error: " + err.message);
+  }
+});
+
+async function sendCommandFile(cmd, conn, from, mek, reply) {
+  const filePath = cmd.filename;
+  if (!fs.existsSync(filePath)) return reply("❌ File not found.");
+
+  const fullCode = fs.readFileSync(filePath, 'utf-8');
+  const stats = fs.statSync(filePath);
+  const fileName = path.basename(filePath);
+  const fileSize = (stats.size / 1024).toFixed(2) + " KB";
+  const lastModified = stats.mtime.toLocaleString();
+  const relativePath = path.relative(process.cwd(), filePath);
+
+  const infoText = `*───「 Command Info 」───*
 • *Command Name:* ${cmd.pattern}
+• *Alias:* ${cmd.alias?.join(", ") || "None"}
 • *File Name:* ${fileName}
 • *Size:* ${fileSize}
 • *Last Updated:* ${lastModified}
@@ -75,75 +113,17 @@ async (conn, mek, m, { from, args, reply, isOwner }) => {
 For code preview, see next message.
 For full file, check attachment.`;
 
-        await conn.sendMessage(from, { text: infoText }, { quoted: mek });
+  await conn.sendMessage(from, { text: infoText }, { quoted: mek });
 
-        const fullCode = fs.readFileSync(filePath, 'utf-8');
-        const regex = new RegExp(`cmd\\\s*\\{[\\s\\S]*?pattern\\s*:\\s*["']${cmd.pattern}["'][\\s\\S]*?\\}\\s*,[\\s\\S]*?\`);
-        const match = fullCode.match(regex);
-        const snippet = match && match[0] ? (
-          match[0].length > 4000 ? match[0].slice(0, 4000) + "\n\n// ...truncated" : match[0]
-        ) : "// Code block not extracted.";
+  const snippet = fullCode.length > 4000 ? fullCode.slice(0, 4000) + "\n\n// ...truncated" : fullCode;
 
-        await conn.sendMessage(from, {
-          text: "```js\n" + snippet + "\n```"
-        }, { quoted: mek });
+  await conn.sendMessage(from, {
+    text: "```js\n" + snippet + "\n```"
+  }, { quoted: mek });
 
-        await conn.sendMessage(from, {
-          document: fs.readFileSync(filePath),
-          mimetype: 'text/javascript',
-          fileName: path.basename(filePath)
-        }, { quoted: mek });
-      }
-
-      return;
-    }
-
-    // Get single command
-    const command = commands.find(c => c.pattern === input || (c.alias && c.alias.includes(input)));
-    if (!command) return reply("❌ Command not found.");
-
-    const filePath = command.filename;
-    if (!fs.existsSync(filePath)) return reply("❌ File not found!");
-
-    const fullCode = fs.readFileSync(filePath, 'utf-8');
-    const stats = fs.statSync(filePath);
-    const fileName = path.basename(filePath);
-    const fileSize = (stats.size / 1024).toFixed(2) + " KB";
-    const lastModified = stats.mtime.toLocaleString();
-    const relativePath = path.relative(process.cwd(), filePath);
-
-    const infoText = `*───「 Command Info 」───*
-• *Command Name:* ${input}
-• *File Name:* ${fileName}
-• *Size:* ${fileSize}
-• *Last Updated:* ${lastModified}
-• *Category:* ${command.category}
-• *Path:* ./${relativePath}
-
-For code preview, see next message.
-For full file, check attachment.`;
-
-    await conn.sendMessage(from, { text: infoText }, { quoted: mek });
-
-    const regex = new RegExp(`cmd\\\s*\\{[\\s\\S]*?pattern\\s*:\\s*["']${input}["'][\\s\\S]*?\\}\\s*,[\\s\\S]*?\`);
-    const match = fullCode.match(regex);
-
-    const snippet = match && match[0] ? (
-      match[0].length > 4000 ? match[0].slice(0, 4000) + "\n\n// ...truncated" : match[0]
-    ) : "// Code block not extracted.";
-
-    await conn.sendMessage(from, {
-      text: "```js\n" + snippet + "\n```"
-    }, { quoted: mek });
-
-    await conn.sendMessage(from, {
-      document: fs.readFileSync(filePath),
-      mimetype: 'text/javascript',
-      fileName: path.basename(filePath)
-    }, { quoted: mek });
-
-  } catch (err) {
-    console.error("Error in .get command:", err);
-    reply("❌ Error: " + err.message);
-  }
-});
+  await conn.sendMessage(from, {
+    document: fs.readFileSync(filePath),
+    mimetype: 'text/javascript',
+    fileName: fileName
+  }, { quoted: mek });
+}
