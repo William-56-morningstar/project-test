@@ -1,8 +1,18 @@
-const config = require('../config');
 const { cmd } = require('../command');
+const config = require('../config');
 const { getAnti, setAnti, initializeAntiDeleteSettings } = require('../data/antidel');
+const fs = require("fs");
+const path = require("path");
 
 initializeAntiDeleteSettings();
+
+function updateAntiDelPath(value) {
+    const configPath = path.join(__dirname, '../config.js');
+    let configData = fs.readFileSync(configPath, 'utf-8');
+    configData = configData.replace(/ANTI_DEL_PATH\s*:\s*["'](.*?)["']/, `ANTI_DEL_PATH: "${value}"`);
+    fs.writeFileSync(configPath, configData, 'utf-8');
+    delete require.cache[require.resolve('../config')];
+}
 
 cmd({
     pattern: "antidelete",
@@ -21,12 +31,14 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
             case 'on':
                 await setAnti('gc', true);
                 await setAnti('dm', true);
-                return reply('_✅ AntiDelete is now enabled for Group Chats and Direct Messages._');
+                updateAntiDelPath("main");
+                return reply('_✅ AntiDelete is now enabled for Group Chats and Direct Messages. Deleted messages will be shown in the same chat._');
 
             case 'off':
                 await setAnti('gc', false);
                 await setAnti('dm', false);
-                return reply('_❌ AntiDelete is now disabled for Group Chats and Direct Messages._');
+                updateAntiDelPath("none");
+                return reply('_❌ AntiDelete is now fully disabled. No deleted messages will be shown._');
 
             case 'off gc':
                 await setAnti('gc', false);
@@ -54,10 +66,14 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
             case 'status':
                 const currentDmStatus = await getAnti('dm');
                 const currentGcStatus = await getAnti('gc');
+                const logMode = config.ANTI_DEL_PATH === "main" ? '🟢 Same Chat' :
+                                config.ANTI_DEL_PATH === "log" ? '🔒 Private Log' :
+                                '❌ Disabled';
                 const statusMsg = `╭───[ *AntiDelete Status* ]
 │
 │ • *Group Chats:* ${currentGcStatus ? '✅ ON' : '❌ OFF'}
 │ • *Direct Messages:* ${currentDmStatus ? '✅ ON' : '❌ OFF'}
+│ • *Log Mode:* ${logMode}
 │
 ╰───────────────`;
                 return reply(statusMsg);
@@ -65,19 +81,19 @@ async (conn, mek, m, { from, reply, q, isCreator }) => {
             default:
                 return reply(`╭───[ *AntiDelete Guide* ]
 │
-│ • .antidelete on – Enable for all
-│ • .antidelete off – Disable for all
+│ • .antidelete on – Enable for all (show in chat)
+│ • .antidelete off – Disable all (no logging)
 │ • .antidelete set gc – Toggle Group
 │ • .antidelete set dm – Toggle DM
 │ • .antidelete set all – Enable for all
 │ • .antidelete off gc – Disable Group
 │ • .antidelete off dm – Disable DM
-│ • .antidelete status – Show status
+│ • .antidelete status – Show current status
 │
 ╰──────────────`);
         }
     } catch (e) {
         console.error("Error in antidelete command:", e);
-        return reply("An error occurred while processing your request.");
+        return reply("❌ An error occurred while processing your request.");
     }
 });
