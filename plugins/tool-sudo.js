@@ -19,10 +19,8 @@ cmd({
     category: "admin",
     react: "✅",
     filename: __filename
-}, async (conn, mek, m, { from, args, reply, isOwner }) => {
+}, async (conn, mek, m, { from, args, reply, isOwner }) => {  // توجه به async بودن
     try {
-        
-
         let target = m.mentionedJid?.[0] 
             || (m.quoted?.sender ?? null)
             || (args[0]?.replace(/[^0-9]/g, '') + "@s.whatsapp.net");
@@ -39,9 +37,9 @@ cmd({
         const uniqueOwners = [...new Set(own)];
         fs.writeFileSync("./lib/owner.json", JSON.stringify(uniqueOwners, null, 2));
 
-        const dec = "✅ Successfully Added User As Temporary Owner",
-        await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+        const dec = "✅ Successfully Added User As Temporary Owner";
+        await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
             caption: dec
         }, { quoted: mek });
     } catch (err) {
@@ -77,9 +75,9 @@ cmd({
         const updated = own.filter(x => x !== target);
         fs.writeFileSync("./lib/owner.json", JSON.stringify(updated, null, 2));
 
-        const dec = "✅ Successfully Removed User As Temporary Owner",
-        await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+        const dec = "✅ Successfully Added User As Temporary Owner";
+        await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
             caption: dec
         }, { quoted: mek });
     } catch (err) {
@@ -112,8 +110,9 @@ cmd({
             listMessage += `${index + 1}. ${owner.replace("@s.whatsapp.net", "")}\n`;
         });
 
-        await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+        const dec = "✅ Successfully Added User As Temporary Owner";
+        await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
             caption: listMessage
         }, { quoted: mek });
     } catch (err) {
