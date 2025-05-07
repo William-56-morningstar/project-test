@@ -3,7 +3,8 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const FormData = require("form-data");
-const { cmd } = require("../command");
+const { cmd, commands } = require('../command');
+
 
 cmd({
   pattern: "menu",
