@@ -19,7 +19,7 @@ cmd({
     category: "admin",
     react: "✅",
     filename: __filename
-}, async (conn, mek, m, { from, args, reply, isOwner }) => {  // توجه به async بودن
+}, async (conn, mek, m, { from, args, isCreator, reply, isOwner }) => {  // توجه به async بودن
     try {
     if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
         let target = m.mentionedJid?.[0] 
