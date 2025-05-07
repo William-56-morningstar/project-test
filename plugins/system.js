@@ -426,7 +426,8 @@ cmd({
       }, { quoted: message });
 
       await reply(`✅ File *${customName}* downloaded and sent successfully.`);
-      
+    }); // ← این پرانتز جا مانده بود
+
     writer.on("error", (err) => {
       console.error("Download error:", err);
       reply("❌ Error while saving the file.");
