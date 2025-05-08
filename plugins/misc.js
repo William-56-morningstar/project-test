@@ -13,6 +13,7 @@ cmd({
     pattern: "antidelete",
     alias: ['antidel', 'ad'],
     desc: "Manage AntiDelete Settings with Reply Menu",
+    react: "🔄",
     category: "misc",
     filename: __filename,
 },
