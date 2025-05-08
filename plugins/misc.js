@@ -37,7 +37,7 @@ Reply with:
 ╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
-        image: { url: "https://files.catbox.moe/kakvgo.jpg" },
+        image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
         caption: menuText
     }, { quoted: mek });
 
