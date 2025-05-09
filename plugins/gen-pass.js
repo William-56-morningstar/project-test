@@ -14,7 +14,7 @@ cmd({
   try {
     const cards = [];
 
-    // تابع تولید پسورد (بدون crypto)
+    // تابع تولید پسورد
     const generatePassword = (length) => {
       const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
       let password = "";
@@ -43,12 +43,12 @@ cmd({
         nativeFlowMessage: {
           buttons: [
             {
-              name: "cta_copy",
-              buttonParamsJson: `{"display_text":"📋 Copy Password","id":"copy_pass_${i}","copy_code":"${password}"}`
+              buttonText: { displayText: "📋 Copy Password" },
+              buttonId: `copy_pass_${i}`,
             },
             {
-              name: "quick_reply",
-              buttonParamsJson: `{"display_text":"🔄 Generate Again","id": ".gpass"}`
+              buttonText: { displayText: "🔄 Generate Again" },
+              buttonId: ".gpass"
             }
           ]
         }
