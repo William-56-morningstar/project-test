@@ -1,68 +1,85 @@
-const crypto = require("crypto");
 const { cmd } = require("../command");
 
 cmd({
-  pattern: "gpass",
-  desc: "Generate a strong password.",
-  category: "other",
+  pattern: "password",
+  desc: "Generate 5 strong passwords with buttons.",
+  category: "tools",
   react: '🔐',
   filename: __filename
 }, async (conn, m, store, {
   from,
   quoted,
-  body,
-  isCmd,
-  command,
-  args,
-  q,
-  isGroup,
-  sender,
-  senderNumber,
-  botNumber2,
-  botNumber,
-  pushname,
-  isMe,
-  isOwner,
-  groupMetadata,
-  groupName,
-  participants,
-  groupAdmins,
-  isBotAdmins,
-  isAdmins,
   reply
 }) => {
   try {
-    // Password length specified by the user, defaults to 12 if not provided
-    const passwordLength = args[0] ? parseInt(args[0]) : 12;
+    const cards = [];
 
-    // Validate the password length
-    if (isNaN(passwordLength) || passwordLength < 8) {
-      return reply("❌ Please provide a valid length for the password (Minimum 8 Characters).");
-    }
-
-    // Password generation function
+    // تابع تولید پسورد (بدون crypto)
     const generatePassword = (length) => {
-      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?';
-      let password = '';
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+      let password = "";
       for (let i = 0; i < length; i++) {
-        const randomIndex = crypto.randomInt(0, chars.length);
+        const randomIndex = Math.floor(Math.random() * chars.length);
         password += chars[randomIndex];
       }
       return password;
     };
 
-    // Generate the password
-    const generatedPassword = generatePassword(passwordLength);
+    for (let i = 0; i < 5; i++) {
+      const password = generatePassword(12);
 
-    // Send the message with the generated password
-    await conn.sendMessage(from, {
-      text: "🔐 *Your Strong Password* 🔐\n\nPlease find your generated password below:\n\n" + generatedPassword + "\n\n*Powered By JawadTechX*"
-    }, {
+      const imageMsg = (await conn.generateWAMessageContent({
+        image: { url: "https://files.catbox.moe/y9ysty.jpg" }
+      }, { upload: conn.waUploadToServer })).imageMessage;
+
+      cards.push({
+        header: {
+          hasMediaAttachment: true,
+          imageMessage: imageMsg
+        },
+        body: {
+          text: `🔑 *Generated Password ${i + 1}*\n\n🔒 *Password:* \`\`\`${password}\`\`\``
+        },
+        nativeFlowMessage: {
+          buttons: [
+            {
+              name: "cta_copy",
+              buttonParamsJson: `{"display_text":"📋 Copy Password","id":"copy_pass_${i}","copy_code":"${password}"}`
+            },
+            {
+              name: "quick_reply",
+              buttonParamsJson: `{"display_text":"🔄 Generate Again","id": ".gpass"}`
+            }
+          ]
+        }
+      });
+    }
+
+    const message = {
+      viewOnceMessage: {
+        message: {
+          interactiveMessage: {
+            body: {
+              text: "*🔐 5 Strong Passwords Generated!*"
+            },
+            carouselMessage: {
+              cards,
+              messageVersion: 1
+            }
+          }
+        }
+      }
+    };
+
+    const msg = await conn.generateWAMessageFromContent(from, message, {
+      userJid: from,
       quoted: quoted
     });
-    
-  } catch (error) {
-    console.error(error);
-    reply("❌ Error generating password: " + error.message);
+
+    await conn.relayMessage(msg.key.remoteJid, msg.message, { messageId: msg.key.id });
+
+  } catch (err) {
+    console.error("Password Generation Error:", err);
+    await reply("❌ An error occurred while generating passwords.");
   }
 });
