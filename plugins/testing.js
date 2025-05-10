@@ -11,7 +11,7 @@ cmd({
     desc: "Check bot owner.",
     category: "menu",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, prefix, pushname, q, reply }) => {
+}, async (conn, mek, m, { from, prefix, pushname, q, reply }) => {
     try {
 
         let teksnya = `*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*
@@ -81,7 +81,8 @@ cmd({
     ];
 
       const messageOptions = {
-        text: teksnya,
+        image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+        caption: teksnya,
         footer: fatter,
         buttons: buttons,
         headerType: 1,
@@ -89,10 +90,8 @@ cmd({
       };
       await conn.sendMessage(from, messageOptions, { quoted: mek });
       
-      await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
-            caption: messageOptions
-        }, { quoted: mek });
+      
+      
         
 
     } catch (e) {
