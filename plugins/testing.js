@@ -2,6 +2,10 @@ const { cmd, commands } = require('../command');
 const { runtime } = require('../lib/functions');
 const axios = require('axios');
 const yts = require("yt-search");
+const {
+  generateWAMessageFromContent,
+  generateWAMessageContent,
+} = require("@whiskeysockets/baileys");
 const config = require("../config");
 const commandPrefix = config.PREFIX;
 
@@ -98,4 +102,86 @@ cmd({
         console.error(e);
         await reply("An error occurred. Please try again.");
     }
+});
+
+
+cmd({
+  'pattern': "menu3",
+  'alias': [],
+  'react': '📜',
+  'desc': "Display the main menu",
+  'category': "menu",
+  'filename': __filename,
+}, async (_0x2d5080, _0x1a71cf, _0x56f5c6, {
+  from: _0x289080,
+  quoted: _0x3ef4cf,
+  body: _0x1b04e4,
+  isCmd: _0x1eed9f,
+  command: _0x14aa3d,
+  args: _0x104c1c,
+  q: _0x4905ab,
+  isGroup: _0x5313d0,
+  sender: _0x4796d0,
+  senderNumber: _0x3a68fa,
+  pushname: _0x1279c5,
+  reply: _0x10d146
+}) => {
+  try {
+    const thumbnailUrl = "https://files.catbox.moe/6gzrcw.jpg"; // لینک تصویر منو
+    const menuText = `*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*\n\n*Hello ${_0x1279c5 || "User"}* 👋🏻\n\n*> 🎗️ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴍᴇɴᴜ🎗️*`;
+
+    const imageMessage = await generateWAMessageContent(
+      { image: { url: thumbnailUrl } },
+      { upload: _0x2d5080.waUploadToServer }
+    );
+
+    let card = {
+      header: {
+        imageMessage: imageMessage.imageMessage,
+        hasMediaAttachment: true,
+      },
+      body: { text: menuText },
+      nativeFlowMessage: {
+        buttons: [
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"All Quran Menu","id": ".quranmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Owner Menu","id": ".ownermenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Download Menu","id": ".dlmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Groups Menu","id": ".groupmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Info Menu","id": ".infomenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Random Menu","id": ".randommenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Convert Menu","id": ".convertmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Ai-cmd Menu","id": ".aimenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Walppapers Menu","id": ". walppapermenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Other Menu","id": ".othermenu"}` },
+        ],
+      },
+    };
+
+    const messageContent = generateWAMessageFromContent(
+      _0x56f5c6.chat,
+      {
+        viewOnceMessage: {
+          message: {
+            interactiveMessage: {
+              body: { text: "*`( MENU OPTIONS )`*" },
+              carouselMessage: {
+                cards: [card],
+                messageVersion: 0x1,
+              },
+            },
+          },
+        },
+      },
+      {}
+    );
+
+    await _0x2d5080.relayMessage(
+      _0x56f5c6.chat,
+      messageContent.message,
+      { messageId: messageContent.key.id }
+    );
+  } catch (error) {
+    console.error(error);
+    _0x10d146(`Error: ${error.message}`);
+  }
 });
