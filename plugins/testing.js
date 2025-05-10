@@ -67,7 +67,7 @@ cmd({
     const pingButton = { displayText: "PING" };
 
     const buttons = [
-      { Id: `${commandPrefix}alive`, buttonText: aliveButton },
+      { buttonId: `${commandPrefix}alive`, buttonText: aliveButton },
       { buttonId: `${commandPrefix}ping`, buttonText: pingButton },
       {
         buttonId: "action",
