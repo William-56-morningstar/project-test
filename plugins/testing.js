@@ -11,7 +11,7 @@ cmd({
     desc: "Check bot owner.",
     category: "menu",
     filename: __filename
-}, async (conn, mek, m, { from, prefix, q, reply }) => {
+}, async (conn, mek, m, { from, prefix, pushname, q, reply }) => {
     try {
 
         let teksnya = `*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*
