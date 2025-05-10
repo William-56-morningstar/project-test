@@ -7,7 +7,7 @@ const commandPrefix = config.PREFIX;
 
 cmd({
     pattern: "menu4",
-    react: "🎶",
+    react: "✅",
     desc: "Check bot owner.",
     category: "menu",
     filename: __filename
@@ -67,7 +67,7 @@ cmd({
     const pingButton = { displayText: "PING" };
 
     const buttons = [
-      { buttonId: `${commandPrefix}alive`, buttonText: aliveButton },
+      { Id: `${commandPrefix}alive`, buttonText: aliveButton },
       { buttonId: `${commandPrefix}ping`, buttonText: pingButton },
       {
         buttonId: "action",
