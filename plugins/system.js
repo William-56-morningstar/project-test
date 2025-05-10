@@ -136,29 +136,30 @@ For get gitfile ${targetPath}
   }
 });
 
-cmd({ on: "body" }, async (conn, mek, m, { from, body }) => {
-  const { quoted } = mek;
+cmd({
+  on: "body" // یعنی هر متنی بررسی شود
+}, async (conn, mek, m, { from, body }) => {
+  if (body !== "PING" || !mek.quoted) return; // فقط وقتی دقیقا "PING" و ریپلای شده
 
-  if (body === "PING" && quoted) {
-    try {
-      const start = Date.now();
-      await conn.sendMessage(from, {
-        react: { text: "⚡", key: mek.key }
-      });
+  try {
+    const start = Date.now();
 
-      const end = Date.now();
-      const responseTime = end - start;
+    await conn.sendMessage(from, {
+      react: { text: "⚡", key: mek.key }
+    });
 
-      return await conn.sendMessage(from, {
-        text: `> *BEN-BOT SPEED: ${responseTime}ms ⚡*`
-      }, { quoted: mek });
+    const end = Date.now();
+    const responseTime = end - start;
 
-    } catch (e) {
-      console.error("Error in PING command:", e);
-      return await conn.sendMessage(from, {
-        text: `❌ Error:\n${e.message}`
-      }, { quoted: mek });
-    }
+    await conn.sendMessage(from, {
+      text: `> *BEN-BOT SPEED: ${responseTime}ms ⚡*`
+    }, { quoted: mek });
+
+  } catch (e) {
+    console.error("PING error:", e);
+    await conn.sendMessage(from, {
+      text: `❌ Error:\n${e.message}`
+    }, { quoted: mek });
   }
 });
 
