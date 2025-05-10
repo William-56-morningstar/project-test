@@ -72,7 +72,7 @@ cmd({
 
     const buttons = [
       { buttonId: `${commandPrefix}alive`, buttonText: aliveButton },
-      { buttonId: `${commandPrefix}ping`, buttonText: pingButton },
+      { buttonId: `PING`, buttonText: pingButton },
       {
         buttonId: "action",
         buttonText: { displayText: "ini pesan interactiveMeta" },
