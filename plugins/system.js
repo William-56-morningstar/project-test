@@ -10,9 +10,11 @@ const fetch = require('node-fetch');
 const AdmZip = require('adm-zip'); // استفاده از adm-zip
 const { exec } = require('child_process');
 
+
+
 cmd({
     pattern: "getsession",
-    alias: ["sessionid", "getsession 2"],
+    alias: ["sessionid", "getsession2"],
     use: '.getsession',
     desc: "Check bot's response time.",
     category: "system",
@@ -133,6 +135,33 @@ For get gitfile ${targetPath}
     await reply(`❌ Error: ${err.message || err}`);
   }
 });
+
+cmd({ on: "body" }, async (conn, mek, m, { from, body }) => {
+  const { quoted } = mek;
+
+  if (body === "PING" && quoted) {
+    try {
+      const start = Date.now();
+      await conn.sendMessage(from, {
+        react: { text: "⚡", key: mek.key }
+      });
+
+      const end = Date.now();
+      const responseTime = end - start;
+
+      return await conn.sendMessage(from, {
+        text: `> *BEN-BOT SPEED: ${responseTime}ms ⚡*`
+      }, { quoted: mek });
+
+    } catch (e) {
+      console.error("Error in PING command:", e);
+      return await conn.sendMessage(from, {
+        text: `❌ Error:\n${e.message}`
+      }, { quoted: mek });
+    }
+  }
+});
+
 
 cmd({
     pattern: "ping",
