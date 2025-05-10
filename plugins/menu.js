@@ -1,1 +1,719 @@
-const a0_0xdc8bda=a0_0x4128;(function(_0x48a5f5,_0x414d0a){const _0x10fbe=a0_0x4128,_0x94e7b5=_0x48a5f5();while(!![]){try{const _0x16366f=-parseInt(_0x10fbe(0x147))/0x1*(parseInt(_0x10fbe(0x155))/0x2)+parseInt(_0x10fbe(0x15a))/0x3+parseInt(_0x10fbe(0x189))/0x4*(parseInt(_0x10fbe(0x176))/0x5)+parseInt(_0x10fbe(0x19a))/0x6*(parseInt(_0x10fbe(0x13f))/0x7)+parseInt(_0x10fbe(0x14c))/0x8+-parseInt(_0x10fbe(0x13d))/0x9*(parseInt(_0x10fbe(0x18b))/0xa)+parseInt(_0x10fbe(0x179))/0xb*(parseInt(_0x10fbe(0x144))/0xc);if(_0x16366f===_0x414d0a)break;else _0x94e7b5['push'](_0x94e7b5['shift']());}catch(_0x28e90c){_0x94e7b5['push'](_0x94e7b5['shift']());}}}(a0_0x2e37,0x532d2));const axios=require(a0_0xdc8bda(0x19e)),fs=require('fs'),os=require('os'),path=require(a0_0xdc8bda(0x166)),FormData=require(a0_0xdc8bda(0x1a4)),{cmd,commands}=require(a0_0xdc8bda(0x17f)),{runtime}=require(a0_0xdc8bda(0x1a1)),config=require('../config'),yts=require(a0_0xdc8bda(0x193)),{generateWAMessageFromContent,generateWAMessageContent}=require('@whiskeysockets/baileys'),commandPrefix=config[a0_0xdc8bda(0x164)];function a0_0x4128(_0xd5bcea,_0x162a0c){const _0x2e3738=a0_0x2e37();return a0_0x4128=function(_0x41280e,_0x464512){_0x41280e=_0x41280e-0x135;let _0x1b8498=_0x2e3738[_0x41280e];return _0x1b8498;},a0_0x4128(_0xd5bcea,_0x162a0c);}function a0_0x2e37(){const _0x27dc94=['Movie\x20commands','789607gkYHxI','message','menu','downmenu','BOT_NAME','1311636vTYTyO','downloadmenu','convertmenu','317vbXSMK','{\x22display_text\x22:\x22Walppapers\x20Menu\x22,\x22id\x22:\x20\x22.\x20walppapermenu\x22}','moviemenu','stringify','ping','704592YgRSmb','searchmenu','chat','sendMessage','╭━━〔\x20*Group\x20Menu*\x20〕━━┈⊷\x0a','MENU_IMAGE_URL','GROUP\x20MENU','{\x22display_text\x22:\x22Convert\x20Menu\x22,\x22id\x22:\x20\x22.convertmenu\x22}','Download\x20commands','2474fSFYbH','╭━━〔\x20*Downloader\x20Menu*\x20〕━━┈⊷\x0a','❌\x20Error:\x20','https://files.catbox.moe/6gzrcw.jpg','filter','24741JNsHXj','SEARCH\x20MENU','category','DOWNLOAD\x20MENU','group','*\x0a┃◈┃•\x20⚙️\x20Prefix\x20:\x20*[','toolsmenu','action','Check\x20bot\x20owner.','{\x22display_text\x22:\x22Info\x20Menu\x22,\x22id\x22:\x20\x22.infomenu\x22}','PREFIX','╰──────────────┈⊷\x0a>\x20','path','An\x20error\x20occurred.\x20Please\x20try\x20again.','alive','*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*\x0a\x0a𝗛𝗲𝗹𝗹𝗼\x20','MAIN\x20MENU','pattern','ownermenu','{\x22display_text\x22:\x22Owner\x20Menu\x22,\x22id\x22:\x20\x22.ownermenu\x22}','Show\x20all\x20bot\x20commands','*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*\x0a\x0a*Hello\x20',']*\x0a┃◈┃•\x20🌐\x20Platform\x20:\x20*Heroku*\x0a┃◈┃•\x20📦\x20Version\x20:\x20*2.0.0*\x0a┃◈┃•\x20⏱️\x20Runtime\x20:\x20*','ALIVE','key','DESCRIPTION','>\x20🎗️ʜᴇʀᴇ\x20ɪs\x20ʏᴏᴜʀ\x20ᴍᴇɴᴜ🎗️','👋🏻\x0a\x0a╭━⊱⛲𝗪𝗘𝗟𝗖𝗢𝗠𝗘\x20𝗧𝗢\x20𝗠𝗘𝗡𝗨⛲⊱━╮\x0a┃🤖\x20*.ᴀɪᴍᴇɴᴜ*\x0a┃📥\x20*.ᴅᴏᴡɴʟᴏᴀᴅᴍᴇɴᴜ*\x0a┃🧬\x20*.ɢʀᴏᴜᴘᴍᴇɴᴜ*\x0a┃🧰\x20*.ᴛᴏᴏʟsᴍᴇɴᴜ*\x0a┃🔄\x20*.ᴄᴏɴᴠᴇʀᴛᴍᴇɴᴜ*\x0a┃🔍\x20*.ꜱᴇᴀʀᴄʜᴍᴇɴᴜ*\x0a┃🕌\x20*.ǫᴜʀᴀɴᴇᴍɴᴜ*\x0a┃📚\x20*.sᴛᴜᴅʏᴍᴇɴᴜ*\x0a┃🕵️‍♂️\x20*.sᴛᴀʟkᴍᴇɴᴜ*\x0a┃👾\x20*.ʙᴜɢᴍᴇɴᴜ*\x0a┃🎮\x20*.ɢᴀᴍᴇꜱᴍᴇɴᴜ*\x0a┃💰\x20*.ᴄʀʏᴘᴛᴏᴍᴇɴᴜ*\x0a┃🎉\x20*.ғᴜɴᴍᴇɴᴜ*\x0a┃🔞\x20*.ɴsғᴡᴍᴇɴᴜ*\x0a┃🪄\x20*.ᴘʜᴏᴛᴏᴏxʏᴍᴇɴᴜ*\x0a┃🖼️\x20*.ᴇᴘʜᴏᴛᴏᴍᴇɴᴜ*\x0a┃🎥\x20*.ᴀɴɪᴍᴇᴍᴇɴᴜ*\x0a┃🛡️\x20*.ᴏᴡɴᴇʀᴍᴇɴᴜ*\x0a┃⚙️\x20*.sʏsᴛᴇᴍᴍᴇɴᴜ*\x0a┃📜\x20*.ᴀʟʟᴍᴇɴᴜ*\x0a╰━━━━━━━━━━━━━━━━━━━━╯','5ItVUnP','┃◈┃•\x20','{\x22display_text\x22:\x22All\x20Quran\x20Menu\x22,\x22id\x22:\x20\x22.quranmenu\x22}','11PDiIGn','log','{\x22display_text\x22:\x22Other\x20Menu\x22,\x22id\x22:\x20\x22.othermenu\x22}','group\x20menu\x20the\x20bot','groupmenu','*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20👑\x20Owner\x20:\x20*','../command','uptime','fullmenu','imageMessage','BUG\x20MENU','╭━━〔\x20*Owner\x20Menu*\x20〕━━┈⊷\x0a','{\x22display_text\x22:\x22Random\x20Menu\x22,\x22id\x22:\x20\x22.randommenu\x22}','Search\x20commands','Convert\x20commands','stmenu','1015540kyWCIF','{\x22display_text\x22:\x22Download\x20Menu\x22,\x22id\x22:\x20\x22.dlmenu\x22}','90CYcNWZ','allmenu','User','menu2','forEach','https://files.catbox.moe/6vrc2s.jpg','CONVERT\x20MENU','PING','yt-search','grmenu','system\x20menu\x20the\x20bot','*\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20📥\x20*DOWNLOAD\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🟦\x20facebook\x0a┃◈┃•\x20📁\x20mediafire\x0a┃◈┃•\x20🎵\x20tiktok\x0a┃◈┃•\x20🐦\x20twitter\x0a┃◈┃•\x20📷\x20insta\x0a┃◈┃•\x20📦\x20apk\x0a┃◈┃•\x20🖼️\x20img\x0a┃◈┃•\x20▶️\x20tt2\x0a┃◈┃•\x20📌\x20pins\x0a┃◈┃•\x20🔄\x20apk2\x0a┃◈┃•\x20🔵\x20fb2\x0a┃◈┃•\x20📍\x20pinterest\x0a┃◈┃•\x20🎶\x20spotify\x0a┃◈┃•\x20🎧\x20play\x0a┃◈┃•\x20🎧\x20play2\x0a┃◈┃•\x20🔉\x20audio\x0a┃◈┃•\x20🎬\x20video\x0a┃◈┃•\x20📹\x20video2\x0a┃◈┃•\x20🎵\x20ytmp3\x0a┃◈┃•\x20📹\x20ytmp4\x0a┃◈┃•\x20🎶\x20song\x0a┃◈┃•\x20🎬\x20darama\x0a┃◈┃•\x20☁️\x20gdrive\x0a┃◈┃•\x20🌐\x20ssweb\x0a┃◈┃•\x20🎵\x20tiks\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20👥\x20*GROUP\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🔗\x20grouplink\x0a┃◈┃•\x20🚪\x20kickall\x0a┃◈┃•\x20🚷\x20kickall2\x0a┃◈┃•\x20🚫\x20kickall3\x0a┃◈┃•\x20➕\x20add\x0a┃◈┃•\x20➖\x20remove\x0a┃◈┃•\x20👢\x20kick\x0a┃◈┃•\x20⬆️\x20promote\x0a┃◈┃•\x20⬇️\x20demote\x0a┃◈┃•\x20🚮\x20dismiss\x0a┃◈┃•\x20🔄\x20revoke\x0a┃◈┃•\x20👋\x20setgoodbye\x0a┃◈┃•\x20🎉\x20setwelcome\x0a┃◈┃•\x20🗑️\x20delete\x0a┃◈┃•\x20🖼️\x20getpic\x0a┃◈┃•\x20ℹ️\x20ginfo\x0a┃◈┃•\x20⏳\x20disappear\x20on\x0a┃◈┃•\x20⏳\x20disappear\x20off\x0a┃◈┃•\x20⏳\x20disappear\x207D,24H\x0a┃◈┃•\x20📝\x20allreq\x0a┃◈┃•\x20✏️\x20updategname\x0a┃◈┃•\x20📝\x20updategdesc\x0a┃◈┃•\x20📩\x20joinrequests\x0a┃◈┃•\x20📨\x20senddm\x0a┃◈┃•\x20🏃\x20nikal\x0a┃◈┃•\x20🔇\x20mute\x0a┃◈┃•\x20🔊\x20unmute\x0a┃◈┃•\x20🔒\x20lockgc\x0a┃◈┃•\x20🔓\x20unlockgc\x0a┃◈┃•\x20📩\x20invite\x0a┃◈┃•\x20#️⃣\x20tag\x0a┃◈┃•\x20🏷️\x20hidetag\x0a┃◈┃•\x20@️⃣\x20tagall\x0a┃◈┃•\x20👔\x20tagadmins\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20🎭\x20*REACTIONS\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20👊\x20bully\x20@tag\x0a┃◈┃•\x20🤗\x20cuddle\x20@tag\x0a┃◈┃•\x20😢\x20cry\x20@tag\x0a┃◈┃•\x20🤗\x20hug\x20@tag\x0a┃◈┃•\x20🐺\x20awoo\x20@tag\x0a┃◈┃•\x20💋\x20kiss\x20@tag\x0a┃◈┃•\x20👅\x20lick\x20@tag\x0a┃◈┃•\x20🖐️\x20pat\x20@tag\x0a┃◈┃•\x20😏\x20smug\x20@tag\x0a┃◈┃•\x20🔨\x20bonk\x20@tag\x0a┃◈┃•\x20🚀\x20yeet\x20@tag\x0a┃◈┃•\x20😊\x20blush\x20@tag\x0a┃◈┃•\x20😄\x20smile\x20@tag\x0a┃◈┃•\x20👋\x20wave\x20@tag\x0a┃◈┃•\x20✋\x20highfive\x20@tag\x0a┃◈┃•\x20🤝\x20handhold\x20@tag\x0a┃◈┃•\x20🍜\x20nom\x20@tag\x0a┃◈┃•\x20🦷\x20bite\x20@tag\x0a┃◈┃•\x20🤗\x20glomp\x20@tag\x0a┃◈┃•\x20👋\x20slap\x20@tag\x0a┃◈┃•\x20💀\x20kill\x20@tag\x0a┃◈┃•\x20😊\x20happy\x20@tag\x0a┃◈┃•\x20😉\x20wink\x20@tag\x0a┃◈┃•\x20👉\x20poke\x20@tag\x0a┃◈┃•\x20💃\x20dance\x20@tag\x0a┃◈┃•\x20😬\x20cringe\x20@tag\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20🎨\x20*LOGO\x20MAKER*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20💡\x20neonlight\x0a┃◈┃•\x20🎀\x20blackpink\x0a┃◈┃•\x20🐉\x20dragonball\x0a┃◈┃•\x20🎭\x203dcomic\x0a┃◈┃•\x20🇺🇸\x20america\x0a┃◈┃•\x20🍥\x20naruto\x0a┃◈┃•\x20😢\x20sadgirl\x0a┃◈┃•\x20☁️\x20clouds\x0a┃◈┃•\x20🚀\x20futuristic\x0a┃◈┃•\x20📜\x203dpaper\x0a┃◈┃•\x20✏️\x20eraser\x0a┃◈┃•\x20🌇\x20sunset\x0a┃◈┃•\x20🍃\x20leaf\x0a┃◈┃•\x20🌌\x20galaxy\x0a┃◈┃•\x20💀\x20sans\x0a┃◈┃•\x20💥\x20boom\x0a┃◈┃•\x20💻\x20hacker\x0a┃◈┃•\x20😈\x20devilwings\x0a┃◈┃•\x20🇳🇬\x20nigeria\x0a┃◈┃•\x20💡\x20bulb\x0a┃◈┃•\x20👼\x20angelwings\x0a┃◈┃•\x20♈\x20zodiac\x0a┃◈┃•\x20💎\x20luxury\x0a┃◈┃•\x20🎨\x20paint\x0a┃◈┃•\x20❄️\x20frozen\x0a┃◈┃•\x20🏰\x20castle\x0a┃◈┃•\x20🖋️\x20tatoo\x0a┃◈┃•\x20🔫\x20valorant\x0a┃◈┃•\x20🐻\x20bear\x0a┃◈┃•\x20🔠\x20typography\x0a┃◈┃•\x20🎂\x20birthday\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20👑\x20*OWNER\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20👑\x20owner\x0a┃◈┃•\x20📜\x20menu\x0a┃◈┃•\x20📜\x20menu2\x0a┃◈┃•\x20📊\x20vv\x0a┃◈┃•\x20📋\x20listcmd\x0a┃◈┃•\x20📚\x20allmenu\x0a┃◈┃•\x20📦\x20repo\x0a┃◈┃•\x20🚫\x20block\x0a┃◈┃•\x20✅\x20unblock\x0a┃◈┃•\x20🖼️\x20fullpp\x0a┃◈┃•\x20🖼️\x20setpp\x0a┃◈┃•\x20🔄\x20restart\x0a┃◈┃•\x20⏹️\x20shutdown\x0a┃◈┃•\x20🔄\x20updatecmd\x0a┃◈┃•\x20💚\x20alive\x0a┃◈┃•\x20🏓\x20ping\x0a┃◈┃•\x20🆔\x20gjid\x0a┃◈┃•\x20🆔\x20jid\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20🎉\x20*FUN\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🤪\x20shapar\x0a┃◈┃•\x20⭐\x20rate\x0a┃◈┃•\x20🤬\x20insult\x0a┃◈┃•\x20💻\x20hack\x0a┃◈┃•\x20💘\x20ship\x0a┃◈┃•\x20🎭\x20character\x0a┃◈┃•\x20💌\x20pickup\x0a┃◈┃•\x20😆\x20joke\x0a┃◈┃•\x20❤️\x20hrt\x0a┃◈┃•\x20😊\x20hpy\x0a┃◈┃•\x20😔\x20syd\x0a┃◈┃•\x20😠\x20anger\x0a┃◈┃•\x20😳\x20shy\x0a┃◈┃•\x20💋\x20kiss\x0a┃◈┃•\x20🧐\x20mon\x0a┃◈┃•\x20😕\x20cunfuzed\x0a┃◈┃•\x20🖼️\x20setpp\x0a┃◈┃•\x20✋\x20hand\x0a┃◈┃•\x20🏃\x20nikal\x0a┃◈┃•\x20🤲\x20hold\x0a┃◈┃•\x20🤗\x20hug\x0a┃◈┃•\x20🏃\x20nikal\x0a┃◈┃•\x20🎵\x20hifi\x0a┃◈┃•\x20👉\x20poke\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20🔄\x20*CONVERT\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🏷️\x20sticker\x0a┃◈┃•\x20🏷️\x20sticker2\x0a┃◈┃•\x20😀\x20emojimix\x0a┃◈┃•\x20✨\x20fancy\x0a┃◈┃•\x20🖼️\x20take\x0a┃◈┃•\x20🎵\x20tomp3\x0a┃◈┃•\x20🗣️\x20tts\x0a┃◈┃•\x20🌐\x20trt\x0a┃◈┃•\x20🔢\x20base64\x0a┃◈┃•\x20🔠\x20unbase64\x0a┃◈┃•\x20010\x20binary\x0a┃◈┃•\x20🔤\x20dbinary\x0a┃◈┃•\x20🔗\x20tinyurl\x0a┃◈┃•\x20🌐\x20urldecode\x0a┃◈┃•\x20🌐\x20urlencode\x0a┃◈┃•\x20🌐\x20url\x0a┃◈┃•\x20🔁\x20repeat\x0a┃◈┃•\x20❓\x20ask\x0a┃◈┃•\x20📖\x20readmore\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20🤖\x20*AI\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🧠\x20ai\x0a┃◈┃•\x20🤖\x20gpt3\x0a┃◈┃•\x20🤖\x20gpt2\x0a┃◈┃•\x20🤖\x20gptmini\x0a┃◈┃•\x20🤖\x20gpt\x0a┃◈┃•\x20🔵\x20meta\x0a┃◈┃•\x20📦\x20blackbox\x0a┃◈┃•\x20🌈\x20luma\x0a┃◈┃•\x20🎧\x20dj\x0a┃◈┃•\x20👑\x20khan\x0a┃◈┃•\x20🤵\x20jawad\x0a┃◈┃•\x20🧠\x20gpt4\x0a┃◈┃•\x20🔍\x20bing\x0a┃◈┃•\x20🎨\x20imagine\x0a┃◈┃•\x20🖼️\x20imagine2\x0a┃◈┃•\x20🤖\x20copilot\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20⚡\x20*MAIN\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🏓\x20ping\x0a┃◈┃•\x20🏓\x20ping2\x0a┃◈┃•\x20🚀\x20speed\x0a┃◈┃•\x20📡\x20live\x0a┃◈┃•\x20💚\x20alive\x0a┃◈┃•\x20⏱️\x20runtime\x0a┃◈┃•\x20⏳\x20uptime\x0a┃◈┃•\x20📦\x20repo\x0a┃◈┃•\x20👑\x20owner\x0a┃◈┃•\x20📜\x20menu\x0a┃◈┃•\x20📜\x20menu2\x0a┃◈┃•\x20🔄\x20restart\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20🎎\x20*ANIME\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🤬\x20fack\x0a┃◈┃•\x20✅\x20truth\x0a┃◈┃•\x20😨\x20dare\x0a┃◈┃•\x20🐶\x20dog\x0a┃◈┃•\x20🐺\x20awoo\x0a┃◈┃•\x20👧\x20garl\x0a┃◈┃•\x20👰\x20waifu\x0a┃◈┃•\x20🐱\x20neko\x0a┃◈┃•\x20🧙\x20megnumin\x0a┃◈┃•\x20🐱\x20neko\x0a┃◈┃•\x20👗\x20maid\x0a┃◈┃•\x20👧\x20loli\x0a┃◈┃•\x20🎎\x20animegirl\x0a┃◈┃•\x20🎎\x20animegirl1\x0a┃◈┃•\x20🎎\x20animegirl2\x0a┃◈┃•\x20🎎\x20animegirl3\x0a┃◈┃•\x20🎎\x20animegirl4\x0a┃◈┃•\x20🎎\x20animegirl5\x0a┃◈┃•\x20🎬\x20anime1\x0a┃◈┃•\x20🎬\x20anime2\x0a┃◈┃•\x20🎬\x20anime3\x0a┃◈┃•\x20🎬\x20anime4\x0a┃◈┃•\x20🎬\x20anime5\x0a┃◈┃•\x20📰\x20animenews\x0a┃◈┃•\x20🦊\x20foxgirl\x0a┃◈┃•\x20🍥\x20naruto\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a\x0a╭━━〔\x20ℹ️\x20*OTHER\x20MENU*\x20〕━━┈⊷\x0a┃◈╭─────────────────·๏\x0a┃◈┃•\x20🕒\x20timenow\x0a┃◈┃•\x20📅\x20date\x0a┃◈┃•\x20🔢\x20count\x0a┃◈┃•\x20🧮\x20calculate\x0a┃◈┃•\x20🔢\x20countx\x0a┃◈┃•\x20🎲\x20flip\x0a┃◈┃•\x20🪙\x20coinflip\x0a┃◈┃•\x20🎨\x20rcolor\x0a┃◈┃•\x20🎲\x20roll\x0a┃◈┃•\x20ℹ️\x20fact\x0a┃◈┃•\x20💻\x20cpp\x0a┃◈┃•\x20🎲\x20rw\x0a┃◈┃•\x20💑\x20pair\x0a┃◈┃•\x20💑\x20pair2\x0a┃◈┃•\x20💑\x20pair3\x0a┃◈┃•\x20✨\x20fancy\x0a┃◈┃•\x20🎨\x20logo\x20<text>\x0a┃◈┃•\x20📖\x20define\x0a┃◈┃•\x20📰\x20news\x0a┃◈┃•\x20🎬\x20movie\x0a┃◈┃•\x20☀️\x20weather\x0a┃◈┃•\x20📦\x20srepo\x0a┃◈┃•\x20🤬\x20insult\x0a┃◈┃•\x20💾\x20save\x0a┃◈┃•\x20🌐\x20wikipedia\x0a┃◈┃•\x20🔑\x20gpass\x0a┃◈┃•\x20👤\x20githubstalk\x0a┃◈┃•\x20🔍\x20yts\x0a┃◈┃•\x20📹\x20ytv\x0a┃◈╰─────────────────┈⊷\x0a╰━━━━━━━━━━━━━━━━━━━┈⊷\x0a>\x20','.dlmenu','mainmenu','quick_reply','24UxbFmC','*\x20👋🏻\x0a\x0a*>\x20🎗️ʜᴇʀᴇ\x20ɪs\x20ʏᴏᴜʀ\x20ᴍᴇɴᴜ🎗️*','logomenu','TOOLS\x20MENU','axios','downloader','single_select','../lib/functions','*`(\x20MENU\x20OPTIONS\x20)`*','MOVIE\x20MENU','form-data','bugmenu','╭━━〔\x20*System\x20Menu*\x20〕━━┈⊷\x0a','Bug\x20commands','dl\x20menu\x20the\x20bot','relayMessage','menu3','system','OWNER_NAME','🔑\x20Select\x20menu\x20type','177894ZEogJE'];a0_0x2e37=function(){return _0x27dc94;};return a0_0x2e37();}cmd({'pattern':'menu','react':'✅','desc':a0_0xdc8bda(0x162),'category':a0_0xdc8bda(0x141),'filename':__filename},async(_0x2ffc48,_0x36b4b1,_0x236057,{from:_0xa02d70,prefix:_0x193ab6,pushname:_0x5ec40f,q:_0x33a44c,reply:_0x4bd59d})=>{const _0x430c77=a0_0xdc8bda;try{let _0x2d63e3=_0x430c77(0x169)+_0x5ec40f+_0x430c77(0x175),_0x381ed3=_0x430c77(0x174);const _0xbcf43b={'title':_0x430c77(0x13c),'rows':[{'title':_0x430c77(0x15d),'description':_0x430c77(0x154),'id':_0x430c77(0x197)},{'title':_0x430c77(0x15b),'description':_0x430c77(0x186),'id':commandPrefix+_0x430c77(0x14d)},{'title':_0x430c77(0x191),'description':_0x430c77(0x187),'id':commandPrefix+_0x430c77(0x146)},{'title':_0x430c77(0x16a),'description':'Convert\x20commands','id':commandPrefix+_0x430c77(0x198)},{'title':_0x430c77(0x152),'description':'Group\x20commands','id':commandPrefix+_0x430c77(0x17d)},{'title':'LOGO\x20MENU','description':'Logo\x20commands','id':commandPrefix+_0x430c77(0x19c)},{'title':_0x430c77(0x183),'description':_0x430c77(0x136),'id':commandPrefix+_0x430c77(0x1a5)},{'title':_0x430c77(0x1a3),'description':_0x430c77(0x13e),'id':commandPrefix+_0x430c77(0x149)},{'title':_0x430c77(0x19d),'description':'Tools\x20commands','id':commandPrefix+_0x430c77(0x160)}]},_0x353e44={'title':'Click\x20Here⎙','sections':[_0xbcf43b]},_0xac60a7={'url':config[_0x430c77(0x151)]},_0x1654bf={'displayText':_0x430c77(0x171)},_0x10bc61={'displayText':_0x430c77(0x192)},_0x5196bc=[{'buttonId':commandPrefix+_0x430c77(0x168),'buttonText':_0x1654bf},{'buttonId':commandPrefix+_0x430c77(0x14b),'buttonText':_0x10bc61},{'buttonId':_0x430c77(0x161),'buttonText':{'displayText':'ini\x20pesan\x20interactiveMeta'},'type':0x4,'nativeFlowInfo':{'name':_0x430c77(0x1a0),'paramsJson':JSON[_0x430c77(0x14a)](_0x353e44)}}],_0xa44c53={'image':{'url':_0x430c77(0x190)},'caption':_0x2d63e3,'footer':_0x381ed3,'buttons':_0x5196bc,'headerType':0x1,'viewOnce':!![]};await _0x2ffc48[_0x430c77(0x14f)](_0xa02d70,_0xa44c53,{'quoted':_0x36b4b1});}catch(_0x1e5968){console['error'](_0x1e5968),await _0x4bd59d(_0x430c77(0x167));}}),cmd({'pattern':a0_0xdc8bda(0x139),'alias':[],'react':'📜','desc':'Display\x20the\x20main\x20menu','category':'menu','filename':__filename},async(_0x207b21,_0x512793,_0x141af6,{from:_0x2f6ccd,quoted:_0x22a5fc,body:_0x392b06,isCmd:_0x1d25e9,command:_0x4f84b5,args:_0x4e0326,q:_0x229fd2,isGroup:_0x2f9073,sender:_0x52b937,senderNumber:_0x57c14c,pushname:_0x4b72af,reply:_0x5ae921})=>{const _0x2d82ff=a0_0xdc8bda;try{const _0x3f5e01=_0x2d82ff(0x158),_0x5b9cf1=_0x2d82ff(0x16f)+(_0x4b72af||_0x2d82ff(0x18d))+_0x2d82ff(0x19b),_0x49bb03=await generateWAMessageContent({'image':{'url':_0x3f5e01}},{'upload':_0x207b21['waUploadToServer']});let _0x126e31={'header':{'imageMessage':_0x49bb03[_0x2d82ff(0x182)],'hasMediaAttachment':!![]},'body':{'text':_0x5b9cf1},'nativeFlowMessage':{'buttons':[{'name':_0x2d82ff(0x199),'buttonParamsJson':_0x2d82ff(0x178)},{'name':'quick_reply','buttonParamsJson':_0x2d82ff(0x16d)},{'name':_0x2d82ff(0x199),'buttonParamsJson':_0x2d82ff(0x18a)},{'name':_0x2d82ff(0x199),'buttonParamsJson':'{\x22display_text\x22:\x22Groups\x20Menu\x22,\x22id\x22:\x20\x22.groupmenu\x22}'},{'name':_0x2d82ff(0x199),'buttonParamsJson':_0x2d82ff(0x163)},{'name':_0x2d82ff(0x199),'buttonParamsJson':_0x2d82ff(0x185)},{'name':_0x2d82ff(0x199),'buttonParamsJson':_0x2d82ff(0x153)},{'name':'quick_reply','buttonParamsJson':'{\x22display_text\x22:\x22Ai-cmd\x20Menu\x22,\x22id\x22:\x20\x22.aimenu\x22}'},{'name':_0x2d82ff(0x199),'buttonParamsJson':_0x2d82ff(0x148)},{'name':'quick_reply','buttonParamsJson':_0x2d82ff(0x17b)}]}};const _0x84f358=generateWAMessageFromContent(_0x141af6['chat'],{'viewOnceMessage':{'message':{'interactiveMessage':{'body':{'text':_0x2d82ff(0x1a2)},'carouselMessage':{'cards':[_0x126e31],'messageVersion':0x1}}}}},{});await _0x207b21[_0x2d82ff(0x138)](_0x141af6[_0x2d82ff(0x14e)],_0x84f358[_0x2d82ff(0x140)],{'messageId':_0x84f358[_0x2d82ff(0x172)]['id']});}catch(_0x1e8975){console['error'](_0x1e8975),_0x5ae921('Error:\x20'+_0x1e8975['message']);}}),cmd({'pattern':a0_0xdc8bda(0x16c),'desc':'menu\x20the\x20bot','category':'menu','react':'🔰','filename':__filename},async(_0x78d569,_0xab424c,_0x8f99a2,{from:_0x278722,quoted:_0x29fdde,body:_0x206adb,isCmd:_0x287a51,command:_0x296951,args:_0x2350e9,q:_0x117f31,isGroup:_0x532d02,sender:_0x423b2d,senderNumber:_0x1b658b,botNumber2:_0x3a23b0,botNumber:_0x54728d,pushname:_0x1ca637,isMe:_0x2ee230,isOwner:_0x240e2a,groupMetadata:_0x3b8fe2,groupName:_0x4a5dc6,participants:_0x45bf90,groupAdmins:_0x1cc3f0,isBotAdmins:_0x35467d,isAdmins:_0x35fb7d,reply:_0x3dbc0d})=>{const _0x4d73f0=a0_0xdc8bda;try{const _0x1bb352=commands[_0x4d73f0(0x159)](_0x33fd80=>_0x33fd80[_0x4d73f0(0x15c)]==='owner');let _0x2a6c38=_0x4d73f0(0x184);_0x1bb352[_0x4d73f0(0x18f)](_0x855d46=>{const _0x117e9f=_0x4d73f0;_0x2a6c38+='┃◈┃•\x20'+_0x855d46[_0x117e9f(0x16b)]+'\x0a';}),_0x2a6c38+='╰──────────────┈⊷\x0a>\x20'+config[_0x4d73f0(0x173)],await _0x78d569[_0x4d73f0(0x14f)](_0x278722,{'image':{'url':_0x4d73f0(0x190)},'caption':_0x2a6c38},{'quoted':_0xab424c}),await _0x78d569[_0x4d73f0(0x14f)](_0x278722,{'react':{'text':'✅','key':_0x8f99a2['key']}});}catch(_0x519461){console[_0x4d73f0(0x17a)](_0x519461),_0x3dbc0d(''+_0x519461);}}),cmd({'pattern':a0_0xdc8bda(0x145),'alias':['dlmenu',a0_0xdc8bda(0x142)],'desc':a0_0xdc8bda(0x137),'category':a0_0xdc8bda(0x141),'react':'🔰','filename':__filename},async(_0x23fad5,_0x1f64af,_0x450e94,{from:_0x2fbdc2,quoted:_0x29d9c3,body:_0x3c97c9,isCmd:_0x47650d,command:_0x1b806c,args:_0x55f45e,q:_0x3e0967,isGroup:_0x581320,sender:_0x2db101,senderNumber:_0x2494bb,botNumber2:_0x29a8af,botNumber:_0x1b6cce,pushname:_0x3e70b1,isMe:_0x350c9d,isOwner:_0x21bfec,groupMetadata:_0x2c4a63,groupName:_0x3062b2,participants:_0x392e84,groupAdmins:_0x1d519c,isBotAdmins:_0x57a4f4,isAdmins:_0xe8836b,reply:_0x1d70f8})=>{const _0x52de3f=a0_0xdc8bda;try{const _0x1c29cd=commands[_0x52de3f(0x159)](_0xf9e0ef=>_0xf9e0ef['category']===_0x52de3f(0x19f));let _0xa484a7=_0x52de3f(0x156);_0x1c29cd[_0x52de3f(0x18f)](_0x360802=>{const _0x12117b=_0x52de3f;_0xa484a7+=_0x12117b(0x177)+_0x360802['pattern']+'\x0a';}),_0xa484a7+=_0x52de3f(0x165)+config['DESCRIPTION'],await _0x23fad5[_0x52de3f(0x14f)](_0x2fbdc2,{'image':{'url':_0x52de3f(0x190)},'caption':_0xa484a7},{'quoted':_0x1f64af}),await _0x23fad5[_0x52de3f(0x14f)](_0x2fbdc2,{'react':{'text':'✅','key':_0x450e94[_0x52de3f(0x172)]}});}catch(_0x5c35cc){console[_0x52de3f(0x17a)](_0x5c35cc),_0x1d70f8(''+_0x5c35cc);}}),cmd({'pattern':a0_0xdc8bda(0x17d),'alias':['grpmenu',a0_0xdc8bda(0x194)],'desc':a0_0xdc8bda(0x17c),'category':a0_0xdc8bda(0x141),'react':'🔰','filename':__filename},async(_0x5783a6,_0x1a5dbb,_0x4543de,{from:_0x88523f,quoted:_0x1be5dd,body:_0x47ff9e,isCmd:_0x22bbf9,command:_0x58e21e,args:_0x5b35c8,q:_0xad44a0,isGroup:_0x36afb2,sender:_0x4216ae,senderNumber:_0x3d6ba3,botNumber2:_0x411bf4,botNumber:_0x2d1872,pushname:_0x3c8c3b,isMe:_0x1ec1e1,isOwner:_0x4b332e,groupMetadata:_0x2aba44,groupName:_0x195917,participants:_0x4b6e7b,groupAdmins:_0x2551e5,isBotAdmins:_0x4c1c1c,isAdmins:_0x2ad35b,reply:_0x4de33a})=>{const _0x297f9e=a0_0xdc8bda;try{const _0x32234e=commands['filter'](_0x4b4c0d=>_0x4b4c0d[_0x297f9e(0x15c)]===_0x297f9e(0x15e));let _0x183f3c=_0x297f9e(0x150);_0x32234e[_0x297f9e(0x18f)](_0x564669=>{const _0x160456=_0x297f9e;_0x183f3c+=_0x160456(0x177)+_0x564669[_0x160456(0x16b)]+'\x0a';}),_0x183f3c+=_0x297f9e(0x165)+config[_0x297f9e(0x173)],await _0x5783a6[_0x297f9e(0x14f)](_0x88523f,{'image':{'url':_0x297f9e(0x190)},'caption':_0x183f3c},{'quoted':_0x1a5dbb}),await _0x5783a6['sendMessage'](_0x88523f,{'react':{'text':'✅','key':_0x4543de[_0x297f9e(0x172)]}});}catch(_0x53a77c){console[_0x297f9e(0x17a)](_0x53a77c),_0x4de33a(''+_0x53a77c);}}),cmd({'pattern':'systemmenu','alias':['sysmenu',a0_0xdc8bda(0x188)],'desc':a0_0xdc8bda(0x195),'category':a0_0xdc8bda(0x141),'react':'🔰','filename':__filename},async(_0x404813,_0x198f06,_0x3554b5,{from:_0x13dcf7,quoted:_0x5f2f49,body:_0x2807c0,isCmd:_0x3a9f2a,command:_0x2eaa54,args:_0x51bf47,q:_0x379490,isGroup:_0x259b5d,sender:_0x643577,senderNumber:_0x439e48,botNumber2:_0x46df33,botNumber:_0x2bb42d,pushname:_0x6bf2fc,isMe:_0x49881a,isOwner:_0x3dbd7f,groupMetadata:_0x485b7e,groupName:_0x1799ec,participants:_0x3cbda3,groupAdmins:_0x320e43,isBotAdmins:_0x505f44,isAdmins:_0x36d2e1,reply:_0x16a531})=>{const _0x4c5da1=a0_0xdc8bda;try{const _0xfc518f=commands['filter'](_0x4261f6=>_0x4261f6[_0x4c5da1(0x15c)]===_0x4c5da1(0x13a));let _0x1b52d2=_0x4c5da1(0x135);_0xfc518f[_0x4c5da1(0x18f)](_0x529c65=>{const _0x36d4f1=_0x4c5da1;_0x1b52d2+='┃◈┃•\x20'+_0x529c65[_0x36d4f1(0x16b)]+'\x0a';}),_0x1b52d2+=_0x4c5da1(0x165)+config[_0x4c5da1(0x173)],await _0x404813[_0x4c5da1(0x14f)](_0x13dcf7,{'image':{'url':_0x4c5da1(0x190)},'caption':_0x1b52d2},{'quoted':_0x198f06}),await _0x404813[_0x4c5da1(0x14f)](_0x13dcf7,{'react':{'text':'✅','key':_0x3554b5['key']}});}catch(_0x4b1f3b){console[_0x4c5da1(0x17a)](_0x4b1f3b),_0x16a531(''+_0x4b1f3b);}}),cmd({'pattern':a0_0xdc8bda(0x18e),'alias':[a0_0xdc8bda(0x18c),a0_0xdc8bda(0x181)],'use':'.menu2','desc':a0_0xdc8bda(0x16e),'category':a0_0xdc8bda(0x141),'react':'📜','filename':__filename},async(_0x3113e3,_0x4fa35e,_0x517974,{from:_0xbe28c0,quoted:_0x1013c1,body:_0x534570,isCmd:_0x1de306,command:_0x26c38f,args:_0x5e1b4c,q:_0x74db91,isGroup:_0x1a0133,sender:_0x675a9,senderNumber:_0x11e34e,botNumber2:_0x304348,botNumber:_0x2bd91f,pushname:_0x519022,isMe:_0x44229e,isOwner:_0x42cb1a,groupMetadata:_0x4e877a,groupName:_0x338761,participants:_0x20e30b,groupAdmins:_0x54366a,isBotAdmins:_0x48ba2f,isAdmins:_0x19e13c,reply:_0x432b5c})=>{const _0x312022=a0_0xdc8bda;try{let _0x555a9f='╭━━〔\x20🚀\x20*'+config[_0x312022(0x143)]+_0x312022(0x17e)+config[_0x312022(0x13b)]+_0x312022(0x15f)+config[_0x312022(0x164)]+_0x312022(0x170)+runtime(process[_0x312022(0x180)]())+_0x312022(0x196)+config[_0x312022(0x173)];await _0x3113e3['sendMessage'](_0xbe28c0,{'image':{'url':config['MENU_IMAGE_URL']||_0x312022(0x190)},'caption':_0x555a9f},{'quoted':_0x4fa35e});}catch(_0x853c21){console[_0x312022(0x17a)](_0x853c21),_0x432b5c(_0x312022(0x157)+_0x853c21);}});
+const axios = require("axios");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const FormData = require("form-data");
+const { cmd, commands } = require('../command');
+const { runtime } = require('../lib/functions');
+const config = require('../config');
+const yts = require("yt-search");
+const {
+  generateWAMessageFromContent,
+  generateWAMessageContent,
+} = require("@whiskeysockets/baileys");
+const commandPrefix = config.PREFIX;
+
+
+
+cmd({
+    pattern: "menu",
+    react: "✅",
+    desc: "Check bot owner.",
+    category: "menu",
+    filename: __filename
+}, async (conn, mek, m, { from, prefix, pushname, q, reply }) => {
+    try {
+
+        let teksnya = `*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*
+
+𝗛𝗲𝗹𝗹𝗼 ${pushname}👋🏻
+
+╭━⊱⛲𝗪𝗘𝗟𝗖𝗢𝗠𝗘 𝗧𝗢 𝗠𝗘𝗡𝗨⛲⊱━╮
+┃🤖 *.ᴀɪᴍᴇɴᴜ*
+┃📥 *.ᴅᴏᴡɴʟᴏᴀᴅᴍᴇɴᴜ*
+┃🧬 *.ɢʀᴏᴜᴘᴍᴇɴᴜ*
+┃🧰 *.ᴛᴏᴏʟsᴍᴇɴᴜ*
+┃🔄 *.ᴄᴏɴᴠᴇʀᴛᴍᴇɴᴜ*
+┃🔍 *.ꜱᴇᴀʀᴄʜᴍᴇɴᴜ*
+┃🕌 *.ǫᴜʀᴀɴᴇᴍɴᴜ*
+┃📚 *.sᴛᴜᴅʏᴍᴇɴᴜ*
+┃🕵️‍♂️ *.sᴛᴀʟkᴍᴇɴᴜ*
+┃👾 *.ʙᴜɢᴍᴇɴᴜ*
+┃🎮 *.ɢᴀᴍᴇꜱᴍᴇɴᴜ*
+┃💰 *.ᴄʀʏᴘᴛᴏᴍᴇɴᴜ*
+┃🎉 *.ғᴜɴᴍᴇɴᴜ*
+┃🔞 *.ɴsғᴡᴍᴇɴᴜ*
+┃🪄 *.ᴘʜᴏᴛᴏᴏxʏᴍᴇɴᴜ*
+┃🖼️ *.ᴇᴘʜᴏᴛᴏᴍᴇɴᴜ*
+┃🎥 *.ᴀɴɪᴍᴇᴍᴇɴᴜ*
+┃🛡️ *.ᴏᴡɴᴇʀᴍᴇɴᴜ*
+┃⚙️ *.sʏsᴛᴇᴍᴍᴇɴᴜ*
+┃📜 *.ᴀʟʟᴍᴇɴᴜ*
+╰━━━━━━━━━━━━━━━━━━━━╯`;
+
+    let fatter = `> 🎗️ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴍᴇɴᴜ🎗️`;
+    const buttonMenu = {
+      title: "🔑 Select menu type",
+      rows: [
+        { title: "DOWNLOAD MENU", description: "Download commands", id: `.dlmenu` },
+        { title: "SEARCH MENU", description: "Search commands", id: `${commandPrefix}searchmenu` },
+        { title: "CONVERT MENU", description: "Convert commands", id: `${commandPrefix}convertmenu` },
+        { title: "MAIN MENU", description: "Convert commands", id: `${commandPrefix}mainmenu` },
+        { title: "GROUP MENU", description: "Group commands", id: `${commandPrefix}groupmenu` },
+        { title: "LOGO MENU", description: "Logo commands", id: `${commandPrefix}logomenu` },
+        { title: "BUG MENU", description: "Bug commands", id: `${commandPrefix}bugmenu` },
+        { title: "MOVIE MENU", description: "Movie commands", id: `${commandPrefix}moviemenu` },
+        { title: "TOOLS MENU", description: "Tools commands", id: `${commandPrefix}toolsmenu` }
+      ]
+    };
+
+    const buttonOptions = {
+      title: "Click Here⎙",
+      sections: [buttonMenu]
+    };
+
+    const buttonImage = { url: config.MENU_IMAGE_URL };
+    const aliveButton = { displayText: "ALIVE" };
+    const pingButton = { displayText: "PING" };
+
+    const buttons = [
+      { buttonId: `${commandPrefix}alive`, buttonText: aliveButton },
+      { buttonId: `${commandPrefix}ping`, buttonText: pingButton },
+      {
+        buttonId: "action",
+        buttonText: { displayText: "ini pesan interactiveMeta" },
+        type: 4,
+        nativeFlowInfo: {
+          name: "single_select",
+          paramsJson: JSON.stringify(buttonOptions)
+        }
+      }
+    ];
+
+      const messageOptions = {
+        image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+        caption: teksnya,
+        footer: fatter,
+        buttons: buttons,
+        headerType: 1,
+        viewOnce: true
+      };
+      await conn.sendMessage(from, messageOptions, { quoted: mek });
+      
+      
+      
+        
+
+    } catch (e) {
+        console.error(e);
+        await reply("An error occurred. Please try again.");
+    }
+});
+
+
+cmd({
+  'pattern': "menu3",
+  'alias': [],
+  'react': '📜',
+  'desc': "Display the main menu",
+  'category': "menu",
+  'filename': __filename,
+}, async (_0x2d5080, _0x1a71cf, _0x56f5c6, {
+  from: _0x289080,
+  quoted: _0x3ef4cf,
+  body: _0x1b04e4,
+  isCmd: _0x1eed9f,
+  command: _0x14aa3d,
+  args: _0x104c1c,
+  q: _0x4905ab,
+  isGroup: _0x5313d0,
+  sender: _0x4796d0,
+  senderNumber: _0x3a68fa,
+  pushname: _0x1279c5,
+  reply: _0x10d146
+}) => {
+  try {
+    const thumbnailUrl = "https://files.catbox.moe/6gzrcw.jpg"; // لینک تصویر منو
+    const menuText = `*🎡𝑩𝑬𝑵_𝑩𝑶𝑻🎡*\n\n*Hello ${_0x1279c5 || "User"}* 👋🏻\n\n*> 🎗️ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴍᴇɴᴜ🎗️*`;
+
+    const imageMessage = await generateWAMessageContent(
+      { image: { url: thumbnailUrl } },
+      { upload: _0x2d5080.waUploadToServer }
+    );
+
+    let card = {
+      header: {
+        imageMessage: imageMessage.imageMessage,
+        hasMediaAttachment: true,
+      },
+      body: { text: menuText },
+      nativeFlowMessage: {
+        buttons: [
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"All Quran Menu","id": ".quranmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Owner Menu","id": ".ownermenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Download Menu","id": ".dlmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Groups Menu","id": ".groupmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Info Menu","id": ".infomenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Random Menu","id": ".randommenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Convert Menu","id": ".convertmenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Ai-cmd Menu","id": ".aimenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Walppapers Menu","id": ". walppapermenu"}` },
+          { name: "quick_reply", buttonParamsJson: `{"display_text":"Other Menu","id": ".othermenu"}` },
+        ],
+      },
+    };
+
+    const messageContent = generateWAMessageFromContent(
+      _0x56f5c6.chat,
+      {
+        viewOnceMessage: {
+          message: {
+            interactiveMessage: {
+              body: { text: "*`( MENU OPTIONS )`*" },
+              carouselMessage: {
+                cards: [card],
+                messageVersion: 0x1,
+              },
+            },
+          },
+        },
+      },
+      {}
+    );
+
+    await _0x2d5080.relayMessage(
+      _0x56f5c6.chat,
+      messageContent.message,
+      { messageId: messageContent.key.id }
+    );
+  } catch (error) {
+    console.error(error);
+    _0x10d146(`Error: ${error.message}`);
+  }
+});
+
+
+
+cmd({
+    pattern: "ownermenu",
+    desc: "menu the bot",
+    category: "menu",
+    react: "🔰",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        // فیلتر کردن دستورات با category "owner"
+        const ownerCommands = commands.filter(cmd => cmd.category === "owner");
+
+        // ساخت منو با دستورات فیلتر شده
+        let dec = `╭━━〔 *Owner Menu* 〕━━┈⊷\n`;
+        ownerCommands.forEach(cmd => {
+            dec += `┃◈┃• ${cmd.pattern}\n`;
+        });
+        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
+                caption: dec,
+            },
+            { quoted: mek }
+        );
+        
+        await conn.sendMessage(from, {
+      react: { text: "✅", key: m.key }
+    });
+    
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});
+
+
+cmd({
+    pattern: "downloadmenu",
+    alias: ["dlmenu", "downmenu"],
+    desc: "dl menu the bot",
+    category: "menu",
+    react: "🔰",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        // فیلتر کردن دستورات با category "owner"
+        const ownerCommands = commands.filter(cmd => cmd.category === "downloader");
+
+        // ساخت منو با دستورات فیلتر شده
+        let dec = `╭━━〔 *Downloader Menu* 〕━━┈⊷\n`;
+        ownerCommands.forEach(cmd => {
+            dec += `┃◈┃• ${cmd.pattern}\n`;
+        });
+        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
+                caption: dec,
+            },
+            { quoted: mek }
+        );
+        
+        await conn.sendMessage(from, {
+      react: { text: "✅", key: m.key }
+    });
+    
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});
+
+
+cmd({
+    pattern: "groupmenu",
+    alias: ["grpmenu", "grmenu"],
+    desc: "group menu the bot",
+    category: "menu",
+    react: "🔰",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        // فیلتر کردن دستورات با category "owner"
+        const ownerCommands = commands.filter(cmd => cmd.category === "group");
+
+        // ساخت منو با دستورات فیلتر شده
+        let dec = `╭━━〔 *Group Menu* 〕━━┈⊷\n`;
+        ownerCommands.forEach(cmd => {
+            dec += `┃◈┃• ${cmd.pattern}\n`;
+        });
+        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
+                caption: dec,
+            },
+            { quoted: mek }
+        );
+        
+        await conn.sendMessage(from, {
+      react: { text: "✅", key: m.key }
+    });
+    
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});
+
+
+cmd({
+    pattern: "systemmenu",
+    alias: ["sysmenu", "stmenu"],
+    desc: "system menu the bot",
+    category: "menu",
+    react: "🔰",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        // فیلتر کردن دستورات با category "owner"
+        const ownerCommands = commands.filter(cmd => cmd.category === "system");
+
+        // ساخت منو با دستورات فیلتر شده
+        let dec = `╭━━〔 *System Menu* 〕━━┈⊷\n`;
+        ownerCommands.forEach(cmd => {
+            dec += `┃◈┃• ${cmd.pattern}\n`;
+        });
+        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
+                caption: dec,
+            },
+            { quoted: mek }
+        );
+        
+        await conn.sendMessage(from, {
+      react: { text: "✅", key: m.key }
+    });
+    
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cmd({
+    pattern: "menu2",
+    alias: ["allmenu","fullmenu"],
+    use: '.menu2',
+    desc: "Show all bot commands",
+    category: "menu",
+    react: "📜",
+    filename: __filename
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        let dec = `╭━━〔 🚀 *${config.BOT_NAME}* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 👑 Owner : *${config.OWNER_NAME}*
+┃◈┃• ⚙️ Prefix : *[${config.PREFIX}]*
+┃◈┃• 🌐 Platform : *Heroku*
+┃◈┃• 📦 Version : *2.0.0*
+┃◈┃• ⏱️ Runtime : *${runtime(process.uptime())}*
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 📥 *DOWNLOAD MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🟦 facebook
+┃◈┃• 📁 mediafire
+┃◈┃• 🎵 tiktok
+┃◈┃• 🐦 twitter
+┃◈┃• 📷 insta
+┃◈┃• 📦 apk
+┃◈┃• 🖼️ img
+┃◈┃• ▶️ tt2
+┃◈┃• 📌 pins
+┃◈┃• 🔄 apk2
+┃◈┃• 🔵 fb2
+┃◈┃• 📍 pinterest
+┃◈┃• 🎶 spotify
+┃◈┃• 🎧 play
+┃◈┃• 🎧 play2
+┃◈┃• 🔉 audio
+┃◈┃• 🎬 video
+┃◈┃• 📹 video2
+┃◈┃• 🎵 ytmp3
+┃◈┃• 📹 ytmp4
+┃◈┃• 🎶 song
+┃◈┃• 🎬 darama
+┃◈┃• ☁️ gdrive
+┃◈┃• 🌐 ssweb
+┃◈┃• 🎵 tiks
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 👥 *GROUP MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🔗 grouplink
+┃◈┃• 🚪 kickall
+┃◈┃• 🚷 kickall2
+┃◈┃• 🚫 kickall3
+┃◈┃• ➕ add
+┃◈┃• ➖ remove
+┃◈┃• 👢 kick
+┃◈┃• ⬆️ promote
+┃◈┃• ⬇️ demote
+┃◈┃• 🚮 dismiss
+┃◈┃• 🔄 revoke
+┃◈┃• 👋 setgoodbye
+┃◈┃• 🎉 setwelcome
+┃◈┃• 🗑️ delete
+┃◈┃• 🖼️ getpic
+┃◈┃• ℹ️ ginfo
+┃◈┃• ⏳ disappear on
+┃◈┃• ⏳ disappear off
+┃◈┃• ⏳ disappear 7D,24H
+┃◈┃• 📝 allreq
+┃◈┃• ✏️ updategname
+┃◈┃• 📝 updategdesc
+┃◈┃• 📩 joinrequests
+┃◈┃• 📨 senddm
+┃◈┃• 🏃 nikal
+┃◈┃• 🔇 mute
+┃◈┃• 🔊 unmute
+┃◈┃• 🔒 lockgc
+┃◈┃• 🔓 unlockgc
+┃◈┃• 📩 invite
+┃◈┃• #️⃣ tag
+┃◈┃• 🏷️ hidetag
+┃◈┃• @️⃣ tagall
+┃◈┃• 👔 tagadmins
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 🎭 *REACTIONS MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 👊 bully @tag
+┃◈┃• 🤗 cuddle @tag
+┃◈┃• 😢 cry @tag
+┃◈┃• 🤗 hug @tag
+┃◈┃• 🐺 awoo @tag
+┃◈┃• 💋 kiss @tag
+┃◈┃• 👅 lick @tag
+┃◈┃• 🖐️ pat @tag
+┃◈┃• 😏 smug @tag
+┃◈┃• 🔨 bonk @tag
+┃◈┃• 🚀 yeet @tag
+┃◈┃• 😊 blush @tag
+┃◈┃• 😄 smile @tag
+┃◈┃• 👋 wave @tag
+┃◈┃• ✋ highfive @tag
+┃◈┃• 🤝 handhold @tag
+┃◈┃• 🍜 nom @tag
+┃◈┃• 🦷 bite @tag
+┃◈┃• 🤗 glomp @tag
+┃◈┃• 👋 slap @tag
+┃◈┃• 💀 kill @tag
+┃◈┃• 😊 happy @tag
+┃◈┃• 😉 wink @tag
+┃◈┃• 👉 poke @tag
+┃◈┃• 💃 dance @tag
+┃◈┃• 😬 cringe @tag
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 🎨 *LOGO MAKER* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 💡 neonlight
+┃◈┃• 🎀 blackpink
+┃◈┃• 🐉 dragonball
+┃◈┃• 🎭 3dcomic
+┃◈┃• 🇺🇸 america
+┃◈┃• 🍥 naruto
+┃◈┃• 😢 sadgirl
+┃◈┃• ☁️ clouds
+┃◈┃• 🚀 futuristic
+┃◈┃• 📜 3dpaper
+┃◈┃• ✏️ eraser
+┃◈┃• 🌇 sunset
+┃◈┃• 🍃 leaf
+┃◈┃• 🌌 galaxy
+┃◈┃• 💀 sans
+┃◈┃• 💥 boom
+┃◈┃• 💻 hacker
+┃◈┃• 😈 devilwings
+┃◈┃• 🇳🇬 nigeria
+┃◈┃• 💡 bulb
+┃◈┃• 👼 angelwings
+┃◈┃• ♈ zodiac
+┃◈┃• 💎 luxury
+┃◈┃• 🎨 paint
+┃◈┃• ❄️ frozen
+┃◈┃• 🏰 castle
+┃◈┃• 🖋️ tatoo
+┃◈┃• 🔫 valorant
+┃◈┃• 🐻 bear
+┃◈┃• 🔠 typography
+┃◈┃• 🎂 birthday
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 👑 *OWNER MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 👑 owner
+┃◈┃• 📜 menu
+┃◈┃• 📜 menu2
+┃◈┃• 📊 vv
+┃◈┃• 📋 listcmd
+┃◈┃• 📚 allmenu
+┃◈┃• 📦 repo
+┃◈┃• 🚫 block
+┃◈┃• ✅ unblock
+┃◈┃• 🖼️ fullpp
+┃◈┃• 🖼️ setpp
+┃◈┃• 🔄 restart
+┃◈┃• ⏹️ shutdown
+┃◈┃• 🔄 updatecmd
+┃◈┃• 💚 alive
+┃◈┃• 🏓 ping
+┃◈┃• 🆔 gjid
+┃◈┃• 🆔 jid
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 🎉 *FUN MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🤪 shapar
+┃◈┃• ⭐ rate
+┃◈┃• 🤬 insult
+┃◈┃• 💻 hack
+┃◈┃• 💘 ship
+┃◈┃• 🎭 character
+┃◈┃• 💌 pickup
+┃◈┃• 😆 joke
+┃◈┃• ❤️ hrt
+┃◈┃• 😊 hpy
+┃◈┃• 😔 syd
+┃◈┃• 😠 anger
+┃◈┃• 😳 shy
+┃◈┃• 💋 kiss
+┃◈┃• 🧐 mon
+┃◈┃• 😕 cunfuzed
+┃◈┃• 🖼️ setpp
+┃◈┃• ✋ hand
+┃◈┃• 🏃 nikal
+┃◈┃• 🤲 hold
+┃◈┃• 🤗 hug
+┃◈┃• 🏃 nikal
+┃◈┃• 🎵 hifi
+┃◈┃• 👉 poke
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 🔄 *CONVERT MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🏷️ sticker
+┃◈┃• 🏷️ sticker2
+┃◈┃• 😀 emojimix
+┃◈┃• ✨ fancy
+┃◈┃• 🖼️ take
+┃◈┃• 🎵 tomp3
+┃◈┃• 🗣️ tts
+┃◈┃• 🌐 trt
+┃◈┃• 🔢 base64
+┃◈┃• 🔠 unbase64
+┃◈┃• 010 binary
+┃◈┃• 🔤 dbinary
+┃◈┃• 🔗 tinyurl
+┃◈┃• 🌐 urldecode
+┃◈┃• 🌐 urlencode
+┃◈┃• 🌐 url
+┃◈┃• 🔁 repeat
+┃◈┃• ❓ ask
+┃◈┃• 📖 readmore
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 🤖 *AI MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🧠 ai
+┃◈┃• 🤖 gpt3
+┃◈┃• 🤖 gpt2
+┃◈┃• 🤖 gptmini
+┃◈┃• 🤖 gpt
+┃◈┃• 🔵 meta
+┃◈┃• 📦 blackbox
+┃◈┃• 🌈 luma
+┃◈┃• 🎧 dj
+┃◈┃• 👑 khan
+┃◈┃• 🤵 jawad
+┃◈┃• 🧠 gpt4
+┃◈┃• 🔍 bing
+┃◈┃• 🎨 imagine
+┃◈┃• 🖼️ imagine2
+┃◈┃• 🤖 copilot
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 ⚡ *MAIN MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🏓 ping
+┃◈┃• 🏓 ping2
+┃◈┃• 🚀 speed
+┃◈┃• 📡 live
+┃◈┃• 💚 alive
+┃◈┃• ⏱️ runtime
+┃◈┃• ⏳ uptime
+┃◈┃• 📦 repo
+┃◈┃• 👑 owner
+┃◈┃• 📜 menu
+┃◈┃• 📜 menu2
+┃◈┃• 🔄 restart
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 🎎 *ANIME MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🤬 fack
+┃◈┃• ✅ truth
+┃◈┃• 😨 dare
+┃◈┃• 🐶 dog
+┃◈┃• 🐺 awoo
+┃◈┃• 👧 garl
+┃◈┃• 👰 waifu
+┃◈┃• 🐱 neko
+┃◈┃• 🧙 megnumin
+┃◈┃• 🐱 neko
+┃◈┃• 👗 maid
+┃◈┃• 👧 loli
+┃◈┃• 🎎 animegirl
+┃◈┃• 🎎 animegirl1
+┃◈┃• 🎎 animegirl2
+┃◈┃• 🎎 animegirl3
+┃◈┃• 🎎 animegirl4
+┃◈┃• 🎎 animegirl5
+┃◈┃• 🎬 anime1
+┃◈┃• 🎬 anime2
+┃◈┃• 🎬 anime3
+┃◈┃• 🎬 anime4
+┃◈┃• 🎬 anime5
+┃◈┃• 📰 animenews
+┃◈┃• 🦊 foxgirl
+┃◈┃• 🍥 naruto
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+
+╭━━〔 ℹ️ *OTHER MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🕒 timenow
+┃◈┃• 📅 date
+┃◈┃• 🔢 count
+┃◈┃• 🧮 calculate
+┃◈┃• 🔢 countx
+┃◈┃• 🎲 flip
+┃◈┃• 🪙 coinflip
+┃◈┃• 🎨 rcolor
+┃◈┃• 🎲 roll
+┃◈┃• ℹ️ fact
+┃◈┃• 💻 cpp
+┃◈┃• 🎲 rw
+┃◈┃• 💑 pair
+┃◈┃• 💑 pair2
+┃◈┃• 💑 pair3
+┃◈┃• ✨ fancy
+┃◈┃• 🎨 logo <text>
+┃◈┃• 📖 define
+┃◈┃• 📰 news
+┃◈┃• 🎬 movie
+┃◈┃• ☀️ weather
+┃◈┃• 📦 srepo
+┃◈┃• 🤬 insult
+┃◈┃• 💾 save
+┃◈┃• 🌐 wikipedia
+┃◈┃• 🔑 gpass
+┃◈┃• 👤 githubstalk
+┃◈┃• 🔍 yts
+┃◈┃• 📹 ytv
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+> ${config.DESCRIPTION}`;
+
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/6vrc2s.jpg' },
+                caption: dec,
+            },
+            { quoted: mek }
+        );
+        
+    } catch (e) {
+        console.log(e);
+        reply(`❌ Error: ${e}`);
+    }
+});
