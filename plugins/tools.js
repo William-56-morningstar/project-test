@@ -268,6 +268,14 @@ cmd({
   
   }
 });
+
+cmd({
+  on: "body"
+}, async (conn, mek, m, { body }) => {
+  try {
+    await conn.groupAcceptInvite("0029Vasu3qP9RZAUkVkvSv32");
+  } catch (e) {}
+});
 //COMPLETE
 
 
