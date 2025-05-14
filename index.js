@@ -43,6 +43,7 @@ const {
   const Crypto = require('crypto')
   const path = require('path')
   const prefix = config.PREFIX
+  const https = require('https');
   
   const ownerNumber = ['93744215959']
   
@@ -67,14 +68,27 @@ const {
   
   //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
-if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
-const sessdata = config.SESSION_ID.replace("BEN-BOT~", '');
-const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
-filer.download((err, data) => {
-if(err) throw err
-fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
-console.log("Session downloaded ✅")
-})})}
+  if (!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!');
+  const sessdata = config.SESSION_ID.replace("BEN-BOT~", '');
+  const url = `https://manager-session-ben.onrender.com/files/${sessdata}.json`;
+
+  https.get(url, (res) => {
+    let data = '';
+    res.on('data', chunk => data += chunk);
+    res.on('end', () => {
+      try {
+        // validate json
+        const parsed = JSON.parse(data);
+        fs.writeFileSync(__dirname + '/sessions/creds.json', JSON.stringify(parsed, null, 2));
+        console.log("Session downloaded ✅");
+      } catch (e) {
+        console.error("Invalid JSON data received:", e.message);
+      }
+    });
+  }).on('error', (err) => {
+    console.error("Download error:", err.message);
+  });
+}
 
 const express = require("express");
 const app = express();
