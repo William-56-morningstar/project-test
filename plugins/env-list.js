@@ -15,6 +15,13 @@ function updateEnvVariable(key, value) {
     }
 
     fs.writeFileSync(envPath, env);
+
+    // ری‌لود کردن dotenv و config
+    require('dotenv').config({ path: envPath });
+
+    // پاک‌سازی کش config
+    delete require.cache[require.resolve('../config')];
+    Object.assign(config, require('../config'));  // ری‌لود
 }
 
 function isEnabled(value) {
@@ -63,9 +70,9 @@ _Reply with: 1.1, 2.2, etc to toggle ON/OFF_
 `;
 
     const sent = await conn.sendMessage(from, {
-        caption: menu,
-        image: { url: config.MENU_IMAGE_URL }
-    }, { quoted: mek });
+    caption: menu,
+    image: { url: "https://files.catbox.moe/6vrc2s.jpg" }  // عکس تستی
+}, { quoted: mek });
 
     const messageID = sent.key.id;
 
