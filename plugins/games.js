@@ -148,3 +148,19 @@ function checkWin(board, symbol) {
     ];
     return wins.some(combo => combo.every(i => board[i] === symbol));
 }
+
+cmd({
+    pattern: "tttcs",
+    alias: ["-tttcs", "tttcancel"],
+    react: "❌",
+    desc: "Cancel the ongoing Tic-Tac-Toe game",
+    category: "game",
+    filename: __filename,
+}, async (conn, mek, m, { from, reply }) => {
+    if (!games[from] || !games[from].playing) {
+        return reply("❗ There is no ongoing Tic-Tac-Toe game to cancel.");
+    }
+
+    delete games[from];
+    return reply("✅ The Tic-Tac-Toe game has been cancelled successfully.");
+});
