@@ -9,7 +9,8 @@ const { writeFileSync } = require('fs');
 const path = require('path');
 const { getAnti, setAnti } = require('../data/antidel');
 
-const games = {}; // Global object to track games by chat id
+
+const games = {}; // Store ongoing games by chat ID
 
 cmd({
   pattern: 'ttt',
@@ -17,8 +18,10 @@ cmd({
   desc: 'Start a Tic-Tac-Toe game or make a move by replying with a number 1-9',
   category: 'game',
   filename: __filename,
-}, async (conn, mek, m, { from, args, reply, sender }) => {
-  // If no ongoing game, start a new game with the command sender as Player 1 (❌)
+}, async (conn, mek, m, { from, args, sender }) => {
+  // Helper function to reply quoting original message
+  const reply = (text) => conn.reply(from, text, mek);
+
   if (!games[from]) {
     games[from] = {
       board: ['1','2','3','4','5','6','7','8','9'],
@@ -37,7 +40,6 @@ cmd({
 
   const game = games[from];
 
-  // If Player 2 not joined, assign current sender as Player 2
   if (!game.playerO && sender !== game.playerX) {
     game.playerO = sender;
     return reply(
@@ -48,29 +50,24 @@ cmd({
     );
   }
 
-  // If game is ongoing and player tries to start new game
+  // If trying to start new game while ongoing
   if (args.length === 0) {
     return reply('❗ There is already an ongoing game! Please reply with a number (1-9) to make your move.');
   }
 
-  // Validate move input: number 1-9
   const move = args[0];
   if (!/^[1-9]$/.test(move)) return reply('❌ Invalid move! Please reply with a number (1-9).');
 
-  // Check if it's player's turn
   if ((game.turn === 'X' && sender !== game.playerX) || (game.turn === 'O' && sender !== game.playerO)) {
     return reply('❗ It\'s not your turn!');
   }
 
-  // Check if the cell is empty
   if (game.board[move - 1] === '❌' || game.board[move - 1] === '⭕') {
     return reply('❌ This position is already taken. Choose another number.');
   }
 
-  // Make the move
   game.board[move - 1] = game.turn === 'X' ? '❌' : '⭕';
 
-  // Check win or draw
   if (checkWin(game.board, game.turn)) {
     const winner = game.turn === 'X' ? game.playerX : game.playerO;
     const symbol = game.turn === 'X' ? '❌' : '⭕';
@@ -78,7 +75,7 @@ cmd({
       `🎉 @${winner.split('@')[0]} (${symbol}) has won the game! 🎉\n\n` +
       printBoard(game.board)
     );
-    delete games[from]; // Remove finished game
+    delete games[from];
     return;
   }
 
@@ -91,10 +88,8 @@ cmd({
     return;
   }
 
-  // Switch turn
   game.turn = game.turn === 'X' ? 'O' : 'X';
 
-  // Show updated board and next player's turn
   reply(
     `🎮 *TIC-TAC-TOE* 🎮\n\n` +
     printBoard(game.board) +
@@ -103,7 +98,23 @@ cmd({
 
 });
 
-// Helper function to print board as string
+cmd({
+  pattern: "tttcs",
+  alias: [".tttcs", ".tttcancel"],
+  react: "❌",
+  desc: "Cancel the ongoing Tic-Tac-Toe game",
+  category: "game",
+  filename: __filename,
+}, async (conn, mek, m, { from }) => {
+  const reply = (text) => conn.reply(from, text, mek);
+  if (!games[from] || !games[from].playing) {
+    return reply("❗ There is no ongoing Tic-Tac-Toe game to cancel.");
+  }
+  delete games[from];
+  return reply("✅ The Tic-Tac-Toe game has been cancelled successfully.");
+});
+
+// Print board as a nice string
 function printBoard(board) {
   return (
     `┄┄┄┄┄┄┄┄┄┄┄\n` +
@@ -116,7 +127,7 @@ function printBoard(board) {
   );
 }
 
-// Helper function to check win condition
+// Check win condition
 function checkWin(board, turn) {
   const symbol = turn === 'X' ? '❌' : '⭕';
   const wins = [
@@ -126,19 +137,3 @@ function checkWin(board, turn) {
   ];
   return wins.some(indices => indices.every(i => board[i] === symbol));
 }
-
-cmd({
-    pattern: "tttcs",
-    alias: [".tttcs", ".tttcancel"],
-    react: "❌",
-    desc: "Cancel the ongoing Tic-Tac-Toe game",
-    category: "game",
-    filename: __filename,
-}, async (conn, mek, m, { from, reply }) => {
-    if (!games[from] || !games[from].playing) {
-        return reply("❗ There is no ongoing Tic-Tac-Toe game to cancel.");
-    }
-
-    delete games[from];
-    return reply("✅ The Tic-Tac-Toe game has been cancelled successfully.");
-});
