@@ -14,7 +14,7 @@ const games = {}; // Store ongoing games by chat ID
 
 cmd({
   pattern: 'ttt',
-  alias: ['-ttt', 'tictactoe'],
+  alias: ['.ttt', '.tictactoe'],
   desc: 'Start a Tic-Tac-Toe game or make a move by replying with a number 1-9',
   category: 'game',
   filename: __filename,
