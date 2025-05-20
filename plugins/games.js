@@ -151,7 +151,7 @@ function checkWin(board, symbol) {
 
 cmd({
     pattern: "tttcs",
-    alias: ["-tttcs", "tttcancel"],
+    alias: [".tttcs", ".tttcancel"],
     react: "❌",
     desc: "Cancel the ongoing Tic-Tac-Toe game",
     category: "game",
