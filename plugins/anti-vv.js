@@ -85,24 +85,24 @@ cmd({
   category: "owner",
   react: "🛡️",
   filename: __filename
-}, async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, isCreator, reply }) => {
+}, async (conn, mek, m, { from, isCreator, reply }) => {
   try {
     if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const currentMode =
       config.ANTIVIEW_ONCE === "all"
         ? "All Chats"
-        : config.ANTIVIEW_ONCE === "group"
-        ? "Groups Only"
         : config.ANTIVIEW_ONCE === "private"
         ? "Private Only"
+        : config.ANTIVIEW_ONCE === "group"
+        ? "Groups Only"
         : "Disabled";
 
-    const caption = `> *BEN-BOT ANTIVIEWONCE SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable for All Chats\n*2.* Enable for Private Chats only\n*3.* Enable for Group Chats only\n*4.* Disable AntiViewOnce\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
+    const text = `> *BEN-BOT ANTIVIEWONCE SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable AntiViewOnce => All Chats\n*2.* Enable AntiViewOnce => Private Only\n*3.* Enable AntiViewOnce => Groups Only\n*4.* Disable AntiViewOnce\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
-      caption
+      caption: text
     }, { quoted: mek });
 
     const messageID = sentMsg.key.id;
@@ -118,8 +118,7 @@ cmd({
 
         const replyText =
           receivedMsg.message?.conversation ||
-          receivedMsg.message?.extendedTextMessage?.text ||
-          "";
+          receivedMsg.message?.extendedTextMessage?.text || "";
 
         const sender = receivedMsg.key.remoteJid;
 
@@ -128,10 +127,10 @@ cmd({
           await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *All Chats*." }, { quoted: receivedMsg });
         } else if (replyText === "2") {
           config.ANTIVIEW_ONCE = "private";
-          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Private Chats* only." }, { quoted: receivedMsg });
+          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Private Chats only*." }, { quoted: receivedMsg });
         } else if (replyText === "3") {
           config.ANTIVIEW_ONCE = "group";
-          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Groups* only." }, { quoted: receivedMsg });
+          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Groups only*." }, { quoted: receivedMsg });
         } else if (replyText === "4") {
           config.ANTIVIEW_ONCE = "off";
           await conn.sendMessage(sender, { text: "❌ AntiViewOnce has been *disabled*." }, { quoted: receivedMsg });
@@ -156,18 +155,14 @@ cmd({
 });
 
 cmd({
-  on: 'body'
-}, async (conn, m, store, {
-  from,
-  isGroup,
-  sender
-}) => {
+  on: "body"
+}, async (conn, m, store, { from, isGroup }) => {
   try {
     const mode = config.ANTIVIEW_ONCE;
 
-    if (mode === 'off') return;
-    if (mode === 'group' && !isGroup) return;
-    if (mode === 'private' && isGroup) return;
+    if (mode === "off") return;
+    if (mode === "private" && isGroup) return;
+    if (mode === "group" && !isGroup) return;
 
     const msg = m.message;
     if (!msg?.viewOnceMessage?.message) return;
@@ -179,22 +174,21 @@ cmd({
     const buffer = await conn.downloadMediaMessage({ message: viewOnceContent });
     if (!buffer) return;
 
-    const caption = content?.caption || '';
-    const mimetype = content?.mimetype || '';
-
+    const caption = content?.caption || "";
+    const mimetype = content?.mimetype || "";
     const sendOptions = { quoted: m };
 
-    if (mtype === 'imageMessage') {
+    if (mtype === "imageMessage") {
       await conn.sendMessage(from, {
         image: buffer,
         caption: caption || "🖼️ View Once image recovered."
       }, sendOptions);
-    } else if (mtype === 'videoMessage') {
+    } else if (mtype === "videoMessage") {
       await conn.sendMessage(from, {
         video: buffer,
         caption: caption || "🎥 View Once video recovered."
       }, sendOptions);
-    } else if (mtype === 'audioMessage') {
+    } else if (mtype === "audioMessage") {
       await conn.sendMessage(from, {
         audio: buffer,
         ptt: content?.ptt || false,
@@ -207,6 +201,6 @@ cmd({
     }
 
   } catch (err) {
-    console.error("AntiViewOnce Error:", err);
+    console.error("AntiViewOnce Auto Error:", err);
   }
 });
