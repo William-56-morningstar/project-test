@@ -914,9 +914,7 @@ cmd({
   filename: __filename
 }, async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, isCreator, reply }) => {
   try {
-    if (!isGroup) return reply("❗This command can only be used in a group.");
-    if (!isBotAdmins) return reply("❗The bot must be admin to perform this action.");
-    if (!isAdmins) return reply("❗Only group admins can use this command.");
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
     const currentMode =
       config.ANTILINK_KICK === "true"
