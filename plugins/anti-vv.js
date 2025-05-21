@@ -81,90 +81,132 @@ cmd({
 
 cmd({
   pattern: "antiviewonce",
-  fromMe: true,
-  desc: "Configure ANTIVIEWONCE mode",
+  desc: "Configure ANTIVIEWONCE system with menu",
   category: "owner",
+  react: "🛡️",
   filename: __filename
-}, async (conn, mek) => {
-  const current =
-    config.ANTIVIEW_ONCE === "all" ? "All Chats" :
-    config.ANTIVIEW_ONCE === "group" ? "Groups Only" :
-    config.ANTIVIEW_ONCE === "private" ? "Private Only" : "Disabled";
+}, async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, isCreator, reply }) => {
+  try {
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
 
-  const caption = `> *ANTIVIEWONCE SETTINGS*\n\n> Current: *${current}*\n\nReply with:\n1. All chats\n2. Private chats only\n3. Group chats only\n4. Disable\n\n╭─────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────◆`;
+    const currentMode =
+      config.ANTIVIEW_ONCE === "all"
+        ? "All Chats"
+        : config.ANTIVIEW_ONCE === "group"
+        ? "Groups Only"
+        : config.ANTIVIEW_ONCE === "private"
+        ? "Private Only"
+        : "Disabled";
 
-  const sent = await conn.sendMessage(mek.jid, {
-    caption,
-    image: { url: "https://i.ibb.co/4gY6xmm/viewonce.jpg" }
-  }, { quoted: mek });
+    const caption = `> *BEN-BOT ANTIVIEWONCE SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable for All Chats\n*2.* Enable for Private Chats only\n*3.* Enable for Group Chats only\n*4.* Disable AntiViewOnce\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
-  const msgId = sent.key.id;
+    const sentMsg = await conn.sendMessage(from, {
+      image: { url: "https://i.ibb.co/4gY6xmm/viewonce.jpg" },
+      caption
+    }, { quoted: mek });
 
-  const handler = async (msgData) => {
-    const received = msgData.messages?.[0];
-    const text = received?.message?.conversation || "";
+    const messageID = sentMsg.key.id;
 
-    if (received?.message?.extendedTextMessage?.contextInfo?.stanzaId !== msgId) return;
+    const handler = async (msgData) => {
+      try {
+        const receivedMsg = msgData.messages[0];
+        if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
 
-    const jid = received.key.remoteJid;
+        const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+        const isReply = quotedId === messageID;
+        if (!isReply) return;
 
-    if (["1", "2", "3", "4"].includes(text)) {
-      if (text === "1") config.ANTIVIEW_ONCE = "all";
-      else if (text === "2") config.ANTIVIEW_ONCE = "private";
-      else if (text === "3") config.ANTIVIEW_ONCE = "group";
-      else config.ANTIVIEW_ONCE = "off";
+        const replyText =
+          receivedMsg.message?.conversation ||
+          receivedMsg.message?.extendedTextMessage?.text ||
+          "";
 
-      await conn.sendMessage(jid, {
-        text: `✅ AntiViewOnce mode set to *${config.ANTIVIEW_ONCE.toUpperCase()}*`
-      }, { quoted: received });
+        const sender = receivedMsg.key.remoteJid;
 
+        if (replyText === "1") {
+          config.ANTIVIEW_ONCE = "all";
+          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *All Chats*." }, { quoted: receivedMsg });
+        } else if (replyText === "2") {
+          config.ANTIVIEW_ONCE = "private";
+          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Private Chats* only." }, { quoted: receivedMsg });
+        } else if (replyText === "3") {
+          config.ANTIVIEW_ONCE = "group";
+          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Groups* only." }, { quoted: receivedMsg });
+        } else if (replyText === "4") {
+          config.ANTIVIEW_ONCE = "off";
+          await conn.sendMessage(sender, { text: "❌ AntiViewOnce has been *disabled*." }, { quoted: receivedMsg });
+        } else {
+          await conn.sendMessage(sender, { text: "❌ Invalid option. Please reply with 1, 2, 3, or 4." }, { quoted: receivedMsg });
+        }
+
+        conn.ev.off("messages.upsert", handler);
+      } catch (err) {
+        console.log("AntiViewOnce handler error:", err);
+      }
+    };
+
+    conn.ev.on("messages.upsert", handler);
+
+    setTimeout(() => {
       conn.ev.off("messages.upsert", handler);
-    } else {
-      await conn.sendMessage(jid, { text: "❌ Invalid option." }, { quoted: received });
-    }
-  };
-
-  conn.ev.on("messages.upsert", handler);
-  setTimeout(() => conn.ev.off("messages.upsert", handler), 600000);
+    }, 600000); // 10 دقیقه
+  } catch (e) {
+    reply(`❗ Error: ${e.message}`);
+  }
 });
 
 cmd({
-  on: "message",
-}, async (client, message) => {
+  on: 'body'
+}, async (conn, m, store, {
+  from,
+  isGroup,
+  sender
+}) => {
   try {
-    const quoted = message?.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-
-    if (!quoted || !quoted.viewOnceMessage) return;
-
-    const isGroup = message.key.remoteJid.endsWith("@g.us");
     const mode = config.ANTIVIEW_ONCE;
 
-    if (
-      (mode === "off") ||
-      (mode === "private" && isGroup) ||
-      (mode === "group" && !isGroup)
-    ) return;
+    if (mode === 'off') return;
+    if (mode === 'group' && !isGroup) return;
+    if (mode === 'private' && isGroup) return;
 
-    const content = quoted.viewOnceMessage.message;
-    const type = Object.keys(content)[0];
-    const buffer = await client.downloadMediaMessage({ message: content });
+    const msg = m.message;
+    if (!msg?.viewOnceMessage?.message) return;
 
-    const msgObj = {};
-    if (type === "imageMessage") {
-      msgObj.image = buffer;
-    } else if (type === "videoMessage") {
-      msgObj.video = buffer;
-    } else if (type === "audioMessage") {
-      msgObj.audio = buffer;
-      msgObj.mimetype = content.audioMessage?.mimetype || "audio/mp4";
-      msgObj.ptt = content.audioMessage?.ptt || false; // اگر ویس باشه true هست
+    const viewOnceContent = msg.viewOnceMessage.message;
+    const mtype = Object.keys(viewOnceContent)[0];
+    const content = viewOnceContent[mtype];
+
+    const buffer = await conn.downloadMediaMessage({ message: viewOnceContent });
+    if (!buffer) return;
+
+    const caption = content?.caption || '';
+    const mimetype = content?.mimetype || '';
+
+    const sendOptions = { quoted: m };
+
+    if (mtype === 'imageMessage') {
+      await conn.sendMessage(from, {
+        image: buffer,
+        caption: caption || "🖼️ View Once image recovered."
+      }, sendOptions);
+    } else if (mtype === 'videoMessage') {
+      await conn.sendMessage(from, {
+        video: buffer,
+        caption: caption || "🎥 View Once video recovered."
+      }, sendOptions);
+    } else if (mtype === 'audioMessage') {
+      await conn.sendMessage(from, {
+        audio: buffer,
+        ptt: content?.ptt || false,
+        mimetype: "audio/mp4"
+      }, sendOptions);
     } else {
-      return; // پیام‌های دیگر را نادیده بگیر
+      await conn.sendMessage(from, {
+        text: "❌ Only image, video, and audio view-once messages are supported."
+      }, sendOptions);
     }
 
-    await client.sendMessage(message.key.remoteJid, msgObj, { quoted: message });
-
   } catch (err) {
-    console.log("Auto VV Error:", err);
+    console.error("AntiViewOnce Error:", err);
   }
 });
