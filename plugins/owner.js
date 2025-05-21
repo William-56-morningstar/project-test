@@ -903,142 +903,37 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
         return reply(`*🫟 ᴇxᴀᴍᴘʟᴇ:  .sᴛᴀᴛᴜs-ʀᴇᴘʟʏ ᴏɴ*`);
     }
 });
+
 //--------------------------------------------
-//  ANTI-LINK COMMANDS
+//  ANTILINK-WARN COMMANDS
 //--------------------------------------------
+
 cmd({
-  pattern: "antilink",
-  desc: "Configure ANTILINK system with menu",
+  pattern: "antilinkwarn",
+  desc: "Enable or disable ANTILINK_WARN in groups",
   category: "owner",
-  react: "🛡️",
+  react: "🚫",
   filename: __filename
-}, async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, isCreator, reply }) => {
+}, async (conn, mek, m, { isGroup, isAdmins, isBotAdmins, args, reply }) => {
   try {
-    if (!isGroup) return reply("❗This command can only be used in a group.");
-    if (!isBotAdmins) return reply("❗The bot must be admin to perform this action.");
-    if (!isAdmins) return reply("❗Only group admins can use this command.");
+    if (!isGroup) return reply('This command can only be used in a group.');
+    if (!isBotAdmins) return reply('Bot must be an admin to use this command.');
+    if (!isAdmins) return reply('You must be an admin to use this command.');
 
-    const currentMode =
-      config.ANTILINK_KICK === "true"
-        ? "Remove"
-        : config.ANTILINK_WARN === "true"
-        ? "Warn"
-        : config.ANTILINK === "true"
-        ? "Delete"
-        : "Disabled";
-
-    const text = `> *ANTILINK SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable ANTILINK => Warn\n*2.* Enable ANTILINK => Delete\n*3.* Enable ANTILINK => Remove/Kick\n*4.* Disable All ANTILINK Modes\n\n───────`;
-
-    const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
-      caption: text
-    }, { quoted: mek });
-
-    const messageID = sentMsg.key.id;
-
-    const handler = async (msgData) => {
-      try {
-        const receivedMsg = msgData.messages[0];
-        if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
-
-        const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
-        const isReply = quotedId === messageID;
-        if (!isReply) return;
-
-        const replyText =
-          receivedMsg.message?.conversation ||
-          receivedMsg.message?.extendedTextMessage?.text ||
-          "";
-
-        const sender = receivedMsg.key.remoteJid;
-
-        // Reset all modes
-        config.ANTILINK = "false";
-        config.ANTILINK_WARN = "false";
-        config.ANTILINK_KICK = "false";
-
-        if (replyText === "1") {
-          config.ANTILINK_WARN = "true";
-          await conn.sendMessage(sender, { text: "✅ ANTILINK 'Warn' mode enabled." }, { quoted: receivedMsg });
-        } else if (replyText === "2") {
-          config.ANTILINK = "true";
-          await conn.sendMessage(sender, { text: "✅ ANTILINK 'Delete' mode enabled." }, { quoted: receivedMsg });
-        } else if (replyText === "3") {
-          config.ANTILINK_KICK = "true";
-          await conn.sendMessage(sender, { text: "✅ ANTILINK 'Remove/Kick' mode enabled." }, { quoted: receivedMsg });
-        } else if (replyText === "4") {
-          await conn.sendMessage(sender, { text: "❌ All ANTILINK features have been disabled." }, { quoted: receivedMsg });
-        } else {
-          await conn.sendMessage(sender, { text: "❌ Invalid option. Please reply with 1, 2, 3, or 4." }, { quoted: receivedMsg });
-        }
-
-        conn.ev.off("messages.upsert", handler);
-      } catch (err) {
-        console.log("Antilink handler error:", err);
-      }
-    };
-
-    conn.ev.on("messages.upsert", handler);
-
-    setTimeout(() => {
-      conn.ev.off("messages.upsert", handler);
-    }, 600000);
+    if (args[0] === "on") {
+      config.ANTILINK_WARN = "true";
+      reply("✅ ANTILINK_WARN has been enabled.");
+    } else if (args[0] === "off") {
+      config.ANTILINK_WARN = "false";
+      reply("❌ ANTILINK_WARN has been disabled.");
+    } else {
+      reply("Usage: *.antilinkwarn on/off*");
+    }
   } catch (e) {
-    reply(`❗ Error: ${e.message}`);
+    reply(`Error: ${e.message}`);
   }
 });
-//
-cmd({
-  on: 'body'
-}, async (conn, m, store, {
-  from,
-  body,
-  sender,
-  isGroup,
-  isAdmins,
-  isBotAdmins
-}) => {
-  try {
-    if (!isGroup || isAdmins || !isBotAdmins) {
-      return;
-    }
-    const linkPatterns = [
-      /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi,
-      /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
-      /wa\.me\/\S+/gi,
-      /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,
-      /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,
-      /https?:\/\/youtu\.be\/\S+/gi,
-      /https?:\/\/(?:www\.)?facebook\.com\/\S+/gi,
-      /https?:\/\/fb\.me\/\S+/gi,
-      /https?:\/\/(?:www\.)?instagram\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?tiktok\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?snapchat\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?pinterest\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,
-      /https?:\/\/ngl\/\S+/gi,
-      /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,
-      /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,
-      /https?:\/\/(?:www\.)?medium\.com\/\S+/gi
-    ];
-    const containsLink = linkPatterns.some(pattern => pattern.test(body));
 
-    if (containsLink && config.ANTILINK === 'true') {
-      await conn.sendMessage(from, { delete: m.key }, { quoted: m });
-      await conn.sendMessage(from, {
-        'text': `@${sender.split('@')[0]}. ⚠️ Links are not allowed in this group`,
-        'mentions': [sender]
-      }, { 'quoted': m });
-    }
-  } catch (error) {
-    console.error(error);
-  }
-});
-//
 cmd({
   'on': "body"
 }, async (conn, m, store, {
@@ -1128,7 +1023,38 @@ cmd({
     reply("❌ An error occurred while processing the message.");
   }
 });
-//
+
+
+//--------------------------------------------
+//  ANTI-KICK COMMANDS
+//--------------------------------------------
+cmd({
+  pattern: "antilinkkick",
+  desc: "Enable or disable ANTILINK_KICK in groups",
+  category: "owner",
+  react: "⚠️",
+  filename: __filename
+}, async (conn, mek, m, { isGroup, isAdmins, isBotAdmins, args, reply }) => {
+  try {
+    if (!isGroup) return reply('This command can only be used in a group.');
+    if (!isBotAdmins) return reply('Bot must be an admin to use this command.');
+    if (!isAdmins) return reply('You must be an admin to use this command.');
+
+    if (args[0] === "on") {
+      config.ANTILINK_KICK = "true";
+      reply("✅ ANTILINK_KICK has been enabled.");
+    } else if (args[0] === "off") {
+      config.ANTILINK_KICK = "false";
+      reply("❌ ANTILINK_KICK has been disabled.");
+    } else {
+      reply("Usage: *.antilinkkick on/off*");
+    }
+  } catch (e) {
+    reply(`Error: ${e.message}`);
+  }
+});
+
+
 cmd({
   'on': "body"
 }, async (conn, m, store, {
@@ -1183,6 +1109,90 @@ cmd({
     reply("An error occurred while processing the message.");
   }
 });
+
+
+
+//--------------------------------------------
+//  ANTI-LINK COMMANDS
+//--------------------------------------------
+cmd({
+  pattern: "antilink",
+  desc: "Enable or disable ANTILINK in groups",
+  category: "owner",
+  react: "❌",
+  filename: __filename
+}, async (conn, mek, m, { isGroup, isAdmins, isBotAdmins, args, reply }) => {
+  try {
+    if (!isGroup) return reply('This command can only be used in a group.');
+    if (!isBotAdmins) return reply('Bot must be an admin to use this command.');
+    if (!isAdmins) return reply('You must be an admin to use this command.');
+
+    if (args[0] === "on") {
+      config.ANTILINK = "true";
+      reply("✅ ANTILINK is now enabled.");
+    } else if (args[0] === "off") {
+      config.ANTILINK = "false";
+      reply("❌ ANTILINK is now disabled.");
+    } else {
+      reply("Usage: *.deletelink on/off*");
+    }
+  } catch (e) {
+    reply(`Error: ${e.message}`);
+  }
+});
+//
+cmd({
+  on: 'body'
+}, async (conn, m, store, {
+  from,
+  body,
+  sender,
+  isGroup,
+  isAdmins,
+  isBotAdmins
+}) => {
+  try {
+    if (!isGroup || isAdmins || !isBotAdmins) {
+      return;
+    }
+    const linkPatterns = [
+      /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi,
+      /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
+      /wa\.me\/\S+/gi,
+      /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,
+      /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,
+      /https?:\/\/youtu\.be\/\S+/gi,
+      /https?:\/\/(?:www\.)?facebook\.com\/\S+/gi,
+      /https?:\/\/fb\.me\/\S+/gi,
+      /https?:\/\/(?:www\.)?instagram\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?tiktok\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?snapchat\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?pinterest\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,
+      /https?:\/\/ngl\/\S+/gi,
+      /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,
+      /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?medium\.com\/\S+/gi
+    ];
+    const containsLink = linkPatterns.some(pattern => pattern.test(body));
+
+    if (containsLink && config.ANTILINK === 'true') {
+      await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+      await conn.sendMessage(from, {
+        'text': `@${sender.split('@')[0]}. ⚠️ Links are not allowed in this group`,
+        'mentions': [sender]
+      }, { 'quoted': m });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
 //--------------------------------------------
 //  ANI-DELETE COMMANDS
 //--------------------------------------------
