@@ -802,32 +802,6 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     }
 });
 
-
-//--------------------------------------------
-//  ANI-BAD COMMANDS
-//--------------------------------------------
-cmd({
-    pattern: "anti-bad",
-    alias: ["antibadword"],
-    desc: "enable or disable antibad.",
-    category: "owner",
-    filename: __filename
-},    
-async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
-
-    const status = args[0]?.toLowerCase();
-    // Check the argument for enabling or disabling the anticall feature
-    if (args[0] === "on") {
-        config.ANTI_BAD_WORD = "true";
-        return reply("*anti bad word is now enabled.*");
-    } else if (args[0] === "off") {
-        config.ANTI_BAD_WORD = "false";
-        return reply("*anti bad word feature is now disabled*");
-    } else {
-        return reply(`_example:  .antibad on_`);
-    }
-});
 //--------------------------------------------
 //  AUTO-STICKER COMMANDS
 //--------------------------------------------
@@ -931,13 +905,12 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
 });
 
 //--------------------------------------------
-//  ANTILINK COMMANDS
+//  ANTILINK-WARN COMMANDS
 //--------------------------------------------
 
 cmd({
-  pattern: "antilink",
-  alias: ["antilinks"],
-  desc: "Enable or disable ANTI_LINK in groups",
+  pattern: "antilinkwarn",
+  desc: "Enable or disable ANTILINK_WARN in groups",
   category: "owner",
   react: "🚫",
   filename: __filename
@@ -948,13 +921,13 @@ cmd({
     if (!isAdmins) return reply('You must be an admin to use this command.');
 
     if (args[0] === "on") {
-      config.ANTI_LINK = "true";
+      config.ANTILINK_WARN = "true";
       reply("✅ ANTI_LINK has been enabled.");
     } else if (args[0] === "off") {
-      config.ANTI_LINK = "false";
-      reply("❌ ANTI_LINK has been disabled.");
+      config.ANTILINK_WARN = "false";
+      reply("❌ ANTILINK_WARN has been disabled.");
     } else {
-      reply("Usage: *.antilink on/off*");
+      reply("Usage: *.antilinkwarn on/off*");
     }
   } catch (e) {
     reply(`Error: ${e.message}`);
@@ -962,9 +935,102 @@ cmd({
 });
 
 cmd({
+  'on': "body"
+}, async (conn, m, store, {
+  from,
+  body,
+  sender,
+  isGroup,
+  isAdmins,
+  isBotAdmins,
+  reply
+}) => {
+  try {
+    // Initialize warnings if not exists
+    if (!global.warnings) {
+      global.warnings = {};
+    }
+
+    // Only act in groups where bot is admin and sender isn't admin
+    if (!isGroup || isAdmins || !isBotAdmins) {
+      return;
+    }
+
+    // List of link patterns to detect
+    const linkPatterns = [
+      /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi, // WhatsApp links
+      /https?:\/\/(?:api\.whatsapp\.com|wa\.me)\/\S+/gi,  // WhatsApp API links
+      /wa\.me\/\S+/gi,                                    // WhatsApp.me links
+      /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,         // Telegram links
+      /https?:\/\/(?:www\.)?\.com\/\S+/gi,                // Generic .com links
+      /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,         // Twitter links
+      /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,        // LinkedIn links
+      /https?:\/\/(?:whatsapp\.com|channel\.me)\/\S+/gi,  // Other WhatsApp/channel links
+      /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,          // Reddit links
+      /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,         // Discord links
+      /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,           // Twitch links
+      /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,           // Vimeo links
+      /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,     // Dailymotion links
+      /https?:\/\/(?:www\.)?medium\.com\/\S+/gi           // Medium links
+    ];
+
+    // Check if message contains any forbidden links
+    const containsLink = linkPatterns.some(pattern => pattern.test(body));
+
+    // Only proceed if anti-link is enabled and link is detected
+    if (containsLink && config.ANTILINK_WARN === 'true') {
+      console.log(`Link detected from ${sender}: ${body}`);
+
+      // Try to delete the message
+      try {
+        await conn.sendMessage(from, {
+          delete: m.key
+        });
+        console.log(`Message deleted: ${m.key.id}`);
+      } catch (error) {
+        console.error("Failed to delete message:", error);
+      }
+
+      // Update warning count for user
+      global.warnings[sender] = (global.warnings[sender] || 0) + 1;
+      const warningCount = global.warnings[sender];
+
+      // Handle warnings
+      if (warningCount < 4) {
+        // Send warning message
+        await conn.sendMessage(from, {
+          text: `‎*⚠️LINKS ARE NOT ALLOWED⚠️*\n` +
+                `*╭────⬡ WARNING ⬡────*\n` +
+                `*├▢ USER :* @${sender.split('@')[0]}!\n` +
+                `*├▢ COUNT : ${warningCount}*\n` +
+                `*├▢ REASON : LINK SENDING*\n` +
+                `*├▢ WARN LIMIT : 3*\n` +
+                `*╰────────────────*`,
+          mentions: [sender]
+        });
+      } else {
+        // Remove user if they exceed warning limit
+        await conn.sendMessage(from, {
+          text: `@${sender.split('@')[0]} *HAS BEEN REMOVED - WARN LIMIT EXCEEDED!*`,
+          mentions: [sender]
+        });
+        await conn.groupParticipantsUpdate(from, [sender], "remove");
+        delete global.warnings[sender];
+      }
+    }
+  } catch (error) {
+    console.error("Anti-link error:", error);
+    reply("❌ An error occurred while processing the message.");
+  }
+});
+
+
+//--------------------------------------------
+//  ANTI-KICK COMMANDS
+//--------------------------------------------
+cmd({
   pattern: "antilinkkick",
-  alias: ["kicklink"],
-  desc: "Enable or disable ANTI_LINK_KICK in groups",
+  desc: "Enable or disable ANTILINK_KICK in groups",
   category: "owner",
   react: "⚠️",
   filename: __filename
@@ -975,11 +1041,11 @@ cmd({
     if (!isAdmins) return reply('You must be an admin to use this command.');
 
     if (args[0] === "on") {
-      config.ANTI_LINK_KICK = "true";
-      reply("✅ ANTI_LINK_KICK has been enabled.");
+      config.ANTILINK_KICK = "true";
+      reply("✅ ANTILINK_KICK has been enabled.");
     } else if (args[0] === "off") {
-      config.ANTI_LINK_KICK = "false";
-      reply("❌ ANTI_LINK_KICK has been disabled.");
+      config.ANTILINK_KICK = "false";
+      reply("❌ ANTILINK_KICK has been disabled.");
     } else {
       reply("Usage: *.antilinkkick on/off*");
     }
@@ -990,9 +1056,68 @@ cmd({
 
 
 cmd({
-  pattern: "deletelink",
-  alias: ["linksdelete"],
-  desc: "Enable or disable DELETE_LINKS in groups",
+  'on': "body"
+}, async (conn, m, store, {
+  from,
+  body,
+  sender,
+  isGroup,
+  isAdmins,
+  isBotAdmins,
+  reply
+}) => {
+  try {
+    if (!isGroup || isAdmins || !isBotAdmins) {
+      return;
+    }
+    const linkPatterns = [
+      /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi,
+      /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
+      /wa\.me\/\S+/gi,
+      /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,
+      /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,
+      /https?:\/\/youtu\.be\/\S+/gi,
+      /https?:\/\/(?:www\.)?facebook\.com\/\S+/gi,
+      /https?:\/\/fb\.me\/\S+/gi,
+      /https?:\/\/(?:www\.)?instagram\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?tiktok\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?snapchat\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?pinterest\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,
+      /https?:\/\/ngl\/\S+/gi,
+      /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,
+      /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?medium\.com\/\S+/gi
+    ];
+    const containsLink = linkPatterns.some(pattern => pattern.test(body));
+
+    if (containsLink && config.ANTILINK_KICK === 'true') {
+      await conn.sendMessage(from, { 'delete': m.key }, { 'quoted': m });
+      await conn.sendMessage(from, {
+        'text': `⚠️ Links are not allowed in this group.\n@${sender.split('@')[0]} has been removed. 🚫`,
+        'mentions': [sender]
+      }, { 'quoted': m });
+
+      await conn.groupParticipantsUpdate(from, [sender], "remove");
+    }
+  } catch (error) {
+    console.error(error);
+    reply("An error occurred while processing the message.");
+  }
+});
+
+
+
+//--------------------------------------------
+//  ANTI-LINK COMMANDS
+//--------------------------------------------
+cmd({
+  pattern: "antilink",
+  desc: "Enable or disable ANTILINK in groups",
   category: "owner",
   react: "❌",
   filename: __filename
@@ -1003,11 +1128,11 @@ cmd({
     if (!isAdmins) return reply('You must be an admin to use this command.');
 
     if (args[0] === "on") {
-      config.DELETE_LINKS = "true";
-      reply("✅ DELETE_LINKS is now enabled.");
+      config.ANTILINK = "true";
+      reply("✅ ANTILINK is now enabled.");
     } else if (args[0] === "off") {
-      config.DELETE_LINKS = "false";
-      reply("❌ DELETE_LINKS is now disabled.");
+      config.ANTILINK = "false";
+      reply("❌ ANTILINK is now disabled.");
     } else {
       reply("Usage: *.deletelink on/off*");
     }
@@ -1015,8 +1140,62 @@ cmd({
     reply(`Error: ${e.message}`);
   }
 });
+//
+cmd({
+  on: 'body'
+}, async (conn, m, store, {
+  from,
+  body,
+  sender,
+  isGroup,
+  isAdmins,
+  isBotAdmins
+}) => {
+  try {
+    if (!isGroup || isAdmins || !isBotAdmins) {
+      return;
+    }
+    const linkPatterns = [
+      /https?:\/\/(?:chat\.whatsapp\.com|wa\.me)\/\S+/gi,
+      /^https?:\/\/(www\.)?whatsapp\.com\/channel\/([a-zA-Z0-9_-]+)$/,
+      /wa\.me\/\S+/gi,
+      /https?:\/\/(?:t\.me|telegram\.me)\/\S+/gi,
+      /https?:\/\/(?:www\.)?youtube\.com\/\S+/gi,
+      /https?:\/\/youtu\.be\/\S+/gi,
+      /https?:\/\/(?:www\.)?facebook\.com\/\S+/gi,
+      /https?:\/\/fb\.me\/\S+/gi,
+      /https?:\/\/(?:www\.)?instagram\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?twitter\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?tiktok\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?linkedin\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?snapchat\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?pinterest\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?reddit\.com\/\S+/gi,
+      /https?:\/\/ngl\/\S+/gi,
+      /https?:\/\/(?:www\.)?discord\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?twitch\.tv\/\S+/gi,
+      /https?:\/\/(?:www\.)?vimeo\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?dailymotion\.com\/\S+/gi,
+      /https?:\/\/(?:www\.)?medium\.com\/\S+/gi
+    ];
+    const containsLink = linkPatterns.some(pattern => pattern.test(body));
+
+    if (containsLink && config.ANTILINK === 'true') {
+      await conn.sendMessage(from, { delete: m.key }, { quoted: m });
+      await conn.sendMessage(from, {
+        'text': `@${sender.split('@')[0]}. ⚠️ Links are not allowed in this group`,
+        'mentions': [sender]
+      }, { 'quoted': m });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 
+//--------------------------------------------
+//  ANI-DELETE COMMANDS
+//--------------------------------------------
 cmd({
     pattern: "antidelete",
     alias: ['antidel', 'ad'],
@@ -1098,5 +1277,63 @@ Reply with:
     conn.ev.on("messages.upsert", handler);
     setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000); // 30 دقیقه
 });
+
+//--------------------------------------------
+//  ANI-BAD COMMANDS
+//--------------------------------------------
+cmd({
+    pattern: "anti-bad",
+    alias: ["antibadword"],
+    desc: "enable or disable antibad.",
+    category: "owner",
+    filename: __filename
+},    
+async (conn, mek, m, { from, args, isCreator, reply }) => {
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+
+    const status = args[0]?.toLowerCase();
+    // Check the argument for enabling or disabling the anticall feature
+    if (args[0] === "on") {
+        config.ANTI_BAD_WORD = "true";
+        return reply("*anti bad word is now enabled.*");
+    } else if (args[0] === "off") {
+        config.ANTI_BAD_WORD = "false";
+        return reply("*anti bad word feature is now disabled*");
+    } else {
+        return reply(`_example:  .antibad on_`);
+    }
+});
+// Anti-Bad Words System
+cmd({
+  'on': "body"
+}, async (conn, m, store, {
+  from,
+  body,
+  isGroup,
+  isAdmins,
+  isBotAdmins,
+  reply,
+  sender
+}) => {
+  try {
+    const badWords = ["wtf", "mia", "xxx", "سکس", "کوس", "غین", "کون", "fuck", 'sex', "huththa", "pakaya", 'ponnaya', "hutto"];
+
+    if (!isGroup || isAdmins || !isBotAdmins) {
+      return;
+    }
+
+    const messageText = body.toLowerCase();
+    const containsBadWord = badWords.some(word => messageText.includes(word));
+
+    if (containsBadWord && config.ANTI_BAD_WORD === "true") {
+      await conn.sendMessage(from, { 'delete': m.key }, { 'quoted': m });
+      await conn.sendMessage(from, { 'text': "🚫⚠️ BAD WORDS NOT ALLOWED IN ⚠️🚫" }, { 'quoted': m });
+    }
+  } catch (error) {
+    console.error(error);
+    reply("An error occurred while processing the message.");
+  }
+});
+
 
 
