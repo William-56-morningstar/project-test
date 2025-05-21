@@ -7,6 +7,9 @@ const AdmZip = require("adm-zip");
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson } = require('../lib/functions2');
 const { writeFileSync } = require('fs');
 const path = require('path');
+const { getAnti, setAnti } = require('../data/antidel');
+
+
 
 
 const OWNER_PATH = path.join(__dirname, "../lib/owner.json");
@@ -160,7 +163,7 @@ cmd({
         }
 
         // Make API request to get pairing code
-        const response = await axios.get(`https://benbot-pairweb.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
+        const response = await axios.get(`https://session-generateor.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
         
         if (!response.data || !response.data.code) {
             return await reply("❌ Failed to retrieve pairing code. Please try again later.");
@@ -204,7 +207,7 @@ cmd({
         }
 
         // Make API request to get pairing code
-        const response = await axios.get(`https://benbot-pairweb.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
+        const response = await axios.get(`https://session-generateor.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
         
         if (!response.data || !response.data.code) {
             return await reply("❌ Failed to retrieve pairing code. Please try again later.");
@@ -499,13 +502,28 @@ cmd({
 }, async (conn, mek, m, { from, args, isCreator, reply }) => {
     if (!isCreator) return reply("*📛 Only the owner can use this command!*");
 
-    const newPrefix = args[0]; // Get the new prefix from the command arguments
+    const newPrefix = args[0];
     if (!newPrefix) return reply("❌ Please provide a new prefix. Example: `.setprefix !`");
 
-    // Update the prefix in memory
-    config.PREFIX = newPrefix;
+    try {
+        // به جای فقط تغییر config.PREFIX در حافظه، 
+        // باید این مقدار را در فایل تنظیمات ذخیره کنی
+        // فرض میکنیم فایل config.json داری که مقدار prefix در اون هست
 
-    return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
+        const fs = require("fs");
+        let configData = JSON.parse(fs.readFileSync("./config.json"));
+
+        configData.PREFIX = newPrefix;
+        fs.writeFileSync("./config.json", JSON.stringify(configData, null, 2));
+
+        // حالا config را هم به روز کن در حافظه
+        config.PREFIX = newPrefix;
+
+        return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
+    } catch (error) {
+        console.error("Error setting prefix:", error);
+        return reply("❌ An error occurred while setting the prefix.");
+    }
 });
 
 
@@ -1002,5 +1020,87 @@ cmd({
   }
 });
 
+
+cmd({
+    pattern: "antidelete",
+    alias: ['antidel', 'ad'],
+    desc: "Manage AntiDelete Settings with Reply Menu",
+    react: "🔄",
+    category: "misc",
+    filename: __filename,
+},
+async (conn, mek, m, { from, reply, isCreator }) => {
+    if (!isCreator) return reply("*Only the bot owner can use this command!*");
+
+    const dmStatus = config.ANTI_DEL_PATH === "log";
+
+    const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
+
+> Current DM: ${dmStatus ? "✅ ON (log)" : "❌ OFF (same)"}
+
+Reply with:
+
+*1.* To Enable Antidelete for All (Group,DM) Same Chat  
+*2.* To Enable Antidelete for All (Group,DM) dm Chat  
+*3.* To Disable All Antidelete and reset
+
+╭────────────────◆  
+│ *POWERED BY NOTHING*  
+╰─────────────────◆`;
+
+    const sentMsg = await conn.sendMessage(from, {
+        image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+        caption: menuText
+    }, { quoted: mek });
+
+    const messageID = sentMsg.key.id;
+
+    const handler = async (msgData) => {
+        try {
+            const receivedMsg = msgData.messages[0];
+            if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
+
+            const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+            const isReply = quotedId === messageID;
+            if (!isReply) return;
+
+            const replyText =
+                receivedMsg.message?.conversation ||
+                receivedMsg.message?.extendedTextMessage?.text || "";
+
+            let responseText = "";
+
+            if (replyText === "1") {
+                await setAnti('gc', true);
+                await setAnti('dm', true);
+                config.ANTI_DEL_PATH = "same";
+                fs.writeFileSync('./config.js', `module.exports = ${JSON.stringify(config, null, 2)};`);
+                responseText = "✅ AntiDelete Enabled.\nand Mode is Same chat\nGroup: ON\nDM: ON (same)";
+            } else if (replyText === "2") {
+                await setAnti('gc', true);
+                await setAnti('dm', true);
+                config.ANTI_DEL_PATH = "log";
+                fs.writeFileSync('./config.js', `module.exports = ${JSON.stringify(config, null, 2)};`);
+                responseText = "✅ AntiDelete Mode changed to DM Log.\nGroup: ON\nDM: ON (log)";
+            } else if (replyText === "3") {
+                await setAnti('gc', false);
+                await setAnti('dm', false);
+                config.ANTI_DEL_PATH = "same";
+                fs.writeFileSync('./config.js', `module.exports = ${JSON.stringify(config, null, 2)};`);
+                responseText = "❌ AntiDelete turned off for both Group and DM.";
+            } else {
+                responseText = "❌ Invalid input. Please reply with *1*, *2*, or *3*.";
+            }
+
+            await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
+            conn.ev.off("messages.upsert", handler);
+        } catch (err) {
+            console.error("AntiDelete handler error:", err);
+        }
+    };
+
+    conn.ev.on("messages.upsert", handler);
+    setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000); // 30 دقیقه
+});
 
 
