@@ -876,7 +876,7 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
 </html>
   `;
   res.send(htmlResponse);
-  });
+});
   app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));
   setTimeout(() => {
   connectToWA()
