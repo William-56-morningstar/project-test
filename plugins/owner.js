@@ -502,28 +502,24 @@ cmd({
 }, async (conn, mek, m, { from, args, isCreator, reply }) => {
     if (!isCreator) return reply("*📛 Only the owner can use this command!*");
 
+    if (!args[0]) return reply("❌ Please provide a new prefix. Example: `.setprefix !`");
+
     const newPrefix = args[0];
-    if (!newPrefix) return reply("❌ Please provide a new prefix. Example: `.setprefix !`");
 
-    try {
-        // به جای فقط تغییر config.PREFIX در حافظه، 
-        // باید این مقدار را در فایل تنظیمات ذخیره کنی
-        // فرض میکنیم فایل config.json داری که مقدار prefix در اون هست
+    // regex برای رد کردن حروف و اعداد (اگر حروف یا عدد بود خطا بده)
+    const hasLetterOrDigit = /[a-zA-Z0-9]/.test(newPrefix);
 
-        const fs = require("fs");
-        let configData = JSON.parse(fs.readFileSync("./config.json"));
-
-        configData.PREFIX = newPrefix;
-        fs.writeFileSync("./config.json", JSON.stringify(configData, null, 2));
-
-        // حالا config را هم به روز کن در حافظه
-        config.PREFIX = newPrefix;
-
-        return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
-    } catch (error) {
-        console.error("Error setting prefix:", error);
-        return reply("❌ An error occurred while setting the prefix.");
+    if (hasLetterOrDigit) {
+        return reply("❌ Invalid prefix. Letters and numbers are not allowed as prefix.");
     }
+
+    if (newPrefix.length < 1 || newPrefix.length > 3) {
+        return reply("❌ Prefix length must be between 1 and 3 characters.");
+    }
+
+    config.PREFIX = newPrefix;
+
+    return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
 });
 
 
