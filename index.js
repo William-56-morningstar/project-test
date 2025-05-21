@@ -787,7 +787,49 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
   }
   
   app.get("/", (req, res) => {
-  res.send("BEN BOT STARTED ✅");
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="fa">
+      <head>
+        <meta charset="UTF-8">
+        <title>BEN BOT STATUS</title>
+        <style>
+          body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Vazirmatn', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+          }
+          .container {
+            background-color: #161b22;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+            text-align: center;
+            border: 1px solid #30363d;
+          }
+          h1 {
+            color: #39ff14;
+            margin-bottom: 10px;
+          }
+          p {
+            font-size: 1.2rem;
+            color: #8b949e;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>✅ BEN BOT STARTED</h1>
+          <p>NOTHING IS BOT OWNER</p>
+        </div>
+      </body>
+      </html>
+    `);
   });
   app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));
   setTimeout(() => {
