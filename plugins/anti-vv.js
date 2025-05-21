@@ -171,28 +171,31 @@ cmd({
     const mtype = Object.keys(viewOnceContent)[0];
     const content = viewOnceContent[mtype];
 
+    // دانلود کامل محتوا مثل vv
     const buffer = await conn.downloadMediaMessage({ message: viewOnceContent });
     if (!buffer) return;
 
     const caption = content?.caption || "";
-    const mimetype = content?.mimetype || "";
     const sendOptions = { quoted: m };
 
+    // ارسال دقیقا مثل vv
     if (mtype === "imageMessage") {
       await conn.sendMessage(from, {
         image: buffer,
-        caption: caption || "🖼️ View Once image recovered."
+        caption: caption,
+        mimetype: content.mimetype || "image/jpeg"
       }, sendOptions);
     } else if (mtype === "videoMessage") {
       await conn.sendMessage(from, {
         video: buffer,
-        caption: caption || "🎥 View Once video recovered."
+        caption: caption,
+        mimetype: content.mimetype || "video/mp4"
       }, sendOptions);
     } else if (mtype === "audioMessage") {
       await conn.sendMessage(from, {
         audio: buffer,
-        ptt: content?.ptt || false,
-        mimetype: "audio/mp4"
+        mimetype: content.mimetype || "audio/mp4",
+        ptt: content.ptt || false
       }, sendOptions);
     } else {
       await conn.sendMessage(from, {
