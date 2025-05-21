@@ -13,8 +13,53 @@ const { exec } = require('child_process');
 
 
 cmd({
+  pattern: "getsession2",
+  use: '.getsession2',
+  desc: "Show bot's session ID with copy button.",
+  category: "system",
+  react: "⚡",
+  filename: __filename
+}, async (conn, mek, m, { from, reply }) => {
+  try {
+    const start = new Date().getTime();
+
+    // ارسال واکنش
+    await conn.sendMessage(from, {
+      react: { text: "⚡", key: mek.key }
+    });
+
+    const end = new Date().getTime();
+    const responseTime = ((end - start) / 1000).toFixed(2);
+    const uptime = runtime(process.uptime());
+
+    const sessionId = config.SESSION_ID;
+
+    // ارسال پیام با دکمه کپی
+    await conn.sendMessage(from, {
+      text: `*🔐 Session ID Information*\n\n📄 *ID:* ${sessionId}\n⏱️ *Response Time:* ${responseTime} s\n📡 *Uptime:* ${uptime}`,
+      footer: "Press the button below to copy session ID.",
+      nativeFlowMessage: {
+        buttons: [
+          {
+            name: "cta_copy",
+            buttonParamsJson: JSON.stringify({
+              display_text: "📋 Copy Session ID",
+              id: "copy_session_id_1",
+              copy_code: sessionId
+            }),
+          }
+        ],
+      }
+    }, { quoted: mek });
+
+  } catch (e) {
+    console.error("Error in getsession:", e);
+    reply(`❌ Error: ${e.message}`);
+  }
+});
+
+cmd({
     pattern: "getsession",
-    alias: ["sessionid", "getsession2"],
     use: '.getsession',
     desc: "Check bot's response time.",
     category: "system",
