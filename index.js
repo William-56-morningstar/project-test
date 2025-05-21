@@ -789,43 +789,108 @@ if (!isReact && config.CUSTOM_REACT === 'true') {
   app.get("/", (req, res) => {
     res.send(`
       <!DOCTYPE html>
-      <html lang="fa">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <title>BEN BOT STATUS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BEN BOT | STATUS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
         <style>
+          * {
+            box-sizing: border-box;
+          }
+  
           body {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            font-family: 'Vazirmatn', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #ffffff;
           }
-          .container {
-            background-color: #161b22;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,255,0,0.2);
+  
+          .card {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px 25px;
+            border-radius: 16px;
             text-align: center;
-            border: 1px solid #30363d;
+            box-shadow: 0 8px 24px rgba(0, 255, 128, 0.3);
+            border: 1px solid #00ff99;
+            width: 90%;
+            max-width: 420px;
+            animation: fadeInUp 1.2s ease-out;
           }
-          h1 {
-            color: #39ff14;
+  
+          .card h1 {
+            font-size: 1.8rem;
+            color: #00ff99;
             margin-bottom: 10px;
           }
-          p {
-            font-size: 1.2rem;
-            color: #8b949e;
+  
+          .card p {
+            font-size: 1rem;
+            color: #cccccc;
+          }
+
+          .status-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #00ff99;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+            animation: pulse 1.2s infinite;
+          }
+  
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+  
+          @keyframes pulse {
+            0% {
+              transform: scale(1);
+              opacity: 1;
+            }
+            50% {
+              transform: scale(1.3);
+              opacity: 0.6;
+            }
+            100% {
+              transform: scale(1);
+              opacity: 1;
+            }
+          }
+  
+          @media (max-width: 480px) {
+            .card {
+              padding: 20px 15px;
+            }
+  
+            .card h1 {
+              font-size: 1.4rem;
+            }
+  
+            .card p {
+              font-size: 0.95rem;
+            }
           }
         </style>
       </head>
       <body>
-        <div class="container">
-          <h1>✅ BEN BOT STARTED</h1>
-          <p>NOTHING IS BOT OWNER</p>
+        <div class="card">
+          <h1><span class="status-dot"></span> BEN BOT IS RUNNING</h1>
+          <p>BEN BOT OWNER IS NOTHING.</p>
         </div>
       </body>
       </html>
