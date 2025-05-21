@@ -101,7 +101,7 @@ cmd({
     const caption = `> *BEN-BOT ANTIVIEWONCE SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable for All Chats\n*2.* Enable for Private Chats only\n*3.* Enable for Group Chats only\n*4.* Disable AntiViewOnce\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://i.ibb.co/4gY6xmm/viewonce.jpg" },
+      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption
     }, { quoted: mek });
 
