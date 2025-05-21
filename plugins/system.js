@@ -13,49 +13,41 @@ const { exec } = require('child_process');
 
 
 cmd({
-  pattern: "getsession2",
-  use: '.getsession2',
-  desc: "Show bot's session ID with copy button.",
-  category: "system",
-  react: "⚡",
-  filename: __filename
+    pattern: "getsession2",
+    use: '.getsession2',
+    desc: "Get bot session ID with copy button.",
+    category: "system",
+    react: "⚡",
+    filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
-  try {
-    const start = new Date().getTime();
+    try {
+        const sessionId = config.SESSION_ID || "SESSION-ID-NOT-SET";
 
-    // ارسال واکنش
-    await conn.sendMessage(from, {
-      react: { text: "⚡", key: mek.key }
-    });
+        await conn.sendMessage(from, {
+            text: `*🔐 Session ID:*\n\n\`\`\`${sessionId}\`\`\``,
+            footer: "Click the button below to copy it.",
+            buttons: [
+                {
+                    buttonId: "copy_session_btn",
+                    buttonText: { displayText: "📋 Copy Session ID" },
+                    type: 4,
+                    nativeFlowInfo: {
+                        name: "cta_copy",
+                        paramsJson: JSON.stringify({
+                            display_text: "📋 Copy Session ID",
+                            id: "copy_session_real",
+                            copy_code: sessionId
+                        })
+                    }
+                }
+            ],
+            headerType: 1
+        }, { quoted: mek });
 
-    const end = new Date().getTime();
-    const responseTime = ((end - start) / 1000).toFixed(2);
-    const uptime = runtime(process.uptime());
-
-    const sessionId = config.SESSION_ID;
-
-    // ارسال پیام با دکمه کپی
-    await conn.sendMessage(from, {
-      text: `*🔐 Session ID Information*\n\n📄 *ID:* ${sessionId}\n⏱️ *Response Time:* ${responseTime} s\n📡 *Uptime:* ${uptime}`,
-      footer: "Press the button below to copy session ID.",
-      nativeFlowMessage: {
-        buttons: [
-          {
-            name: "cta_copy",
-            buttonParamsJson: JSON.stringify({
-              display_text: "📋 Copy Session ID",
-              id: "copy_session_id_1",
-              copy_code: sessionId
-            }),
-          }
-        ],
-      }
-    }, { quoted: mek });
-
-  } catch (e) {
-    console.error("Error in getsession:", e);
-    reply(`❌ Error: ${e.message}`);
-  }
+    } catch (e) {
+        console.error("Error in getsession:", e);
+        reply(`❌ Error: ${e.message}`);
+    }
 });
 
 cmd({
