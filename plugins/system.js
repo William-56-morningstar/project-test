@@ -92,18 +92,14 @@ cmd({
         
         const text = `*BEN BOT DEPLOY Available 🌝💗*\n
 🚀 *Fast & Secure Bot Deployment!*\n
-\n
 *Plans:*\n
 *2$ Only* — 30 Days Warranty — Heroku\n
 *5$ Only* — 60 Days Warranty — Heroku\n
 *10$ Only* — 3 Months Warranty — Heroku\n
-\n
 > *Contact Now:* wa.me/93744215959?text=Hi%2C%20I'm%20interested%20in%20buying%20a%20bot%20deployment%20plan\n
-\n
 *Payment Methods:*\n
 - Binance ✔️\n
 - Mobile Top-up ✔️\n
-\n
 *24/7 Support | Easy Setup | Trusted Service*`;
 
         // ارسال تصویر همراه با متن
