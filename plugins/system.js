@@ -11,45 +11,6 @@ const AdmZip = require('adm-zip'); // استفاده از adm-zip
 const { exec } = require('child_process');
 
 
-
-cmd({
-    pattern: "getsession2",
-    use: '.getsession2',
-    desc: "Get bot session ID with copy button.",
-    category: "system",
-    react: "⚡",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        const sessionId = config.SESSION_ID || "SESSION-ID-NOT-SET";
-
-        await conn.sendMessage(from, {
-            text: `*🔐 Session ID:*\n\n\`\`\`${sessionId}\`\`\``,
-            footer: "Click the button below to copy it.",
-            buttons: [
-                {
-                    buttonId: "copy_session_btn",
-                    buttonText: { displayText: "📋 Copy Session ID" },
-                    type: 4,
-                    nativeFlowInfo: {
-                        name: "cta_copy",
-                        paramsJson: JSON.stringify({
-                            display_text: "📋 Copy Session ID",
-                            id: "copy_session_real",
-                            copy_code: sessionId
-                        })
-                    }
-                }
-            ],
-            headerType: 1
-        }, { quoted: mek });
-
-    } catch (e) {
-        console.error("Error in getsession:", e);
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
 cmd({
     pattern: "getsession",
     use: '.getsession',
@@ -92,6 +53,53 @@ cmd({
 
     } catch (e) {
         console.error("Error in ping command:", e);
+        reply(`An error occurred: ${e.message}`);
+    }
+});
+
+
+cmd({
+    pattern: "bot",
+    use: '.bot',
+    desc: "Check bot's response time.",
+    category: "system",
+    react: "⚡",
+    filename: __filename
+}, async (conn, mek, m, { from, quoted, sender, reply }) => {
+    try {
+        const start = new Date().getTime();
+
+        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
+        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+
+        const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
+        let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+
+        // Ensure reaction and text emojis are different
+        while (textEmoji === reactionEmoji) {
+            textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+        }
+
+        // Send reaction using conn.sendMessage()
+        await conn.sendMessage(from, {
+            react: { text: textEmoji, key: mek.key }
+        });
+
+        const end = new Date().getTime();
+        const responseTime = (end - start) / 1000;
+        const uptime = runtime(process.uptime());
+        const startTime = new Date(Date.now() - process.uptime() * 1000);
+        
+        const text = `*BEN BOT DEPLOY Avaible 🌝💗*\n\n*2$ Only || 30Day warranty || Heroku*\n\nContact: wa.me/93744215959?text=hello_i_want_buy\n\nPayment method: *Binance ✔️*\n* Mobile Top up ✔️*`;
+
+        // ارسال تصویر همراه با متن
+        await conn.sendMessage(from, {
+            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
+            caption: text
+        }, { quoted: mek });
+
+    } catch (e) {
+        console.error("Error in bot  command:", e);
         reply(`An error occurred: ${e.message}`);
     }
 });
