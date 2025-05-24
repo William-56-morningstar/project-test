@@ -90,7 +90,7 @@ cmd({
         const uptime = runtime(process.uptime());
         const startTime = new Date(Date.now() - process.uptime() * 1000);
         
-        const text = `*BEN BOT DEPLOY Avaible 🌝💗*\n\n*2$ Only || 30Day warranty || Heroku*\n\nContact: wa.me/93744215959?text=hello_i_want_buy\n\nPayment method: *Binance ✔️*\n* Mobile Top up ✔️*`;
+        const text = `*BEN BOT DEPLOY Avaible 🌝💗*\n\n*2$ Only || 30Day warranty || Heroku*\n*5$ Only || 60Day warranty || Heroku*\n*10$ Only || 3Month warranty || Heroku*\n\n> *Contact:* wa.me/93744215959?text=hello_i_want_buy_bot_depoly_for_x_month\n\nPayment method:\n\n*Binance ✔️*\n* Mobile Top up ✔️*`;
 
         // ارسال تصویر همراه با متن
         await conn.sendMessage(from, {
