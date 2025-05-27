@@ -15,6 +15,7 @@ const commandPrefix = config.PREFIX;
 
 
 
+/*
 cmd({
     pattern: "menu",
     react: "✅",
@@ -107,6 +108,52 @@ cmd({
     } catch (e) {
         console.error(e);
         await reply("An error occurred. Please try again.");
+    }
+});
+*/
+
+cmd({
+    pattern: "menu",
+    alias: ["help", "commands"],
+    desc: "Show all menu categories",
+    category: "general",
+    react: "📖",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        // گرفتن تمام کتگوری‌ها
+        const categories = [...new Set(commands.map(cmd => cmd.category))];
+
+        let menuText = "";
+
+        for (const category of categories) {
+            const cmdsInCat = commands.filter(cmd => cmd.category === category);
+
+            if (cmdsInCat.length === 0) continue;
+
+            menuText += `╭━━━━❮ *${category.toUpperCase()}* ❯━⊷\n`;
+
+            cmdsInCat.forEach(cmd => {
+                menuText += `┃◇ .${cmd.pattern}\n`;
+            });
+
+            menuText += `╰━━━━━━━━━━━━━━━━━⊷\n\n`;
+        }
+
+        // ارسال منو با تصویر
+        await conn.sendMessage(from, {
+            image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
+            caption: menuText.trim()
+        }, { quoted: mek });
+
+        await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+
+    } catch (e) {
+        console.error(e);
+        reply("Error while generating menu:\n" + e.toString());
     }
 });
 
