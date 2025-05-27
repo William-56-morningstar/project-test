@@ -117,7 +117,7 @@ cmd({
     alias: ["help", "commands"],
     desc: "Show all menu categories",
     category: "general",
-    react: "📖",
+    react: "⏳",
     filename: __filename
 },
 async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
@@ -128,21 +128,26 @@ async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
         const freeMem = os.freemem() / (1024 ** 3);
         const usedMem = totalMem - freeMem;
 
-        const mode = "public"; // یا private
-        const version = "2.0.0";
+        const version = "𝟐.𝟎.𝟎";
         const plugins = commands.length;
         const now = new Date();
         const time = now.toLocaleTimeString("en-US", { hour12: true, timeZone: "Asia/Kabul" });
         const date = now.toLocaleDateString("en-CA", { timeZone: "Asia/Kabul" });
 
-        let menuText = `╭══〘〘 *𝘽𝙀𝙉-𝘽𝙊𝙏* 〙〙═⊷
+        const days = Math.floor(uptime / (3600 * 24));
+        const hours = Math.floor((uptime % (3600 * 24)) / 3600);
+        const minutes = Math.floor((uptime % 3600) / 60);
+        const seconds = Math.floor(uptime % 60);
+        const uptimeStr = `${days}𝐝 ${hours}𝐡 ${minutes}𝐦 ${seconds}𝐬`;
+
+        let menuText = `╭══〘〘 *𝐁𝐄𝐍-𝐁𝐎𝐓* 〙〙═⊷
 ┃❍ *Mᴏᴅᴇ:* ${config.MODE}
 ┃❍ *Pʀᴇғɪx:* [ ${commandPrefix} ]
 ┃❍ *Usᴇʀ:* ${_0x1279c5 || "User"}
 ┃❍ *Pʟᴜɢɪɴs:* ${plugins}
 ┃❍ *Vᴇʀsɪᴏɴ:* ${version}
-┃❍ *Uᴘᴛɪᴍᴇ:* ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m
-┃❍ *Tɪᴍᴇ Nᴏᴡ:* ${time} Afghanistan
+┃❍ *Uᴘᴛɪᴍᴇ:* ${uptimeStr}
+┃❍ *Tɪᴍᴇ Nᴏᴡ:* ${time}
 ┃❍ *Dᴀᴛᴇ Tᴏᴅᴀʏ:* ${date}
 ┃❍ *Tɪᴍᴇ Zᴏɴᴇ:* Asia/Kabul
 ┃❍ *Sᴇʀᴠᴇʀ Rᴀᴍ:* ${usedMem.toFixed(2)} GB / ${totalMem.toFixed(2)} GB
