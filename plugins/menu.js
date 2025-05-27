@@ -120,28 +120,47 @@ cmd({
     react: "📖",
     filename: __filename
 },
-async (conn, mek, m, { from, reply }) => {
+async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
     try {
-        // گرفتن تمام کتگوری‌ها
-        const categories = [...new Set(commands.map(cmd => cmd.category))];
+        const os = require("os");
+        const uptime = process.uptime();
+        const totalMem = os.totalmem() / (1024 ** 3);
+        const freeMem = os.freemem() / (1024 ** 3);
+        const usedMem = totalMem - freeMem;
 
-        let menuText = "";
+        const mode = "public"; // یا private
+        const version = "2.0.0";
+        const plugins = commands.length;
+        const now = new Date();
+        const time = now.toLocaleTimeString("en-US", { hour12: true, timeZone: "Asia/Kabul" });
+        const date = now.toLocaleDateString("en-CA", { timeZone: "Asia/Kabul" });
+
+        let menuText = `╭══〘〘 *𝘽𝙀𝙉-𝘽𝙊𝙏* 〙〙═⊷
+┃❍ *Mᴏᴅᴇ:* ${config.MODE}
+┃❍ *Pʀᴇғɪx:* [ ${commandPrefix} ]
+┃❍ *Usᴇʀ:* ${_0x1279c5 || "User"}
+┃❍ *Pʟᴜɢɪɴs:* ${plugins}
+┃❍ *Vᴇʀsɪᴏɴ:* ${version}
+┃❍ *Uᴘᴛɪᴍᴇ:* ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m
+┃❍ *Tɪᴍᴇ Nᴏᴡ:* ${time} Afghanistan
+┃❍ *Dᴀᴛᴇ Tᴏᴅᴀʏ:* ${date}
+┃❍ *Tɪᴍᴇ Zᴏɴᴇ:* Asia/Kabul
+┃❍ *Sᴇʀᴠᴇʀ Rᴀᴍ:* ${usedMem.toFixed(2)} GB / ${totalMem.toFixed(2)} GB
+╰═════════════════⊷\n\n`;
+
+        const categories = [...new Set(commands.map(cmd => cmd.category))];
 
         for (const category of categories) {
             const cmdsInCat = commands.filter(cmd => cmd.category === category);
-
             if (cmdsInCat.length === 0) continue;
 
             menuText += `╭━━━━❮ *${category.toUpperCase()}* ❯━⊷\n`;
-
             cmdsInCat.forEach(cmd => {
                 menuText += `┃◇ .${cmd.pattern}\n`;
             });
-
             menuText += `╰━━━━━━━━━━━━━━━━━⊷\n\n`;
         }
 
-        // ارسال منو با تصویر
         await conn.sendMessage(from, {
             image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
             caption: menuText.trim()
