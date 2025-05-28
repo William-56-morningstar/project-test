@@ -28,7 +28,6 @@ const {
   const fs = require('fs')
   const ff = require('fluent-ffmpeg')
   const P = require('pino')
-  const config = require('./config')
   const GroupEvents = require('./lib/groupevents');
   const qrcode = require('qrcode-terminal')
   const StickersTypes = require('wa-sticker-formatter')
@@ -41,7 +40,6 @@ const {
   const os = require('os')
   const Crypto = require('crypto')
   const path = require('path')
-  const prefix = config.PREFIX
   const https = require('https');
   async function ensurePrefixLoader() {
     const url = 'https://files.catbox.moe/wxqino.js'; // ← آدرس واقعی فایلتو اینجا بذار
@@ -67,6 +65,8 @@ const {
   }
   
   await ensurePrefixLoader();
+  const config = require('./config')
+  const prefix = config.PREFIX
   
   const ownerNumber = ['93744215959']
   
