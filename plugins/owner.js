@@ -8,6 +8,7 @@ const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson
 const { writeFileSync } = require('fs');
 const path = require('path');
 const { getAnti, setAnti } = require('../data/antidel');
+const { getPrefixFileInfo } = require('../lib/prefixLoader');
 
 
 
@@ -492,6 +493,7 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     }
 });
 
+
 cmd({
     pattern: "setprefix",
     alias: ["prefix"],
@@ -506,20 +508,39 @@ cmd({
 
     const newPrefix = args[0];
 
-    // regex برای رد کردن حروف و اعداد (اگر حروف یا عدد بود خطا بده)
-    const hasLetterOrDigit = /[a-zA-Z0-9]/.test(newPrefix);
+    if (/[a-zA-Z0-9]/.test(newPrefix))
+        return reply("❌ Invalid prefix. Letters and numbers are not allowed.");
 
-    if (hasLetterOrDigit) {
-        return reply("❌ Invalid prefix. Letters and numbers are not allowed as prefix.");
-    }
-
-    if (newPrefix.length < 1 || newPrefix.length > 3) {
+    if (newPrefix.length < 1 || newPrefix.length > 3)
         return reply("❌ Prefix length must be between 1 and 3 characters.");
+
+    const info = getPrefixFileInfo();
+    if (!info) return reply("❌ Failed to determine bot info from creds.");
+
+    try {
+        const newData = { prefix: newPrefix };
+        const encoded = Buffer.from(JSON.stringify(newData, null, 2)).toString('base64');
+
+        // بررسی وجود فایل برای sha
+        let sha = null;
+        try {
+            const res = await axios.get(info.apiUrl, { headers: info.headers });
+            sha = res.data.sha;
+        } catch {}
+
+        const payload = {
+            message: `Update prefix to ${newPrefix}`,
+            content: encoded,
+            branch: 'main',
+            ...(sha && { sha })
+        };
+
+        await axios.put(info.apiUrl, payload, { headers: info.headers });
+        return reply(`✅ Prefix updated and saved to *${newPrefix}*.`);
+    } catch (e) {
+        console.error("GitHub save error:", e?.response?.data || e.message);
+        return reply("❌ Failed to save new prefix.");
     }
-
-    config.PREFIX = newPrefix;
-
-    return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
 });
 
 
