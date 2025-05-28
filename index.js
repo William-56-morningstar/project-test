@@ -112,8 +112,6 @@ async function ensurePrefixLoader() {
   }
 }
 
-await ensurePrefixLoader();
-
 
 const express = require("express");
 const app = express();
@@ -122,6 +120,7 @@ const port = process.env.PORT || 9090;
   //=============================================
   
   async function connectToWA() {
+  await ensurePrefixLoader();
   console.log("Connecting to WhatsApp ⏳️...");
   const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
   var { version } = await fetchLatestBaileysVersion()
