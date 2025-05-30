@@ -8,7 +8,9 @@ const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson
 const { writeFileSync } = require('fs');
 const path = require('path');
 const { getAnti, setAnti } = require('../data/antidel');
-
+const { exec } = require('child_process');
+const FormData = require('form-data');
+const { setConfig, getConfig } = require("../lib/configdb");
 
 
 
@@ -163,7 +165,7 @@ cmd({
         }
 
         // Make API request to get pairing code
-        const response = await axios.get(`https://session-generateor.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
+        const response = await axios.get(`https://session.apis-nothing.xyz/code?number=${encodeURIComponent(phoneNumber)}`);
         
         if (!response.data || !response.data.code) {
             return await reply("❌ Failed to retrieve pairing code. Please try again later.");
@@ -174,12 +176,6 @@ cmd({
 
         // Send initial message with formatting
         await reply(`${doneMessage}\n\n*Your pairing code is:* ${pairingCode}`);
-
-        // Add 2 second delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Send clean code message
-        await reply(`${pairingCode}`);
 
     } catch (error) {
         console.error("Pair command error:", error);
@@ -207,7 +203,7 @@ cmd({
         }
 
         // Make API request to get pairing code
-        const response = await axios.get(`https://session-generateor.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
+        const response = await axios.get(`https://session.apis-nothing.xyz/code?number=${encodeURIComponent(phoneNumber)}`);
         
         if (!response.data || !response.data.code) {
             return await reply("❌ Failed to retrieve pairing code. Please try again later.");
@@ -218,12 +214,6 @@ cmd({
 
         // Send initial message with formatting
         await reply(`${doneMessage}\n\n*Your pairing code is:* ${pairingCode}`);
-
-        // Add 2 second delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Send clean code message
-        await reply(`${pairingCode}`);
 
     } catch (error) {
         console.error("Pair command error:", error);
@@ -492,34 +482,22 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     }
 });
 
+
 cmd({
-    pattern: "setprefix",
-    alias: ["prefix"],
-    react: "🔧",
-    desc: "Change the bot's command prefix.",
-    category: "owner",
-    filename: __filename,
-}, async (conn, mek, m, { from, args, isCreator, reply }) => {
-    if (!isCreator) return reply("*📛 Only the owner can use this command!*");
+  pattern: "setprefix",
+  desc: "Set the bot's command prefix",
+  category: "owner",
+  react: "✅",
+  filename: __filename
+}, async (conn, mek, m, { args, isCreator, reply }) => {
+  if (!isCreator) return reply("❗ Only the bot owner can use this command.");
+  const newPrefix = args[0]?.trim();
+  if (!newPrefix || newPrefix.length > 2) return reply("❌ Provide a valid prefix (1–2 characters).");
 
-    if (!args[0]) return reply("❌ Please provide a new prefix. Example: `.setprefix !`");
+  await setConfig("PREFIX", newPrefix);
 
-    const newPrefix = args[0];
-
-    // regex برای رد کردن حروف و اعداد (اگر حروف یا عدد بود خطا بده)
-    const hasLetterOrDigit = /[a-zA-Z0-9]/.test(newPrefix);
-
-    if (hasLetterOrDigit) {
-        return reply("❌ Invalid prefix. Letters and numbers are not allowed as prefix.");
-    }
-
-    if (newPrefix.length < 1 || newPrefix.length > 3) {
-        return reply("❌ Prefix length must be between 1 and 3 characters.");
-    }
-
-    config.PREFIX = newPrefix;
-
-    return reply(`✅ Prefix successfully changed to *${newPrefix}*`);
+  await reply(`✅ Prefix updated to: *${newPrefix}*\n\n♻️ Restarting...`);
+  setTimeout(() => exec("pm2 restart all"), 2000);
 });
 
 
