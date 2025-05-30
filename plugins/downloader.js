@@ -196,20 +196,14 @@ Reply With:
 
         const songData = JSON.parse(songCache);
 
-        const audioMsg = {
-          audio: { url: songData.url },
-          mimetype: "audio/mpeg",
-          fileName: `${songData.title}.mp3`
-        };
-
         if (text === "1") {
           await conn.sendMessage(from, audioMsg, { quoted: msg });
+          }, { quoted: msg });
         } else if (text === "2") {
           await conn.sendMessage(from, {
-            ...audioMsg,
+            document: { url: songData.url },
             mimetype: "audio/mpeg",
-            ptt: false,
-            mimetype: 'application/octet-stream'
+            fileName: `${songData.title}.mp3`
           }, { quoted: msg });
         } else {
           await conn.sendMessage(from, { text: "❌ Invalid option. Reply with 1 or 2." }, { quoted: msg });
