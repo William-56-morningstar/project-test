@@ -22,8 +22,8 @@ cmd({
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['🔥'];
-        const textEmojis = ['🔥'];
+        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
+        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
@@ -69,8 +69,8 @@ cmd({
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['🛡️'];
-        const textEmojis = ['🛡️'];
+        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
+        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
@@ -231,8 +231,8 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['⚡'];
-        const textEmojis = ['⚡'];
+        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
+        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
@@ -537,8 +537,8 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['⚡'];
-        const textEmojis = ['⚡'];
+        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
+        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
