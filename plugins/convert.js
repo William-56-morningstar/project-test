@@ -7,7 +7,6 @@ const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require("../lib/functions");
 const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
-const { sleep } = require('../lib/functions');
 const {cmd , commands} = require('../command')
 const { videoToWebp } = require('../lib/video-utils');
 const { Sticker, createSticker, StickerTypes } = require("wa-sticker-formatter");
