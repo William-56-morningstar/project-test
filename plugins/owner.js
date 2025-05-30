@@ -523,6 +523,9 @@ cmd({
     fs.rmSync(extractPath, { recursive: true, force: true });
 
     await reply("✅ Update completed successfully...");
+    reply("Restarting...");  
+        await sleep(1500);  
+        exec("pm2 restart all");  
   } catch (err) {
     console.error("Update error:", err);
     reply("❌ Update failed: " + err.message);
