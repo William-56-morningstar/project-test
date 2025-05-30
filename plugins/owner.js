@@ -373,8 +373,7 @@ For full file, check attachment.`;
 
 
 cmd({
-  pattern: "update",
-  alias: ["upgrade", "sync"],
+  pattern: "update2",
   react: '🆕',
   desc: "Update the bot to the latest version.",
   category: "misc",
@@ -471,7 +470,7 @@ function copyFolderSync(source, target) {
 
 
 cmd({
-  pattern: "update2",
+  pattern: "update",
   desc: "Pull the latest code from GitHub repo (ZIP method)",
   react: "🆕",
   category: "owner",

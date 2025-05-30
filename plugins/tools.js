@@ -51,6 +51,16 @@ async (conn, mek, m, { from, args, q, reply, react }) => {
         await conn.sendMessage(from, {
             image: { url: info.flag },
             caption: text,
+            contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                      newsletterJid: '1206333358997689@newsletter',
+                      newsletterName: "NOTHING TECH",
+                      serverMessageId: 143,
+                    },
+                  },
             contextInfo: { mentionedJid: [m.sender] }
         }, { quoted: mek });
 
