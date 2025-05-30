@@ -315,20 +315,11 @@ ${uptimeFormatted}
 *╰═════════════════⊷*
     `;
 
-    // پیام اصلی با تصویر
-    const sentMsg = await client.sendMessage(message.chat, {
+    await client.sendMessage(message.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
     }, { quoted: message });
-
-    // ارسال ریکشن به پیام بالا (همون پیام ارسال‌شده توسط بات)
-    await client.sendMessage(message.chat, {
-      react: {
-        text: "✅",
-        key: sentMsg.key
-      }
-    });
-
+        
   } catch (err) {
     console.error("Alive Command Error:", err);
     await reply(`❌ Error: ${err.message || err}`);
