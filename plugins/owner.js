@@ -472,30 +472,63 @@ function copyFolderSync(source, target) {
 
 cmd({
   pattern: "update2",
-  desc: "Pull the latest code from GitHub repo",
+  desc: "Pull the latest code from GitHub repo (ZIP method)",
   react: "🆕",
   category: "owner",
   filename: __filename
 }, async (client, message, args, { reply, isOwner }) => {
-  if (!isOwner) return;
+  if (!isOwner) return reply("❌ Owner only.");
 
   try {
-    await reply("🛠 Pulling latest updates from GitHub...");
+    await reply("🛠 Downloading latest update from GitHub...");
 
-    const { execSync } = require("child_process");
+    const zipUrl = "https://github.com/NOTHING-MD420/project-test/archive/refs/heads/main.zip";
+    const zipPath = path.join(__dirname, "repo.zip");
+    const extractPath = path.join(__dirname, "update_tmp");
 
-    // اجرای git pull
-    const output = execSync("git pull origin main", { encoding: "utf-8" });
+    // دانلود ZIP
+    const { data } = await axios.get(zipUrl, { responseType: "arraybuffer" });
+    fs.writeFileSync(zipPath, data);
 
-    // پاسخ موفق
-    await reply(`✅ Update complete:\n\`\`\`\n${output}\n\`\`\``);
-    
-    await reply(`✅ On restarting`);
-    execSync("pm2 restart all");
+    // آنزیپ
+    const zip = new AdmZip(zipPath);
+    zip.extractAllTo(extractPath, true);
 
+    // پوشه اصلی پروژه در داخل ZIP
+    const extractedFolder = fs.readdirSync(extractPath).find(f => f.startsWith("project-test-"));
+    const source = path.join(extractPath, extractedFolder);
+    const target = path.join(__dirname, ".."); // روت پروژه
+
+    // کپی محتوا
+    const copyFolderSync = (src, dest) => {
+      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+
+      for (const item of fs.readdirSync(src)) {
+        const srcPath = path.join(src, item);
+        const destPath = path.join(dest, item);
+
+        if (["config.js", "app.json"].includes(item)) continue;
+
+        if (fs.lstatSync(srcPath).isDirectory()) {
+          copyFolderSync(srcPath, destPath);
+        } else {
+          fs.copyFileSync(srcPath, destPath);
+        }
+      }
+    };
+
+    copyFolderSync(source, target);
+
+    // حذف فایل‌ها
+    fs.unlinkSync(zipPath);
+    fs.rmSync(extractPath, { recursive: true, force: true });
+
+    await reply("✅ Update completed successfully.\n♻️ Restarting bot...");
+
+    setTimeout(() => exec("pm2 restart all"), 1000);
   } catch (err) {
     console.error("Update error:", err);
-    await reply("❌ Update failed.\nCheck if Git is installed and repo is correctly cloned.");
+    reply("❌ Update failed: " + err.message);
   }
 });
 
