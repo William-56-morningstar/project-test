@@ -113,7 +113,6 @@ cmd({
 
 // MP3 song download 
 
-
 cmd({
   pattern: "song",
   alias: ["play", "mp3"],
@@ -139,7 +138,7 @@ cmd({
       const res = await fetch(apiUrl);
       const data = await res.json();
 
-      if (!data?.result?.downloadUrl) return reply("⛔ Download failed.");
+      if (!data?.result?.downloadUrl) return reply("⛔ Failed to download the song.");
       downloadUrl = data.result.downloadUrl;
 
       setConfig(cacheKey, JSON.stringify({
@@ -159,21 +158,21 @@ cmd({
     const caption = `*✦ BEN_BOT-V1 DOWNLOADER ✦*\n\n
 ╭───────────────◆
 │⿻ *Title:* ${song.title}
-│⿻ *Quality:* mp3/audio (128kbps)
+│⿻ *Quality:* MP3 / 128kbps
 │⿻ *Duration:* ${song.timestamp}
-│⿻ *Viewers:* ${song.views}
+│⿻ *Views:* ${song.views}
 │⿻ *Uploaded:* ${song.ago}
 │⿻ *Artist:* ${song.author.name}
 ╰────────────────◆
-⦿ *Direct Yt Link:* ${song.url}
+⦿ *YouTube Link:* ${song.url}
 
-Reply With:
-*1* To Download Audio 🎶
-*2* To Download Audio Document 📄
+Reply with:
+*1* - Audio 🎧
+*2* - Document 📄
 
-╭────────────────◆
-│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing*
-╰─────────────────◆`;
+╭───────────────◆
+│ Powered by BEN-BOT
+╰────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
       image: { url: song.thumbnail },
@@ -196,17 +195,26 @@ Reply With:
 
         const songData = JSON.parse(songCache);
 
+        const audioMsg = {
+          audio: { url: songData.url },
+          mimetype: "audio/mpeg",
+          fileName: `${songData.title}.mp3`
+        };
+
         if (text === "1") {
           await conn.sendMessage(from, audioMsg, { quoted: msg });
-          }, { quoted: msg });
+
         } else if (text === "2") {
           await conn.sendMessage(from, {
             document: { url: songData.url },
             mimetype: "audio/mpeg",
             fileName: `${songData.title}.mp3`
           }, { quoted: msg });
+
         } else {
-          await conn.sendMessage(from, { text: "❌ Invalid option. Reply with 1 or 2." }, { quoted: msg });
+          await conn.sendMessage(from, {
+            text: "❌ Invalid option. Please reply with *1* or *2*."
+          }, { quoted: msg });
         }
 
         conn.ev.off("messages.upsert", handler);
@@ -216,10 +224,10 @@ Reply With:
     };
 
     conn.ev.on("messages.upsert", handler);
-    setTimeout(() => conn.ev.off("messages.upsert", handler), 10 * 60 * 1000); // 10 min
+    setTimeout(() => conn.ev.off("messages.upsert", handler), 10 * 60 * 1000); // 10 minutes timeout
 
   } catch (err) {
     console.error(err);
-    reply("🚫 An error occurred.");
+    reply("🚫 An unexpected error occurred.");
   }
 });
