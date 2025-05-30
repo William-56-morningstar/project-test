@@ -9,6 +9,178 @@ const FormData = require("form-data");
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson } = require('../lib/functions')
 
 
+
+
+cmd({
+  pattern: "sticker",
+  desc: "Convert image or short video to sticker",
+  react: "🖼️",
+  category: "tools",
+  use: ".sticker (reply to image/video)",
+  filename: __filename
+}, async (client, message, match) => {
+  try {
+    if (!message.quoted) {
+      return await client.sendMessage(message.chat, {
+        text: "🖼️ Please reply to an image or short video to convert to sticker."
+      }, { quoted: message });
+    }
+
+    const mtype = message.quoted.mtype;
+    if (mtype !== "imageMessage" && mtype !== "videoMessage") {
+      return await client.sendMessage(message.chat, {
+        text: "⚠️ Only image or short video supported."
+      }, { quoted: message });
+    }
+
+    const media = await message.quoted.download();
+    await client.sendMessage(message.chat, {
+      sticker: media
+    }, { quoted: message });
+
+  } catch (error) {
+    console.error("Sticker Error:", error);
+    await client.sendMessage(message.chat, {
+      text: "❌ Failed to create sticker:\n" + error.message
+    }, { quoted: message });
+  }
+});
+
+cmd({
+  pattern: "cp",
+  desc: "Send media with a new caption",
+  react: "✏️",
+  category: "tools",
+  use: ".cp <new caption>",
+  filename: __filename
+}, async (client, message, match, { q }) => {
+  try {
+    if (!message.quoted) {
+      return await client.sendMessage(message.chat, {
+        text: "❗ Please reply to an image, video, or document message and type the new caption.\n\nExample:\n.cp This is the new caption"
+      }, { quoted: message });
+    }
+
+    if (!q) {
+      return await client.sendMessage(message.chat, {
+        text: "📌 Please provide the new caption."
+      }, { quoted: message });
+    }
+
+    const mime = message.quoted.mtype;
+    const buffer = await message.quoted.download();
+
+    let content = {};
+
+    if (mime === "imageMessage") {
+      content = {
+        image: buffer,
+        caption: q
+      };
+    } else if (mime === "videoMessage") {
+      content = {
+        video: buffer,
+        caption: q
+      };
+    } else if (mime === "documentMessage") {
+      content = {
+        document: buffer,
+        caption: q,
+        mimetype: message.quoted.mimetype,
+        fileName: message.quoted.filename || "file"
+      };
+    } else {
+      return await client.sendMessage(message.chat, {
+        text: "❌ Only images, videos, or document messages are supported."
+      }, { quoted: message });
+    }
+
+    await client.sendMessage(message.chat, content, { quoted: message });
+
+  } catch (e) {
+    console.error("CP Caption Error:", e);
+    await client.sendMessage(message.chat, {
+      text: "⚠️ Failed to change the caption:\n" + e.message
+    }, { quoted: message });
+  }
+});
+
+cmd({
+  pattern: "send",
+  alias: ["sendme", "save"],
+  react: '📤',
+  desc: "Saves quoted message to user private chat",
+  category: "tools",
+  filename: __filename
+}, async (client, message, match, { from }) => {
+  try {
+    if (!match.quoted) {
+      return await client.sendMessage(from, {
+        text: "*🍁 Please reply to a message!*"
+      }, { quoted: message });
+    }
+
+    const quoted = match.quoted;
+    const mtype = quoted.mtype;
+    const senderJid = message.sender;
+    const options = { quoted: message };
+
+    let contentToSend = null;
+
+    if (quoted.text) {
+      contentToSend = { text: quoted.text };
+    } else if (quoted.imageMessage || mtype === "imageMessage") {
+      const buffer = await quoted.download();
+      contentToSend = {
+        image: buffer,
+        caption: quoted.text || '',
+        mimetype: quoted.mimetype || "image/jpeg"
+      };
+    } else if (quoted.videoMessage || mtype === "videoMessage") {
+      const buffer = await quoted.download();
+      contentToSend = {
+        video: buffer,
+        caption: quoted.text || '',
+        mimetype: quoted.mimetype || "video/mp4"
+      };
+    } else if (quoted.audioMessage || mtype === "audioMessage") {
+      const buffer = await quoted.download();
+      contentToSend = {
+        audio: buffer,
+        mimetype: quoted.mimetype || "audio/mp4",
+        ptt: quoted.ptt || false
+      };
+    } else if (quoted.documentMessage || mtype === "documentMessage") {
+      const buffer = await quoted.download();
+      contentToSend = {
+        document: buffer,
+        mimetype: quoted.mimetype || "application/octet-stream",
+        fileName: quoted.fileName || "file"
+      };
+    } else if (quoted.stickerMessage || mtype === "stickerMessage") {
+      const buffer = await quoted.download();
+      contentToSend = {
+        sticker: buffer
+      };
+    } else {
+      return await client.sendMessage(from, {
+        text: "⚠️ Unsupported message type!"
+      }, { quoted: message });
+    }
+
+    await client.sendMessage(senderJid, contentToSend, options);
+    await client.sendMessage(from, {
+      text: "✅ Saved to your private chat!"
+    }, { quoted: message });
+
+  } catch (error) {
+    console.error("Save to PV Error:", error);
+    await client.sendMessage(from, {
+      text: "❌ Error:\n" + error.message
+    }, { quoted: message });
+  }
+});
+
 cmd({
     pattern: "qr",
     alias: ["qrcode", "qr2"],
