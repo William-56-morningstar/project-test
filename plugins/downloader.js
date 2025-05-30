@@ -197,7 +197,9 @@ Reply With:
         const songData = JSON.parse(songCache);
 
         if (text === "1") {
-          await conn.sendMessage(from, audioMsg, { quoted: msg });
+          await conn.sendMessage(from, {
+            audio: { url: songData.url },
+            mimetype: "audio/mpeg"
           }, { quoted: msg });
         } else if (text === "2") {
           await conn.sendMessage(from, {
