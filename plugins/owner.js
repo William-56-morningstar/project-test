@@ -470,34 +470,6 @@ function copyFolderSync(source, target) {
 }
 
 
-cmd({
-  pattern: "update2",
-  desc: "Pull the latest code from GitHub repo",
-  react: "🆕",
-  category: "owner",
-  filename: __filename
-}, async (client, message, args, { reply, isOwner }) => {
-  if (!isOwner) return;
-
-  try {
-    await reply("🛠 Pulling latest updates from GitHub...");
-
-    const { execSync } = require("child_process");
-
-    // اجرای git pull
-    const output = execSync("git pull origin main", { encoding: "utf-8" });
-
-    // پاسخ موفق
-    await reply(`✅ Update complete:\n\`\`\`\n${output}\n\`\`\``);
-
-    execSync("pm2 restart all");
-
-  } catch (err) {
-    console.error("Update error:", err);
-    await reply("❌ Update failed.\nCheck if Git is installed and repo is correctly cloned.");
-  }
-});
-
 
 cmd({
   pattern: "update2",
