@@ -22,8 +22,8 @@ cmd({
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
-        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+        const reactionEmojis = ['🔥'];
+        const textEmojis = ['🔥'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
@@ -69,8 +69,8 @@ cmd({
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
-        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+        const reactionEmojis = ['🛡️'];
+        const textEmojis = ['🛡️'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
@@ -231,8 +231,8 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
-        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+        const reactionEmojis = ['⚡'];
+        const textEmojis = ['⚡'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
@@ -315,11 +315,20 @@ ${uptimeFormatted}
 *╰═════════════════⊷*
     `;
 
-    await client.sendMessage(message.chat, {
+    // پیام اصلی با تصویر
+    const sentMsg = await client.sendMessage(message.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
     }, { quoted: message });
-        
+
+    // ارسال ریکشن به پیام بالا (همون پیام ارسال‌شده توسط بات)
+    await client.sendMessage(message.chat, {
+      react: {
+        text: "✅",
+        key: sentMsg.key
+      }
+    });
+
   } catch (err) {
     console.error("Alive Command Error:", err);
     await reply(`❌ Error: ${err.message || err}`);
@@ -537,8 +546,8 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
     try {
         const start = new Date().getTime();
 
-        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
-        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+        const reactionEmojis = ['⚡'];
+        const textEmojis = ['⚡'];
 
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
         let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
