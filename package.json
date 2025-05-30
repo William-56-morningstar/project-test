@@ -13,7 +13,7 @@
     "npm": "10.x"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "npm:baileys-pro@latest",
+    "@whiskeysockets/baileys": "github:AxellNetwork/Baileys",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@dark-yasiya/yt-dl.js": "1.0.5",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -23,6 +23,7 @@
     "pm2": "^6.0.5",
     "util": "^0.12.4",
     "express": "latest",
+    "better-sqlite3": "*",
     "moment-timezone": "^0.5.45",
     "axios": "^1.2.5",
     "crypto-digest-sync": "^1.0.0",

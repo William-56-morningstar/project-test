@@ -1,3 +1,4 @@
+const { getConfig } = require("./lib/configdb");
 const fs = require('fs');
 require('dotenv').config();
 
@@ -5,7 +6,7 @@ function convertToBool(text, fault = 'true') {
     return text === fault ? true : false;
 }
 module.exports = {
-SESSION_ID: process.env.SESSION_ID || "BEN-BOT~IGE0UDLa#JIG1-JV-NqGV65kl97nF0THfRYwaUDBo_aqbtUsVM2E",
+SESSION_ID: process.env.SESSION_ID || "",
 // add your Session Id 
 AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
 // make true or false status auto seen
@@ -27,7 +28,7 @@ MENTION_REPLY: process.env.MENTION_REPLY || "false",
 // make true if want auto voice reply if someone menetion you 
 MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/6vrc2s.jpg'",
 // add custom menu and mention reply image url
-PREFIX: process.env.PREFIX || ".",
+PREFIX: getConfig("PREFIX") || ".",
 // add your prifix for bot   
 BOT_NAME: process.env.BOT_NAME || "BEN-BOT",
 // add bot namw here for menu
