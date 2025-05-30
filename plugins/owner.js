@@ -522,9 +522,7 @@ cmd({
     fs.unlinkSync(zipPath);
     fs.rmSync(extractPath, { recursive: true, force: true });
 
-    await reply("✅ Update completed successfully.\n♻️ Restarting bot...");
-
-    setTimeout(() => exec("pm2 restart all"), 1000);
+    await reply("✅ Update completed successfully...");
   } catch (err) {
     console.error("Update error:", err);
     reply("❌ Update failed: " + err.message);
