@@ -195,6 +195,18 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         await conn.sendMessage(from, {
             text}, { quoted: mek });
             
+            await conn.sendMessage(from, {
+            text}, { quoted: mek });
+            
+            await conn.sendMessage(from, {
+            text}, { quoted: mek });
+            
+            await conn.sendMessage(from, {
+            text}, { quoted: mek });
+            
+            await conn.sendMessage(from, {
+            text}, { quoted: mek });
+            
         await conn.sendMessage(from, {
             react: { text: "✅", key: m.key }
         });
