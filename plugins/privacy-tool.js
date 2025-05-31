@@ -41,15 +41,15 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         await conn.sendMessage(
             from,
             {
-                image: { url: `https://files.catbox.moe/7zfdcq.jpg` }, // Replace with privacy-themed image if available
+                image: { url: `https://files.catbox.moe/6vrc2s.jpg` }, // Replace with privacy-themed image if available
                 caption: privacyMenu,
                 contextInfo: {
                     mentionedJid: [m.sender],
                     forwardingScore: 999,
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363354023106228@newsletter',
-                        newsletterName: "Privacy Settings",
+                        newsletterJid: '1206333358997689@newsletter',
+                        newsletterName: "NOTHING TECH",
                         serverMessageId: 143
                     }
                 }
