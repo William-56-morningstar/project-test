@@ -5,6 +5,21 @@ const path = require('path');
 const axios = require("axios");
 
 
+// 💡 اینو بالا فایل بذار
+function getNewsletterContext(senderJid) {
+    return {
+        mentionedJid: [senderJid],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363333589976873@newsletter',
+            newsletterName: "NOTHING TECH",
+            serverMessageId: 143
+        }
+    };
+}
+
+// 📦 دستور cmd به‌روز شده
 cmd({
     pattern: "privacy",
     alias: ["privacymenu"],
@@ -12,7 +27,7 @@ cmd({
     category: "privacy",
     react: "🔐",
     filename: __filename
-}, 
+},
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
         let privacyMenu = `╭━━〔 *Privacy Settings* 〕━━┈⊷
@@ -41,18 +56,9 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         await conn.sendMessage(
             from,
             {
-                image: { url: `https://files.catbox.moe/6vrc2s.jpg` }, // Replace with privacy-themed image if available
+                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
                 caption: privacyMenu,
-                contextInfo: {
-                    mentionedJid: [m.sender],
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363333589976873@newsletter',
-                        newsletterName: "NOTHING TECH",
-                        serverMessageId: 143
-                    }
-                }
+                contextInfo: getNewsletterContext(m.sender)
             },
             { quoted: mek }
         );
@@ -75,20 +81,27 @@ async (conn, mek, m, { from, isOwner, reply }) => {
     if (!isOwner) return reply("*📛 You are not the owner!*");
 
     try {
-        // Fetch the block list
         const blockedUsers = await conn.fetchBlocklist();
 
+        let msgText = '';
         if (blockedUsers.length === 0) {
-            return reply("📋 Your block list is empty.");
+            msgText = "📋 Your block list is empty.";
+        } else {
+            const list = blockedUsers
+                .map((user, i) => `🚧 BLOCKED ${user.split('@')[0]}`)
+                .join('\n');
+            const count = blockedUsers.length;
+            msgText = `📋 Blocked Users (${count}):\n\n${list}`;
         }
 
-        // Format the blocked users with 📌 and count the total
-        const list = blockedUsers
-            .map((user, i) => `🚧 BLOCKED ${user.split('@')[0]}`) // Remove domain and add 📌
-            .join('\n');
-
-        const count = blockedUsers.length;
-        reply(`📋 Blocked Users (${count}):\n\n${list}`);
+        await conn.sendMessage(
+            from,
+            {
+                text: msgText,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     } catch (err) {
         console.error(err);
         reply(`❌ Failed to fetch block list: ${err.message}`);
