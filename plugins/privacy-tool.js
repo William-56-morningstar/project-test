@@ -113,41 +113,107 @@ cmd({
     desc: "Displays the user's bio.",
     category: "privacy",
     filename: __filename,
-}, async (conn, mek, m, { args, reply }) => {
+}, async (conn, mek, m, { quoted, reply }) => {
     try {
-        const jid = args[0] || mek.key.remoteJid;
+        let jid;
+
+        if (quoted) {
+            jid = quoted.sender;
+        } else {
+            return reply("⛔ Please reply to someone's message to fetch their bio.");
+        }
+
         const about = await conn.fetchStatus?.(jid);
-        if (!about) return reply("No bio found.");
-        return reply(`User Bio:\n\n${about.status}`);
+
+        if (!about || !about.status) {
+            return await conn.sendMessage(
+                m.chat,
+                {
+                    text: "❌ No bio found.",
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
+        }
+
+        return await conn.sendMessage(
+            m.chat,
+            {
+                text: `📄 Bio:\n\n${about.status}`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+
     } catch (error) {
-        console.error("Error in bio command:", error);
-        reply("No bio found.");
+        console.error("Error in getbio command:", error);
+        await conn.sendMessage(
+            m.chat,
+            {
+                text: "❌ Error fetching bio.",
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     }
 });
+
+
 cmd({
-    pattern: "setppall",
+    pattern: "setppall*",
     desc: "Update Profile Picture Privacy",
     category: "privacy",
     react: "🔐",
     filename: __filename
 }, 
-async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    if (!isOwner) return reply("❌ You are not the owner!");
-    
+async (conn, mek, m, { from, args, isOwner, reply }) => {
+    if (!isOwner) {
+        return await conn.sendMessage(
+            from,
+            {
+                text: "❌ You are not the owner!",
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+    }
+
     try {
-        const value = args[0] || 'all'; 
-        const validValues = ['all', 'contacts', 'contact_blacklist', 'none'];  
-        
+        const value = args[0] || 'all';
+        const validValues = ['all', 'contacts', 'contact_blacklist', 'none'];
+
         if (!validValues.includes(value)) {
-            return reply("❌ Invalid option. Valid options are: 'all', 'contacts', 'contact_blacklist', 'none'.");
+            return await conn.sendMessage(
+                from,
+                {
+                    text: "❌ Invalid option.\nValid options: *all*, *contacts*, *contact_blacklist*, *none*.",
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
         }
-        
+
         await conn.updateProfilePicturePrivacy(value);
-        reply(`✅ Profile picture privacy updated to: ${value}`);
+        await conn.sendMessage(
+            from,
+            {
+                text: `✅ Profile picture privacy updated to: *${value}*`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     } catch (e) {
-        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
+        await conn.sendMessage(
+            from,
+            {
+                text: `❌ An error occurred.\n\n_Error:_ ${e.message}`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     }
 });
+
 cmd({
     pattern: "setonline",
     desc: "Update Online Privacy",
@@ -155,21 +221,51 @@ cmd({
     react: "🔐",
     filename: __filename
 }, 
-async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    if (!isOwner) return reply("❌ You are not the owner!");
+async (conn, mek, m, { from, args, isOwner, reply }) => {
+    if (!isOwner) {
+        return await conn.sendMessage(
+            from,
+            {
+                text: "❌ You are not the owner!",
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+    }
 
     try {
-        const value = args[0] || 'all'; 
+        const value = args[0] || 'all';
         const validValues = ['all', 'match_last_seen'];
-        
+
         if (!validValues.includes(value)) {
-            return reply("❌ Invalid option. Valid options are: 'all', 'match_last_seen'.");
+            return await conn.sendMessage(
+                from,
+                {
+                    text: "❌ Invalid option.\nValid options: *all*, *match_last_seen*.",
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
         }
 
         await conn.updateOnlinePrivacy(value);
-        reply(`✅ Online privacy updated to: ${value}`);
+        await conn.sendMessage(
+            from,
+            {
+                text: `✅ Online privacy updated to: *${value}*`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     } catch (e) {
-        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
+        await conn.sendMessage(
+            from,
+            {
+                text: `❌ An error occurred.\n\n_Error:_ ${e.message}`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     }
 });
 
@@ -202,38 +298,6 @@ async (conn, mek, m, { from, isOwner, quoted, reply }) => {
     }
 });
 
-cmd({
-    pattern: "setmyname",
-    desc: "Set your WhatsApp display name.",
-    category: "privacy",
-    react: "⚙️",
-    filename: __filename
-},
-async (conn, mek, m, { from, isOwner, reply, args }) => {
-    if (!isOwner) return reply("❌ You are not the owner!");
-
-    // Ensure you have the display name argument
-    const displayName = args.join(" ");
-    if (!displayName) return reply("❌ Please provide a display name.");
-
-    try {
-        // Ensure the session is loaded before trying to update
-        const { state, saveCreds } = await useMultiFileAuthState('path/to/auth/folder');
-        const conn = makeWASocket({
-            auth: state,
-            printQRInTerminal: true,
-        });
-
-        conn.ev.on('creds.update', saveCreds);
-
-        // Update display name after connection
-        await conn.updateProfileName(displayName);
-        reply(`✅ Your display name has been set to: ${displayName}`);
-    } catch (err) {
-        console.error(err);
-        reply("❌ Failed to set your display name.");
-    }
-});
 
 cmd({
     pattern: "updatebio",
@@ -243,18 +307,65 @@ cmd({
     use: '.updatebio',
     filename: __filename
 },
-async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+async (conn, mek, m, { from, q, isOwner, reply }) => {
     try {
-        if (!isOwner) return reply('🚫 *You must be an Owner to use this command*');
-        if (!q) return reply('❓ *Enter the New Bio*');
-        if (q.length > 139) return reply('❗ *Sorry! Character limit exceeded*');
+        if (!isOwner) {
+            return await conn.sendMessage(
+                from,
+                {
+                    text: '🚫 *You must be an Owner to use this command*',
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
+        }
+
+        if (!q) {
+            return await conn.sendMessage(
+                from,
+                {
+                    text: '❓ *Please provide the new bio text*',
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
+        }
+
+        if (q.length > 139) {
+            return await conn.sendMessage(
+                from,
+                {
+                    text: '❗ *Sorry! Character limit exceeded (max 139 characters)*',
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
+        }
+
         await conn.updateProfileStatus(q);
-        await conn.sendMessage(from, { text: "✔️ *New Bio Added Successfully*" }, { quoted: mek });
+
+        await conn.sendMessage(
+            from,
+            {
+                text: "✔️ *New bio set successfully!*",
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     } catch (e) {
-        reply('🚫 *An error occurred!*\n\n' + e);
-        l(e);
+        console.error("UpdateBio Error:", e);
+        await conn.sendMessage(
+            from,
+            {
+                text: `🚫 *An error occurred!*\n\n_Error:_ ${e.message}`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     }
 });
+
+
 cmd({
     pattern: "groupsprivacy",
     desc: "Update Group Add Privacy",
@@ -262,21 +373,53 @@ cmd({
     react: "🔐",
     filename: __filename
 }, 
-async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    if (!isOwner) return reply("❌ You are not the owner!");
+async (conn, mek, m, { from, args, isOwner, reply }) => {
+    if (!isOwner) {
+        return await conn.sendMessage(
+            from,
+            {
+                text: "❌ *You are not the owner!*",
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+    }
 
     try {
-        const value = args[0] || 'all'; 
+        const value = args[0] || 'all';
         const validValues = ['all', 'contacts', 'contact_blacklist', 'none'];
-        
+
         if (!validValues.includes(value)) {
-            return reply("❌ Invalid option. Valid options are: 'all', 'contacts', 'contact_blacklist', 'none'.");
+            return await conn.sendMessage(
+                from,
+                {
+                    text: "❌ *Invalid option.*\nValid options: `all`, `contacts`, `contact_blacklist`, `none`",
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
         }
 
         await conn.updateGroupsAddPrivacy(value);
-        reply(`✅ Group add privacy updated to: ${value}`);
+
+        await conn.sendMessage(
+            from,
+            {
+                text: `✅ *Group add privacy updated to:* \`${value}\``,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+
     } catch (e) {
-        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
+        await conn.sendMessage(
+            from,
+            {
+                text: `🚫 *An error occurred while processing your request.*\n\n_Error:_ ${e.message}`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
     }
 });
 
@@ -287,14 +430,33 @@ cmd({
     use: '.getprivacy',
     filename: __filename
 },
-async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+async (conn, mek, m, { from, l, isOwner, reply }) => {
+    if (!isOwner) {
+        return await conn.sendMessage(
+            from,
+            {
+                text: '🚫 *You must be an Owner to use this command*',
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+    }
+
     try {
-        if (!isOwner) return reply('🚫 *You must be an Owner to use this command*');
         const duka = await conn.fetchPrivacySettings?.(true);
-        if (!duka) return reply('🚫 *Failed to fetch privacy settings*');
-        
+        if (!duka) {
+            return await conn.sendMessage(
+                from,
+                {
+                    text: '🚫 *Failed to fetch privacy settings*',
+                    contextInfo: getNewsletterContext(m.sender)
+                },
+                { quoted: mek }
+            );
+        }
+
         let puka = `
-╭───「 𝙿𝚁𝙸𝚅𝙰𝙲𝚈  」───◆  
+╭───「 𝙿𝚁𝙸𝚅𝙰𝙲𝚈 」───◆  
 │ ∘ 𝚁𝚎𝚊𝚍 𝚁𝚎𝚌𝚎𝚒𝚙𝚝: ${duka.readreceipts}  
 │ ∘ 𝙿𝚛𝚘𝚏𝚒𝚕𝚎 𝙿𝚒𝚌𝚝𝚞𝚛𝚎: ${duka.profile}  
 │ ∘ 𝚂𝚝𝚊𝚝𝚞𝚜: ${duka.status}  
@@ -303,38 +465,60 @@ async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, 
 │ ∘ 𝙶𝚛𝚘𝚞𝚙 𝙿𝚛𝚒𝚟𝚊𝚌𝚢: ${duka.groupadd}  
 │ ∘ 𝙲𝚊𝚕𝚕 𝙿𝚛𝚒𝚟𝚊𝚌𝚢: ${duka.calladd}  
 ╰────────────────────`;
-        await conn.sendMessage(from, { text: puka }, { quoted: mek });
+
+        await conn.sendMessage(
+            from,
+            {
+                text: puka,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
+
     } catch (e) {
-        reply('🚫 *An error occurred!*\n\n' + e);
+        await conn.sendMessage(
+            from,
+            {
+                text: `🚫 *An error occurred!*\n\n${e}`,
+                contextInfo: getNewsletterContext(m.sender)
+            },
+            { quoted: mek }
+        );
         l(e);
     }
 });
+
 cmd({
     pattern: "getpp",
-    desc: "Fetch the profile picture of a tagged or replied user.",
-    category: "owner",
-    filename: __filename
-}, async (conn, mek, m, { quoted, isGroup, sender, participants, reply }) => {
+    desc: "Fetch the profile picture of a replied or mentioned user.",
+    category: "privacy",
+    react: "🖼️",
+    filename: __filename,
+},
+async (conn, mek, m, { quoted, mentionedJid, reply }) => {
     try {
-        // Determine the target user
-        const targetJid = quoted ? quoted.sender : sender;
+        // Check if user is tagged or replied to
+        if (!quoted && (!mentionedJid || mentionedJid.length === 0)) {
+            return reply("⚠️ Please reply to a user's message or mention a user.");
+        }
 
-        if (!targetJid) return reply("⚠️ Please reply to a message to fetch the profile picture.");
+        // Get target JID
+        const targetJid = quoted?.sender || mentionedJid[0];
+        const picUrl = await conn.profilePictureUrl(targetJid, 'image').catch(() => null);
 
-        // Fetch the user's profile picture URL
-        const userPicUrl = await conn.profilePictureUrl(targetJid, "image").catch(() => null);
+        if (!picUrl) {
+            return reply("❌ Couldn't fetch profile picture. The user may not have one or privacy settings restrict access.");
+        }
 
-        if (!userPicUrl) return reply("⚠️ No profile picture found for the specified user.");
-
-        // Send the user's profile picture
         await conn.sendMessage(m.chat, {
-            image: { url: userPicUrl },
-            caption: "🖼️ Here is the profile picture of the specified user."
-        });
+            image: { url: picUrl },
+            caption: `🖼️ Profile picture of @${targetJid.split('@')[0]}`,
+            mentions: [targetJid],
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
+
     } catch (e) {
-        console.error("Error fetching user profile picture:", e);
-        reply("❌ An error occurred while fetching the profile picture. Please try again later.");
+        console.error("getpp error:", e);
+        reply("❌ Error fetching profile picture. Please try again later.");
     }
 });
-
-          
