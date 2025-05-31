@@ -20,7 +20,7 @@ cmd({
 },
 async (conn, mek, m, { from, args, q, reply, react }) => {
     try {
-        if (!q) return reply("Please provide a country name.\nExample: `.countryinfo Afghanistan`");
+        if (!q) return reply("Please provide a country name.\nExample: `.countryinfo Afghanistan Inda`");
 
         const apiUrl = `https://api.siputzx.my.id/api/tools/countryInfo?name=${encodeURIComponent(q)}`;
         const { data } = await axios.get(apiUrl);

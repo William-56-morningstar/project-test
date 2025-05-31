@@ -18,6 +18,39 @@ const { Buffer } = require('buffer');
 
 
 cmd(
+    {
+        pattern: 'take',
+        alias: ['rename', 'stake'],
+        desc: 'Create a sticker with a custom pack name.',
+        category: 'sticker',
+        use: '<reply media or URL>',
+        filename: __filename,
+    },
+    async (conn, mek, m, { quoted, args, q, reply, from }) => {
+        if (!mek.quoted) return reply(`*Reply to any sticker or image.*`);
+        
+        let mime = mek.quoted.mtype;
+        let pack = q || "NOTHING-BEN"; // پیش‌فرض اگر کاربر چیزی ننوشت
+
+        if (mime === "imageMessage" || mime === "stickerMessage") {
+            let media = await mek.quoted.download();
+            let sticker = new Sticker(media, {
+                pack: pack,
+                type: StickerTypes.FULL,
+                categories: ["🤩", "🎉"],
+                id: "12345",
+                quality: 75,
+                background: 'transparent',
+            });
+            const buffer = await sticker.toBuffer();
+            return conn.sendMessage(mek.chat, { sticker: buffer }, { quoted: mek });
+        } else {
+            return reply("*Uhh, Please reply to an image.*");
+        }
+    }
+);
+
+cmd(
   {
     pattern: 'sticker',
     alias: ['s',],
