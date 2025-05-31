@@ -19,7 +19,7 @@ const crypto = require('crypto');
 const webp = require('node-webpmux');
 const axios = require('axios');
 const { exec } = require('child_process');
-l
+
 
 cmd(
     {
