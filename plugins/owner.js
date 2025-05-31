@@ -305,7 +305,7 @@ async (conn, m, { reply, q, react }) => {
 cmd({
     pattern: "get",
     desc: "Fetch the command's file info and source code",
-    category: "owner",
+    category: "nothing",
     react: "📦",
     filename: __filename
 },
@@ -523,7 +523,6 @@ cmd({
     fs.rmSync(extractPath, { recursive: true, force: true });
 
     await reply("✅ Update completed successfully...");
-    reply("Restarting...");  
         await sleep(1500);  
         exec("pm2 restart all");  
   } catch (err) {
