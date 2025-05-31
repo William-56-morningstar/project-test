@@ -15,7 +15,11 @@ const converter = require('../data/converter');
 const stickerConverter = require('../data/sticker-converter');
 const PDFDocument = require('pdfkit');
 const { Buffer } = require('buffer');
-
+const crypto = require('crypto');
+const webp = require('node-webpmux');
+const axios = require('axios');
+const { exec } = require('child_process');
+l
 
 cmd(
     {
