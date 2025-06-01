@@ -768,63 +768,63 @@ cmd({
 });
 
 
+const fsExtra = require("fs-extra");
+
 cmd({
   pattern: "fetch",
-  desc: "Fetch and display data or file from any URL",
+  desc: "Fetch data from any URL (JSON, files, etc)",
   category: "tools",
   react: "🌐",
-  filename: __filename,
+  filename: __filename
 },
 async (conn, mek, m, { from, args, reply }) => {
   try {
-    const url = args.join(" ").trim();
-    if (!url) return reply("❌ *Please provide a URL.*");
-    if (!/^https?:\/\//.test(url)) return reply("🚫 *URL must start with http:// or https://*");
+    const q = args.join(" ").trim();
+    if (!q) return reply("❌ Please provide a URL.");
+    if (!/^https?:\/\//.test(q)) return reply("❌ URL must start with http:// or https://");
 
-    const res = await axios.get(url, { responseType: "arraybuffer" });
-    const contentType = res.headers["content-type"] || "";
+    const res = await axios.get(q, { responseType: "arraybuffer" });
+    const contentType = res.headers["content-type"];
     const buffer = Buffer.from(res.data);
-    const fileExt = contentType.split("/")[1]?.split(";")[0] || "bin";
-    const fileName = `fetched_file.${fileExt}`;
+
+    const ext = contentType.split("/")[1]?.split(";")[0] || "bin";
+    const fileName = `fetched.${ext}`;
     const options = { quoted: mek };
 
-    // 🟢 Handle JSON
+    // Handle JSON response
     if (contentType.includes("application/json")) {
-      const json = JSON.parse(buffer.toString("utf-8"));
-      const jsonPreview = JSON.stringify(json, null, 2).slice(0, 2048);
+      const json = JSON.parse(buffer.toString());
       return conn.sendMessage(from, {
-        text: `📦 *Fetched JSON Preview:*\n\`\`\`\n${jsonPreview}\n\`\`\``,
+        text: `📦 *Fetched JSON:*\n\`\`\`${JSON.stringify(json, null, 2).slice(0, 2048)}\`\`\``
       }, options);
     }
 
-    // 🔵 Handle image, video, audio, or generic file
-    const message = {};
-    if (contentType.startsWith("image/")) {
-      message.image = buffer;
-      message.caption = `🖼️ *Fetched Image* (${contentType})`;
-    } else if (contentType.startsWith("video/")) {
-      message.video = buffer;
-      message.caption = `🎞️ *Fetched Video* (${contentType})`;
-    } else if (contentType.startsWith("audio/")) {
-      message.audio = buffer;
-      message.mimetype = contentType;
-    } else {
-      // 🔒 Save unknown file type to temp
-      const tempDir = path.join(__dirname, "..", "temp");
-      const filePath = path.join(tempDir, fileName);
-      await fs.ensureDir(tempDir);
-      await fs.writeFile(filePath, buffer);
+    // Prepare temp path
+    const tempDir = path.join(__dirname, "..", "temp");
+    await fsExtra.ensureDir(tempDir);
+    const filePath = path.join(tempDir, fileName);
+    await fsExtra.writeFile(filePath, buffer);
 
-      message.document = fs.readFileSync(filePath);
-      message.fileName = fileName;
-      message.mimetype = contentType;
-      message.caption = `📄 *Fetched File* (${contentType})`;
+    // Detect content
+    let messageContent = {};
+    const fileBuffer = await fsExtra.readFile(filePath);
+    if (contentType.includes("image")) {
+      messageContent.image = fileBuffer;
+    } else if (contentType.includes("video")) {
+      messageContent.video = fileBuffer;
+    } else if (contentType.includes("audio")) {
+      messageContent.audio = fileBuffer;
+    } else {
+      messageContent.document = fileBuffer;
+      messageContent.mimetype = contentType;
+      messageContent.fileName = fileName;
     }
 
-    await conn.sendMessage(from, message, options);
+    await conn.sendMessage(from, messageContent, options);
+    await fsExtra.unlink(filePath); // Clean up
 
   } catch (e) {
-    console.error("🌐 Fetch Error:", e);
+    console.error("Fetch Error:", e);
     reply(`❌ *Error occurred:*\n\`\`\`${e.message}\`\`\``);
   }
 });
