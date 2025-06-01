@@ -31,6 +31,7 @@ cmd({
   category: 'game',
   filename: __filename,
 }, async (conn, mek, m, { from, sender, reply }) => {
+
   const replyText = async (text, mentions = [], quoted = m) => {
     await conn.sendMessage(from, { text, mentions }, { quoted });
   };
@@ -44,7 +45,7 @@ cmd({
       playing: true
     };
 
-    const startMsg = await conn.sendMessage(from, {
+    await conn.sendMessage(from, {
       text:
         `🎮 *TIC-TAC-TOE* 🎮\n\n` +
         `Game started! @${sender.split('@')[0]} (❌) waiting for player 2 (⭕).\n\n` +
@@ -53,87 +54,56 @@ cmd({
       mentions: [sender]
     }, { quoted: m });
 
-    const messageID = startMsg.key.id;
-
     const handler = async (msgData) => {
       try {
         const receivedMsg = msgData.messages[0];
         if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
 
-        const isReplyToGameMsg = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === messageID;
-        if (!isReplyToGameMsg) return;
-
         const moveText =
           receivedMsg.message?.conversation ||
           receivedMsg.message?.extendedTextMessage?.text || "";
-
         const move = moveText.trim();
-        const player = receivedMsg.key.participant || receivedMsg.participant || receivedMsg.key.remoteJid;
+        const player = receivedMsg.key.participant || receivedMsg.key.remoteJid;
 
-        if (!/^[1-9]$/.test(move)) {
-          await conn.sendMessage(from, { text: "❌ Invalid move! Reply with a number 1-9." }, { quoted: receivedMsg });
-          return;
-        }
+        // Ignore if not 1-9
+        if (!/^[1-9]$/.test(move)) return;
 
         const game = games[from];
-        if (!game || !game.playing) {
-          await conn.sendMessage(from, { text: "❗ There is no active game." }, { quoted: receivedMsg });
-          conn.ev.off("messages.upsert", handler);
-          return;
-        }
+        if (!game || !game.playing) return;
 
-        // If playerO not yet joined
+        // Join second player
         if (!game.playerO && player !== game.playerX) {
           game.playerO = player;
-
-          // Register first move of playerO
-          const moveIndex = parseInt(move) - 1;
-
-          if (game.board[moveIndex] === '❌' || game.board[moveIndex] === '⭕') {
-            await conn.sendMessage(from, { text: "❌ Position already taken." }, { quoted: receivedMsg });
-            return;
-          }
-
-          game.board[moveIndex] = '⭕';
-
-          if (checkWin(game.board, 'O')) {
-            await conn.sendMessage(from, {
-              text: `🎉 @${player.split('@')[0]} (⭕) wins!\n\n${printBoard(game.board)}`,
-              mentions: [player]
-            });
-            delete games[from];
-            conn.ev.off("messages.upsert", handler);
-            return;
-          }
-
-          game.turn = 'X';
-
           await conn.sendMessage(from, {
-            text:
-              `🎮 @${player.split('@')[0]} joined as Player 2 (⭕).\n\n` +
-              printBoard(game.board) +
-              `\n@${game.playerX.split('@')[0]}'s turn (❌)\nReply with 1-9.`,
-            mentions: [game.playerX, game.playerO]
+            text: `🎮 @${player.split('@')[0]} joined as Player 2 (⭕).\n\n${printBoard(game.board)}\n@${game.playerX.split('@')[0]}'s turn (❌)\nReply with 1-9.`,
+            mentions: [game.playerX, player]
           });
           return;
         }
 
-        // Not player turn
+        // Ignore third users
+        if (player !== game.playerX && player !== game.playerO) return;
+
+        // Check turn
         if ((game.turn === 'X' && player !== game.playerX) || (game.turn === 'O' && player !== game.playerO)) {
-          await conn.sendMessage(from, { text: "❗ It's not your turn!" }, { quoted: receivedMsg });
+          await conn.sendMessage(from, {
+            text: `❗ It's not your turn!`,
+            mentions: [player]
+          });
           return;
         }
 
-        const moveIndex = parseInt(move) - 1;
-
-        // Cell already taken
-        if (game.board[moveIndex] === '❌' || game.board[moveIndex] === '⭕') {
-          await conn.sendMessage(from, { text: "❌ Position already taken." }, { quoted: receivedMsg });
+        // Check if cell taken
+        if (game.board[parseInt(move) - 1] === '❌' || game.board[parseInt(move) - 1] === '⭕') {
+          await conn.sendMessage(from, {
+            text: `❌ Position already taken.`,
+            mentions: [player]
+          });
           return;
         }
 
-        // Make move
-        game.board[moveIndex] = game.turn === 'X' ? '❌' : '⭕';
+        // Set move
+        game.board[parseInt(move) - 1] = game.turn === 'X' ? '❌' : '⭕';
 
         // Check win
         if (checkWin(game.board, game.turn)) {
@@ -160,14 +130,17 @@ cmd({
 
         // Switch turn
         game.turn = game.turn === 'X' ? 'O' : 'X';
+        const nextPlayer = game.turn === 'X' ? game.playerX : game.playerO;
+        const nextSymbol = game.turn === 'X' ? '❌' : '⭕';
 
         await conn.sendMessage(from, {
           text:
             `🎮 *TIC-TAC-TOE* 🎮\n\n` +
             printBoard(game.board) +
-            `\n@${game.turn === 'X' ? game.playerX.split('@')[0] : game.playerO.split('@')[0]}'s turn (${game.turn === 'X' ? '❌' : '⭕'})\nReply with 1-9.`,
-          mentions: [game.playerX, game.playerO]
+            `\n@${nextPlayer.split('@')[0]}'s turn (${nextSymbol})\nReply with 1-9.`,
+          mentions: [nextPlayer]
         });
+
       } catch (e) {
         console.error('TicTacToe handler error:', e);
       }
@@ -178,7 +151,8 @@ cmd({
     setTimeout(() => {
       conn.ev.off("messages.upsert", handler);
       if (games[from]) delete games[from];
-    }, 10 * 60 * 1000);
+    }, 10 * 60 * 1000); // 10 minutes
+
   } else {
     await replyText("❗ There is already an ongoing game! Reply with a number 1-9 to play.");
   }
