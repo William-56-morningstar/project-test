@@ -1295,83 +1295,94 @@ cmd({
 //  ANI-DELETE COMMANDS
 //--------------------------------------------
 
+
 cmd({
   pattern: "antidelete",
   desc: "Manage AntiDelete Settings with Reply Menu",
   react: "🔄",
   category: "misc",
   filename: __filename,
-},
-  async (conn, mek, m, { from, reply, isCreator }) => {
-    if (!isCreator) return reply("*Only the bot owner can use this command!*");
+}, async (conn, mek, m, { from, reply, isCreator }) => {
+  if (!isCreator) return reply("*Only the bot owner can use this command!*");
 
-    const currentMode = (await getConfig("ANTI_DEL_PATH")) || "same";
+  const currentMode = (await getConfig("ANTI_DEL_PATH")) || "same";
+  const groupOn = await getAnti("gc");
+  const dmOn = await getAnti("dm");
 
-    const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
+  let statusText = "";
+  if (!groupOn && !dmOn) {
+    statusText = "❌ *AntiDelete is currently OFF.*";
+  } else {
+    const modeText = currentMode === "log" ? "Log Mode (Inbox)" : "Same Chat";
+    statusText =
+      "✅ *AntiDelete is ON:*\n" +
+      `> Group: ${groupOn ? modeText : "❌ OFF"}\n` +
+      `> DM: ${dmOn ? modeText : "❌ OFF"}`;
+  }
 
-> Current Mode: ${currentMode === "log" ? "✅ ON (inbox)" : "✅ ON (same)"}
+  const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n${statusText}
 
 Reply with:
 
-*1.* To Enable Antidelete for All (Group,DM) Same Chat  
-*2.* To Enable Antidelete for All (Group,DM) dm Chat  
-*3.* To Disable All Antidelete and reset
+*1.* To Enable Antidelete for All (Group, DM) → Same Chat  
+*2.* To Enable Antidelete for All (Group, DM) → Log Inbox  
+*3.* To Disable Antidelete for both
 
 ╭────────────────◆  
 │ *POWERED BY NOTHING*  
 ╰─────────────────◆`;
 
-    const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
-      caption: menuText
-    }, { quoted: mek });
+  const sentMsg = await conn.sendMessage(from, {
+    image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+    caption: menuText
+  }, { quoted: mek });
 
-    const messageID = sentMsg.key.id;
+  const messageID = sentMsg.key.id;
 
-    const handler = async (msgData) => {
-      try {
-        const receivedMsg = msgData.messages[0];
-        if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
+  const handler = async (msgData) => {
+    try {
+      const receivedMsg = msgData.messages[0];
+      if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
 
-        const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
-        const isReply = quotedId === messageID;
-        if (!isReply) return;
+      const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+      const isReply = quotedId === messageID;
+      if (!isReply) return;
 
-        const replyText =
-          receivedMsg.message?.conversation ||
-          receivedMsg.message?.extendedTextMessage?.text || "";
+      const replyText =
+        receivedMsg.message?.conversation ||
+        receivedMsg.message?.extendedTextMessage?.text || "";
 
-        let responseText = "";
+      let responseText = "";
 
-        if (replyText === "1") {
-          await setAnti("gc", true);
-          await setAnti("dm", true);
-          await setConfig("ANTI_DEL_PATH", "same");
-          responseText = "✅ AntiDelete Enabled.\nand Mode is Same chat\nGroup: ON\nDM: ON (same)";
-        } else if (replyText === "2") {
-          await setAnti("gc", true);
-          await setAnti("dm", true);
-          await setConfig("ANTI_DEL_PATH", "log");
-          responseText = "✅ AntiDelete Mode changed to DM Log.\nGroup: ON\nDM: ON (log)";
-        } else if (replyText === "3") {
-          await setAnti("gc", false);
-          await setAnti("dm", false);
-          await setConfig("ANTI_DEL_PATH", "same");
-          responseText = "❌ AntiDelete turned off for both Group and DM.";
-        } else {
-          responseText = "❌ Invalid input. Please reply with *1*, *2*, or *3*.";
-        }
-
-        await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
-        conn.ev.off("messages.upsert", handler);
-      } catch (err) {
-        console.error("AntiDelete handler error:", err);
+      if (replyText === "1") {
+        await setAnti("gc", true);
+        await setAnti("dm", true);
+        await setConfig("ANTI_DEL_PATH", "same");
+        responseText = "✅ AntiDelete Enabled.\n> Group: ON (Same Chat)\n> DM: ON (Same Chat)";
+      } else if (replyText === "2") {
+        await setAnti("gc", true);
+        await setAnti("dm", true);
+        await setConfig("ANTI_DEL_PATH", "log");
+        responseText = "✅ AntiDelete Enabled.\n> Group: ON (Inbox Log)\n> DM: ON (Inbox Log)";
+      } else if (replyText === "3") {
+        await setAnti("gc", false);
+        await setAnti("dm", false);
+        await setConfig("ANTI_DEL_PATH", "same");
+        responseText = "❌ AntiDelete has been turned OFF for both Group and DM.";
+      } else {
+        responseText = "❌ Invalid input. Please reply with *1*, *2*, or *3*.";
       }
-    };
 
-    conn.ev.on("messages.upsert", handler);
-    setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000);
-  });
+      await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
+      conn.ev.off("messages.upsert", handler);
+    } catch (err) {
+      console.error("AntiDelete handler error:", err);
+    }
+  };
+
+  conn.ev.on("messages.upsert", handler);
+  setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000); // 30 min timeout
+});
 
 //--------------------------------------------
 //  ANI-BAD COMMANDS
