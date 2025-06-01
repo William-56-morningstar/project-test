@@ -1309,7 +1309,7 @@ cmd({
 
     const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
 
-> Current DM: ${currentMode === "log" ? "✅ ON (log)" : "❌ OFF (same)"}
+> Current Mode: ${currentMode === "log" ? "✅ ON (inbox)" : "✅ ON (same)"}
 
 Reply with:
 
