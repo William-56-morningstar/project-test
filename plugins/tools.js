@@ -784,44 +784,51 @@ async (conn, mek, m, { from, args, reply }) => {
     if (!/^https?:\/\//.test(q)) return reply("❌ URL must start with http:// or https://");
 
     const res = await axios.get(q, { responseType: "arraybuffer" });
-    const contentType = res.headers["content-type"];
+    const contentType = res.headers["content-type"] || "";
     const buffer = Buffer.from(res.data);
 
-    const ext = contentType.split("/")[1]?.split(";")[0] || "bin";
+    const extFromType = contentType.split("/")[1]?.split(";")[0] || "";
+    const extFromUrl = path.extname(q).split("?")[0].slice(1).toLowerCase(); // e.g. 'mp3', 'jpg'
+    const ext = extFromUrl || extFromType || "bin";
+
     const fileName = `fetched.${ext}`;
-    const options = { quoted: mek };
-
-    // Handle JSON response
-    if (contentType.includes("application/json")) {
-      const json = JSON.parse(buffer.toString());
-      return conn.sendMessage(from, {
-        text: `📦 *Fetched JSON:*\n\`\`\`${JSON.stringify(json, null, 2).slice(0, 2048)}\`\`\``
-      }, options);
-    }
-
-    // Prepare temp path
     const tempDir = path.join(__dirname, "..", "temp");
     await fsExtra.ensureDir(tempDir);
     const filePath = path.join(tempDir, fileName);
     await fsExtra.writeFile(filePath, buffer);
 
-    // Detect content
-    let messageContent = {};
     const fileBuffer = await fsExtra.readFile(filePath);
-    if (contentType.includes("image")) {
+    const options = { quoted: mek };
+    let messageContent = {};
+
+    // If JSON
+    if (contentType.includes("application/json")) {
+      const json = JSON.parse(buffer.toString());
+      await fsExtra.unlink(filePath);
+      return conn.sendMessage(from, {
+        text: `📦 *Fetched JSON:*\n\`\`\`${JSON.stringify(json, null, 2).slice(0, 2048)}\`\`\``
+      }, options);
+    }
+
+    // Detect media type using content-type or URL extension
+    const isAudio = contentType.includes("audio") || ext === "mp3" || ext === "wav" || ext === "ogg";
+    const isImage = contentType.includes("image") || ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+    const isVideo = contentType.includes("video") || ["mp4", "mkv", "mov", "avi"].includes(ext);
+
+    if (isImage) {
       messageContent.image = fileBuffer;
-    } else if (contentType.includes("video")) {
+    } else if (isVideo) {
       messageContent.video = fileBuffer;
-    } else if (contentType.includes("audio")) {
+    } else if (isAudio) {
       messageContent.audio = fileBuffer;
     } else {
       messageContent.document = fileBuffer;
-      messageContent.mimetype = contentType;
+      messageContent.mimetype = contentType || "application/octet-stream";
       messageContent.fileName = fileName;
     }
 
     await conn.sendMessage(from, messageContent, options);
-    await fsExtra.unlink(filePath); // Clean up
+    await fsExtra.unlink(filePath); // Clean up temp
 
   } catch (e) {
     console.error("Fetch Error:", e);
