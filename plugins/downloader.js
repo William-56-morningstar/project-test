@@ -1,8 +1,142 @@
-const { cmd } = require("../command");
 const fetch = require("node-fetch");
 const config = require('../config');
 const { ytsearch } = require('@dark-yasiya/yt-dl.js');
 const { getConfig, setConfig } = require('../lib/configdb');
+const axios = require("axios");
+const { fetchJson } = require("../lib/functions");
+const { downloadTiktok } = require("@mrnima/tiktok-downloader");
+const { facebook } = require("@mrnima/facebook-downloader");
+const cheerio = require("cheerio");
+const { igdl } = require("ruhend-scraper");
+const { cmd, commands } = require('../command');
+
+
+cmd({
+  pattern: "ig",
+  alias: ["insta", "instagram"],
+  desc: "Download Instagram videos/images using BK9 API",
+  react: "🎥",
+  category: "download",
+  filename: __filename
+}, async (conn, m, store, { from, q, reply }) => {
+  try {
+    if (!q || !q.startsWith("http")) {
+      return reply("❌ Please provide a valid Instagram link.");
+    }
+
+    await conn.sendMessage(from, {
+      react: { text: "⏳", key: m.key }
+    });
+
+    const apiURL = `https://bk9.fun/download/instagram?url=${encodeURIComponent(q)}`;
+    const response = await axios.get(apiURL);
+    const json = response.data;
+
+    if (!json.status || !Array.isArray(json.BK9)) {
+      return reply("⚠️ Failed to fetch Instagram media. Please check the link.");
+    }
+
+    for (const media of json.BK9) {
+      const type = media.type || "";
+      const url = media.url;
+      if (!url) continue;
+
+      if (type === "image") {
+        await conn.sendMessage(from, {
+          image: { url },
+          caption: "📥 *Instagram Image*"
+        }, { quoted: m });
+      } else {
+        await conn.sendMessage(from, {
+          video: { url },
+          caption: "📥 *Instagram Video*"
+        }, { quoted: m });
+      }
+    }
+
+  } catch (error) {
+    console.error("IG Download Error:", error);
+    reply("❌ An error occurred while processing your Instagram link.");
+  }
+});
+
+
+cmd({
+    pattern: "movie",
+    desc: "Fetch detailed information about a movie.",
+    category: "utility",
+    react: "🎬",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply, sender, args }) => {
+    try {
+        // Properly extract the movie name from arguments
+        const movieName = args.length > 0 ? args.join(' ') : m.text.replace(/^[\.\#\$\!]?movie\s?/i, '').trim();
+        
+        if (!movieName) {
+            return reply("📽️ Please provide the name of the movie.\nExample: .movie Captain America");
+        }
+
+        const apiUrl = `https://apis.davidcyriltech.my.id/imdb?query=${encodeURIComponent(movieName)}`;
+        const response = await axios.get(apiUrl);
+
+        if (!response.data.status || !response.data.movie) {
+            return reply("🚫 Movie not found. Please check the name and try again.");
+        }
+
+        const movie = response.data.movie;
+        
+        // Format the caption
+        const dec = `
+🎬 *${movie.title}* (${movie.year}) ${movie.rated || ''}
+
+⭐ *IMDb:* ${movie.imdbRating || 'N/A'} | 🍅 *Rotten Tomatoes:* ${movie.ratings.find(r => r.source === 'Rotten Tomatoes')?.value || 'N/A'} | 💰 *Box Office:* ${movie.boxoffice || 'N/A'}
+
+📅 *Released:* ${new Date(movie.released).toLocaleDateString()}
+⏳ *Runtime:* ${movie.runtime}
+🎭 *Genre:* ${movie.genres}
+
+📝 *Plot:* ${movie.plot}
+
+🎥 *Director:* ${movie.director}
+✍️ *Writer:* ${movie.writer}
+🌟 *Actors:* ${movie.actors}
+
+🌍 *Country:* ${movie.country}
+🗣️ *Language:* ${movie.languages}
+🏆 *Awards:* ${movie.awards || 'None'}
+
+[View on IMDb](${movie.imdbUrl})
+`;
+
+        // Send message with the requested format
+        await conn.sendMessage(
+            from,
+            {
+                image: { 
+                    url: movie.poster && movie.poster !== 'N/A' ? movie.poster : 'https://files.catbox.moe/6vrc2s.jpg'
+                },
+                caption: dec,
+                contextInfo: {
+                    mentionedJid: [sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363333589976873@newsletter',
+                        newsletterName: "NOTHING TECH",
+                        serverMessageId: 143
+                    }
+                }
+            },
+            { quoted: mek }
+        );
+
+    } catch (e) {
+        console.error('Movie command error:', e);
+        reply(`❌ Error: ${e.message}`);
+    }
+});
+
 
 cmd({
   pattern: 'gitclone',

@@ -7,54 +7,7 @@ const axios = require("axios");
 const { cmd, commands } = require('../command');
 
 
-cmd({
-  pattern: "ig",
-  alias: ["insta", "instagram"],
-  desc: "Download Instagram videos/images using BK9 API",
-  react: "🎥",
-  category: "download",
-  filename: __filename
-}, async (conn, m, store, { from, q, reply }) => {
-  try {
-    if (!q || !q.startsWith("http")) {
-      return reply("❌ Please provide a valid Instagram link.");
-    }
 
-    await conn.sendMessage(from, {
-      react: { text: "⏳", key: m.key }
-    });
-
-    const apiURL = `https://bk9.fun/download/instagram?url=${encodeURIComponent(q)}`;
-    const response = await axios.get(apiURL);
-    const json = response.data;
-
-    if (!json.status || !Array.isArray(json.BK9)) {
-      return reply("⚠️ Failed to fetch Instagram media. Please check the link.");
-    }
-
-    for (const media of json.BK9) {
-      const type = media.type || "";
-      const url = media.url;
-      if (!url) continue;
-
-      if (type === "image") {
-        await conn.sendMessage(from, {
-          image: { url },
-          caption: "📥 *Instagram Image*"
-        }, { quoted: m });
-      } else {
-        await conn.sendMessage(from, {
-          video: { url },
-          caption: "📥 *Instagram Video*"
-        }, { quoted: m });
-      }
-    }
-
-  } catch (error) {
-    console.error("IG Download Error:", error);
-    reply("❌ An error occurred while processing your Instagram link.");
-  }
-});
 
 
 // twitter-dl
