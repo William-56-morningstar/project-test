@@ -33,6 +33,13 @@
       "value": "93744215959"
 
     }, 
+    
+    "ANTI_DELETE": {
+      "description": "for on antidelete in Whatsapp bot use true.",
+      "required": false,
+      "value": "true"
+
+    }, 
 
     "ANTI_LINK": {
       "description": "Make it true if you want bot auto remove group link.",
