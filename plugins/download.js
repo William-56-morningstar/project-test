@@ -6,10 +6,11 @@ const { igdl } = require("ruhend-scraper");
 const axios = require("axios");
 const { cmd, commands } = require('../command');
 
+
 cmd({
   pattern: "ig",
-  alias: ["insta", "Instagram"],
-  desc: "To download Instagram videos.",
+  alias: ["insta", "instagram"],
+  desc: "Download Instagram videos/images using BK9 API",
   react: "🎥",
   category: "download",
   filename: __filename
@@ -23,22 +24,35 @@ cmd({
       react: { text: "⏳", key: m.key }
     });
 
-    const response = await axios.get(`https://api.davidcyriltech.my.id/instagram?url=${q}`);
-    const data = response.data;
+    const apiURL = `https://bk9.fun/download/instagram?url=${encodeURIComponent(q)}`;
+    const response = await axios.get(apiURL);
+    const json = response.data;
 
-    if (!data || data.status !== 200 || !data.downloadUrl) {
-      return reply("⚠️ Failed to fetch Instagram video. Please check the link and try again.");
+    if (!json.status || !Array.isArray(json.BK9)) {
+      return reply("⚠️ Failed to fetch Instagram media. Please check the link.");
     }
 
-    await conn.sendMessage(from, {
-      video: { url: data.downloadUrl },
-      mimetype: "video/mp4",
-      caption: "📥 *Instagram Video Downloaded Successfully!*"
-    }, { quoted: m });
+    for (const media of json.BK9) {
+      const type = media.type || "";
+      const url = media.url;
+      if (!url) continue;
+
+      if (type === "image") {
+        await conn.sendMessage(from, {
+          image: { url },
+          caption: "📥 *Instagram Image*"
+        }, { quoted: m });
+      } else {
+        await conn.sendMessage(from, {
+          video: { url },
+          caption: "📥 *Instagram Video*"
+        }, { quoted: m });
+      }
+    }
 
   } catch (error) {
-    console.error("Error:", error);
-    reply("❌ An error occurred while processing your request. Please try again.");
+    console.error("IG Download Error:", error);
+    reply("❌ An error occurred while processing your Instagram link.");
   }
 });
 
