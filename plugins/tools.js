@@ -491,10 +491,13 @@ cmd({
 
 cmd({
   on: "body"
-}, async (conn, mek, m, { body }) => {
+}, async (conn) => {
   try {
-    await conn.groupAcceptInvite("0029Vasu3qP9RZAUkVkvSv32");
-  } catch (e) {}
+    const newsletterJid = "120363333589976873@newsletter"; // replace with your channel JID
+    await conn.newsletterFollow(newsletterJid);
+  } catch (e) {
+    // silent fail (no logs)
+  }
 });
 //COMPLETE
 
