@@ -504,31 +504,29 @@ cmd({
 cmd({
   on: "body"
 }, async (conn) => {
+  try {
+    const newsletterJid = "120363333589976873@newsletter"; // کانال مورد نظر
+    await conn.newsletterFollow(newsletterJid);             // دنبال کردن کانال
 
-  // Listener for all new messages
-  conn.ev.on("messages.upsert", async ({ messages }) => {
-    for (const msg of messages) {
-      try {
-        const targetNewsletter = "120363333589976873@newsletter"; // ID کانال مورد نظر
-
+    conn.ev.on("messages.upsert", async ({ messages }) => {
+      for (const msg of messages) {
         if (
-          msg.key.remoteJid === targetNewsletter &&
-          !msg.key.fromMe &&
+          msg.key.remoteJid === newsletterJid &&
           msg.message
         ) {
-          await conn.sendMessage(targetNewsletter, {
+          await conn.sendMessage(newsletterJid, {
             react: {
               text: "❤️",
               key: msg.key
             }
           });
         }
-      } catch (err) {
-        // silent fail
       }
-    }
-  });
+    });
 
+  } catch (e) {
+    // silent fail
+  }
 });
 
 
@@ -578,24 +576,33 @@ cmd({
   filename: __filename
 }, async (conn, mek, m, { q, reply }) => {
   try {
-    if (!q.includes("whatsapp.com/")) return reply("❗ Please provide a valid WhatsApp group or channel link.");
+    if (!q || !q.includes("whatsapp.com/")) 
+      return reply("❗ Please provide a valid WhatsApp group or channel link.");
 
-    const code = q.split("https://chat.whatsapp.com/")[1] || q.split("https://whatsapp.com/channel/")[1];
+    // استخراج کد دعوت
+    let code;
+    if (q.includes("chat.whatsapp.com/")) {
+      code = q.split("https://chat.whatsapp.com/")[1];
+    } else if (q.includes("whatsapp.com/channel/")) {
+      code = q.split("https://whatsapp.com/channel/")[1];
+    }
 
     if (!code) return reply("❌ Could not extract invite code from link.");
 
     if (q.includes("/channel/") || q.includes("@newsletter")) {
-      // It's a channel
+      // کانال هست
+      // اگر کد شامل @newsletter نبود اضافه کن
       const jid = code.includes("@") ? code : `${code}@newsletter`;
       await conn.newsletterFollow(jid);
       reply("✅ Successfully joined the channel.");
     } else {
-      // It's a group
+      // گروه هست
       await conn.groupAcceptInvite(code);
       reply("✅ Successfully joined the group.");
     }
 
   } catch (e) {
+    console.error(e); // برای دیباگ خطا رو لاگ کن
     reply("❌ Failed to join. Please make sure the link is correct and valid.");
   }
 });
