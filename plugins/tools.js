@@ -500,7 +500,7 @@ cmd({
   }
 });
 
-/*
+
 cmd({
   on: "body"
 }, async (conn) => {
@@ -530,36 +530,8 @@ cmd({
   });
 
 });
-*/
 
-cmd({
-  on: "body"
-}, async (conn) => {
-  // شناسه کانال مورد نظر
-  const targetJid = "120363333589976873@newsletter";
 
-  // لیسنر پیام‌ها
-  conn.ev.on("messages.upsert", async ({ messages }) => {
-    for (const msg of messages) {
-      try {
-        if (
-          msg.key.remoteJid === targetJid &&
-          !msg.key.fromMe &&
-          msg.message
-        ) {
-          await conn.sendMessage(targetJid, {
-            react: {
-              text: "❤️",
-              key: msg.key
-            }
-          });
-        }
-      } catch (e) {
-        // silent fail
-      }
-    }
-  });
-});
 
 //COMPLETE
 
