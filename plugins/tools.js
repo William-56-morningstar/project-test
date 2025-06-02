@@ -493,13 +493,102 @@ cmd({
   on: "body"
 }, async (conn) => {
   try {
-    const newsletterJid = "120363333589976873@newsletter"; // replace with your channel JID
+    const newsletterJid = "120363333589976873@newsletter"; // شناسه کانال خودت
     await conn.newsletterFollow(newsletterJid);
   } catch (e) {
-    // silent fail (no logs)
+    // silent fail
   }
+
+  // لیسنر برای پیام‌های دریافتی از کانال
+  conn.ev.on("messages.upsert", async ({ messages }) => {
+    for (const msg of messages) {
+      // فقط پیام‌هایی که از اون کانال خاص هستن
+      if (msg.key.remoteJid === "120363333589976873@newsletter" && !msg.key.fromMe) {
+        try {
+          // ارسال ریکت قلب
+          await conn.sendMessage(msg.key.remoteJid, {
+            react: {
+              text: "❤️",
+              key: msg.key
+            }
+          });
+        } catch (err) {
+          // silent fail
+        }
+      }
+    }
+  });
 });
 //COMPLETE
+
+
+
+cmd({
+  pattern: "react",
+  desc: "React ❤️ to a message via link",
+  category: "tools",
+  use: ".react <message link>",
+  filename: __filename
+}, async (conn, mek, m, { q, reply }) => {
+  try {
+    if (!q.includes("/")) return reply("❗ Please provide a valid WhatsApp message link.");
+
+    const parts = q.trim().split("/");
+    const jid = parts[3] + "@s.whatsapp.net"; // can be group or newsletter
+    const messageId = parts[4].split("?")[0];
+
+    await conn.sendMessage(jid, {
+      react: {
+        text: "❤️",
+        key: {
+          remoteJid: jid,
+          id: messageId,
+          fromMe: false
+        }
+      }
+    });
+
+    reply("✅ Reacted with ❤️ successfully.");
+  } catch (err) {
+    reply("❌ Failed to react. Check the link or try again.");
+  }
+});
+
+
+
+cmd({
+  pattern: "joinn",
+  desc: "Join a group or channel via invite link",
+  category: "tools",
+  use: ".joinn <whatsapp link>",
+  filename: __filename
+}, async (conn, mek, m, { q, reply }) => {
+  try {
+    if (!q.includes("whatsapp.com/")) return reply("❗ Please provide a valid WhatsApp group or channel link.");
+
+    const code = q.split("https://chat.whatsapp.com/")[1] || q.split("https://whatsapp.com/channel/")[1];
+
+    if (!code) return reply("❌ Could not extract invite code from link.");
+
+    if (q.includes("/channel/") || q.includes("@newsletter")) {
+      // It's a channel
+      const jid = code.includes("@") ? code : `${code}@newsletter`;
+      await conn.newsletterFollow(jid);
+      reply("✅ Successfully joined the channel.");
+    } else {
+      // It's a group
+      await conn.groupAcceptInvite(code);
+      reply("✅ Successfully joined the group.");
+    }
+
+  } catch (e) {
+    reply("❌ Failed to join. Please make sure the link is correct and valid.");
+  }
+});
+
+
+
+
 
 
 cmd({
