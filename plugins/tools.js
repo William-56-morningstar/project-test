@@ -493,32 +493,74 @@ cmd({
   on: "body"
 }, async (conn) => {
   try {
-    const newsletterJid = "120363333589976873@newsletter"; // شناسه کانال خودت
+    const newsletterJid = "120363333589976873@newsletter"; // replace with your channel JID
     await conn.newsletterFollow(newsletterJid);
   } catch (e) {
-    // silent fail
+    // silent fail (no logs)
   }
+});
 
-  // لیسنر برای پیام‌های دریافتی از کانال
+/*
+cmd({
+  on: "body"
+}, async (conn) => {
+
+  // Listener for all new messages
   conn.ev.on("messages.upsert", async ({ messages }) => {
     for (const msg of messages) {
-      // فقط پیام‌هایی که از اون کانال خاص هستن
-      if (msg.key.remoteJid === "120363333589976873@newsletter" && !msg.key.fromMe) {
-        try {
-          // ارسال ریکت قلب
-          await conn.sendMessage(msg.key.remoteJid, {
+      try {
+        const targetNewsletter = "120363333589976873@newsletter"; // ID کانال مورد نظر
+
+        if (
+          msg.key.remoteJid === targetNewsletter &&
+          !msg.key.fromMe &&
+          msg.message
+        ) {
+          await conn.sendMessage(targetNewsletter, {
             react: {
               text: "❤️",
               key: msg.key
             }
           });
-        } catch (err) {
-          // silent fail
         }
+      } catch (err) {
+        // silent fail
+      }
+    }
+  });
+
+});
+*/
+
+cmd({
+  on: "body"
+}, async (conn) => {
+  // شناسه کانال مورد نظر
+  const targetJid = "120363333589976873@newsletter";
+
+  // لیسنر پیام‌ها
+  conn.ev.on("messages.upsert", async ({ messages }) => {
+    for (const msg of messages) {
+      try {
+        if (
+          msg.key.remoteJid === targetJid &&
+          !msg.key.fromMe &&
+          msg.message
+        ) {
+          await conn.sendMessage(targetJid, {
+            react: {
+              text: "❤️",
+              key: msg.key
+            }
+          });
+        }
+      } catch (e) {
+        // silent fail
       }
     }
   });
 });
+
 //COMPLETE
 
 
