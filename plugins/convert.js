@@ -21,12 +21,28 @@ const axios = require('axios');
 const { exec } = require('child_process');
 
 
+
+function getNewsletterContext(senderJid) {
+    return {
+        mentionedJid: [senderJid],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363333589976873@newsletter',
+            newsletterName: "NOTHING TECH",
+            serverMessageId: 143
+        }
+    };
+}
+
+
+
 cmd(
     {
         pattern: 'take',
         alias: ['rename', 'stake'],
         desc: 'Create a sticker with a custom pack name.',
-        category: 'sticker',
+        category: 'convert',
         use: '<reply media or URL>',
         filename: __filename,
     },
@@ -139,7 +155,8 @@ cmd({
     const media = await message.quoted.download();
     await client.sendMessage(message.chat, {
       image: media,
-      caption: "✅ Sticker converted to image."
+      caption: "✅ Sticker converted to image.",
+      contextInfo: getNewsletterContext(m.sender)
     }, { quoted: message });
 
   } catch (error) {
@@ -188,6 +205,7 @@ cmd({
             await client.sendMessage(from, {
                 image: imageBuffer,
                 caption: "> Sticker converted to image",
+                contextInfo: getNewsletterContext(m.sender),
                 mimetype: 'image/png'
             }, { quoted: message });
 
@@ -195,6 +213,7 @@ cmd({
             await client.sendMessage(from, {
                 video: mediaBuffer,
                 caption: "> Video extracted successfully",
+                contextInfo: getNewsletterContext(m.sender),
                 mimetype: 'video/mp4'
             }, { quoted: message });
         }
