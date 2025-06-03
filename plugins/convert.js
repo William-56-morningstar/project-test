@@ -144,7 +144,7 @@ cmd({
   category: "convert",
   use: ".toimg (reply to sticker)",
   filename: __filename
-}, async (client, message, match) => {
+}, async (client, m, message, match) => {
   try {
     if (!message.quoted || message.quoted.mtype !== "stickerMessage") {
       return await client.sendMessage(message.chat, {
