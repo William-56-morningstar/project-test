@@ -15,6 +15,20 @@ const commandPrefix = config.PREFIX;
 
 
 
+function getNewsletterContext(senderJid) {
+    return {
+        mentionedJid: [senderJid],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363333589976873@newsletter',
+            newsletterName: "NOTHING TECH",
+            serverMessageId: 143
+        }
+    };
+}
+
+
 /*
 cmd({
     pattern: "menu",
@@ -173,7 +187,8 @@ async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
 
         await conn.sendMessage(from, {
             image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
-            caption: menuText.trim()
+            caption: menuText.trim(),
+            contextInfo: getNewsletterContext(m.sender)
         }, { quoted: mek });
 
         await conn.sendMessage(from, {
@@ -185,170 +200,3 @@ async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
         reply("Error while generating menu:\n" + e.toString());
     }
 });
-
-
-
-cmd({
-    pattern: "ownermenu",
-    desc: "menu the bot",
-    category: "menu",
-    react: "🔰",
-    filename: __filename
-}, 
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // فیلتر کردن دستورات با category "owner"
-        const ownerCommands = commands.filter(cmd => cmd.category === "owner");
-
-        // ساخت منو با دستورات فیلتر شده
-        let dec = `╭━━〔 *Owner Menu* 〕━━┈⊷\n`;
-        ownerCommands.forEach(cmd => {
-            dec += `┃◈┃• ${cmd.pattern}\n`;
-        });
-        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
-
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
-                caption: dec,
-            },
-            { quoted: mek }
-        );
-        
-        await conn.sendMessage(from, {
-      react: { text: "✅", key: m.key }
-    });
-    
-    } catch (e) {
-        console.log(e);
-        reply(`${e}`);
-    }
-});
-
-
-cmd({
-    pattern: "downloadmenu",
-    alias: ["dlmenu", "downmenu"],
-    desc: "dl menu the bot",
-    category: "menu",
-    react: "🔰",
-    filename: __filename
-}, 
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // فیلتر کردن دستورات با category "owner"
-        const ownerCommands = commands.filter(cmd => cmd.category === "downloader");
-
-        // ساخت منو با دستورات فیلتر شده
-        let dec = `╭━━〔 *Downloader Menu* 〕━━┈⊷\n`;
-        ownerCommands.forEach(cmd => {
-            dec += `┃◈┃• ${cmd.pattern}\n`;
-        });
-        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
-
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
-                caption: dec,
-            },
-            { quoted: mek }
-        );
-        
-        await conn.sendMessage(from, {
-      react: { text: "✅", key: m.key }
-    });
-    
-    } catch (e) {
-        console.log(e);
-        reply(`${e}`);
-    }
-});
-
-
-cmd({
-    pattern: "groupmenu",
-    alias: ["grpmenu", "grmenu"],
-    desc: "group menu the bot",
-    category: "menu",
-    react: "🔰",
-    filename: __filename
-}, 
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // فیلتر کردن دستورات با category "owner"
-        const ownerCommands = commands.filter(cmd => cmd.category === "group");
-
-        // ساخت منو با دستورات فیلتر شده
-        let dec = `╭━━〔 *Group Menu* 〕━━┈⊷\n`;
-        ownerCommands.forEach(cmd => {
-            dec += `┃◈┃• ${cmd.pattern}\n`;
-        });
-        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
-
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
-                caption: dec,
-            },
-            { quoted: mek }
-        );
-        
-        await conn.sendMessage(from, {
-      react: { text: "✅", key: m.key }
-    });
-    
-    } catch (e) {
-        console.log(e);
-        reply(`${e}`);
-    }
-});
-
-
-cmd({
-    pattern: "systemmenu",
-    alias: ["sysmenu", "stmenu"],
-    desc: "system menu the bot",
-    category: "menu",
-    react: "🔰",
-    filename: __filename
-}, 
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // فیلتر کردن دستورات با category "owner"
-        const ownerCommands = commands.filter(cmd => cmd.category === "system");
-
-        // ساخت منو با دستورات فیلتر شده
-        let dec = `╭━━〔 *System Menu* 〕━━┈⊷\n`;
-        ownerCommands.forEach(cmd => {
-            dec += `┃◈┃• ${cmd.pattern}\n`;
-        });
-        dec += `╰──────────────┈⊷\n> ${config.DESCRIPTION}`;
-
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
-                caption: dec,
-            },
-            { quoted: mek }
-        );
-        
-        await conn.sendMessage(from, {
-      react: { text: "✅", key: m.key }
-    });
-    
-    } catch (e) {
-        console.log(e);
-        reply(`${e}`);
-    }
-});
-
-
-
-
-
-
-
