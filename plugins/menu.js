@@ -15,20 +15,6 @@ const commandPrefix = config.PREFIX;
 
 
 
-function getNewsletterContext(senderJid) {
-    return {
-        mentionedJid: [senderJid],
-        forwardingScore: 999,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363333589976873@newsletter',
-            newsletterName: "NOTHING TECH",
-            serverMessageId: 143
-        }
-    };
-}
-
-
 /*
 cmd({
     pattern: "menu",
@@ -188,7 +174,16 @@ async (conn, mek, m, { from, pushname: _0x1279c5, reply }) => {
         await conn.sendMessage(from, {
             image: { url: `https://files.catbox.moe/6vrc2s.jpg` },
             caption: menuText.trim(),
-            contextInfo: getNewsletterContext(m.sender)
+            contextInfo: {
+                mentionedJid: [m.sender],
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363333589976873@newsletter',
+                    newsletterName: "NOTHING TECH",
+                    serverMessageId: 143
+                }
+            }
         }, { quoted: mek });
 
         await conn.sendMessage(from, {
