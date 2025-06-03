@@ -10,6 +10,20 @@ const path = require('path');
 const { getAnti, setAnti } = require('../data/antidel');
 
 
+function getNewsletterContext(senderJid) {
+    return {
+        mentionedJid: [senderJid],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363333589976873@newsletter',
+            newsletterName: "NOTHING TECH",
+            serverMessageId: 143
+        }
+    };
+}
+
+
 cmd({
   pattern: "vv",
   react: '⚠️',
@@ -47,21 +61,24 @@ cmd({
         messageContent = {
           image: buffer,
           caption: match.quoted.text || '',
-          mimetype: match.quoted.mimetype || "image/jpeg"
+          mimetype: match.quoted.mimetype || "image/jpeg",
+          contextInfo: getNewsletterContext(m.sender)
         };
         break;
       case "videoMessage":
         messageContent = {
           video: buffer,
           caption: match.quoted.text || '',
-          mimetype: match.quoted.mimetype || "video/mp4"
+          mimetype: match.quoted.mimetype || "video/mp4",
+          contextInfo: getNewsletterContext(m.sender)
         };
         break;
       case "audioMessage":
         messageContent = {
           audio: buffer,
           mimetype: "audio/mp4",
-          ptt: match.quoted.ptt || false
+          ptt: match.quoted.ptt || false,
+          contextInfo: getNewsletterContext(m.sender)
         };
         break;
       default:
