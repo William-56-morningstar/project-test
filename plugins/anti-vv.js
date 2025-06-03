@@ -30,7 +30,9 @@ cmd({
   desc: "Owner Only - retrieve quoted message back to user",
   category: "owner",
   filename: __filename
-}, async (client, m, match, { from, isCreator }) => {
+}, async (client, m, match, extra = {}) => {
+  const { from, isCreator } = extra;
+
   try {
     if (!isCreator) {
       return await client.sendMessage(from, {
@@ -94,7 +96,7 @@ cmd({
 
   } catch (error) {
     console.error("vv Error:", error);
-    await client.sendMessage(from, {
+    await client.sendMessage(from || m.chat, {
       text: "❌ Error fetching view once message:\n" + error.message,
       contextInfo: getNewsletterContext(m.sender)
     }, { quoted: m });
