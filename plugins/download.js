@@ -225,6 +225,7 @@ cmd({
       if (!data?.result?.downloadUrl) return reply("⛔ Download failed.", null, {
         contextInfo: getNewsletterContext(m.sender)
       });
+
       downloadUrl = data.result.downloadUrl;
 
       setConfig(cacheKey, JSON.stringify({
@@ -234,7 +235,8 @@ cmd({
         artist: song.author.name,
         duration: song.timestamp,
         views: song.views,
-        yt: song.url
+        yt: song.url,
+        ago: song.ago
       }));
     } else {
       const parsed = JSON.parse(cachedData);
@@ -273,7 +275,10 @@ Reply With:
         const msg = msgData.messages[0];
         if (!msg?.message || !msg.key?.remoteJid) return;
 
-        const quotedId = msg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+        const quotedMsg = msg.message?.extendedTextMessage?.contextInfo;
+        const quotedId = quotedMsg?.stanzaId;
+
+        // فقط ریپلای به همون بنر
         if (quotedId !== messageID) return;
 
         const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
@@ -284,13 +289,14 @@ Reply With:
 
         const songData = JSON.parse(songCache);
 
-        if (text === "1") {
+        if (text.trim() === "1") {
           await conn.sendMessage(from, {
             audio: { url: songData.url },
             mimetype: "audio/mpeg",
+            ptt: false, // جلوگیری از voice
             contextInfo: getNewsletterContext(m.sender)
           }, { quoted: msg });
-        } else if (text === "2") {
+        } else if (text.trim() === "2") {
           await conn.sendMessage(from, {
             document: { url: songData.url },
             mimetype: "audio/mpeg",
