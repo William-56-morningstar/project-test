@@ -1296,21 +1296,20 @@ cmd({
 //--------------------------------------------
 
 cmd({
-    pattern: "antidelete",
-    alias: ['antidel', 'ad'],
-    desc: "Manage AntiDelete Settings with Reply Menu",
-    react: "🔄",
-    category: "misc",
-    filename: __filename,
+  pattern: "antidelete",
+  desc: "Manage AntiDelete Settings with Reply Menu",
+  react: "🔄",
+  category: "misc",
+  filename: __filename,
 },
-async (conn, mek, m, { from, reply, isCreator }) => {
+  async (conn, mek, m, { from, reply, isCreator }) => {
     if (!isCreator) return reply("*Only the bot owner can use this command!*");
 
-    const dmStatus = config.ANTI_DEL_PATH === "log";
+    const currentMode = (await getConfig("ANTI_DEL_PATH")) || "same";
 
     const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
 
-> Current DM: ${dmStatus ? "✅ ON (log)" : "❌ OFF (same)"}
+> Current Mode: ${currentMode === "log" ? "✅ ON (inbox)" : "✅ ON (same)"}
 
 Reply with:
 
@@ -1323,59 +1322,56 @@ Reply with:
 ╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
-        image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
-        caption: menuText
+      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+      caption: menuText
     }, { quoted: mek });
 
     const messageID = sentMsg.key.id;
 
     const handler = async (msgData) => {
-        try {
-            const receivedMsg = msgData.messages[0];
-            if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
+      try {
+        const receivedMsg = msgData.messages[0];
+        if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
 
-            const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
-            const isReply = quotedId === messageID;
-            if (!isReply) return;
+        const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+        const isReply = quotedId === messageID;
+        if (!isReply) return;
 
-            const replyText =
-                receivedMsg.message?.conversation ||
-                receivedMsg.message?.extendedTextMessage?.text || "";
+        const replyText =
+          receivedMsg.message?.conversation ||
+          receivedMsg.message?.extendedTextMessage?.text || "";
 
-            let responseText = "";
+        let responseText = "";
 
-            if (replyText === "1") {
-                await setAnti('gc', true);
-                await setAnti('dm', true);
-                config.ANTI_DEL_PATH = "same";
-                fs.writeFileSync('./config.js', `module.exports = ${JSON.stringify(config, null, 2)};`);
-                responseText = "✅ AntiDelete Enabled.\nand Mode is Same chat\nGroup: ON\nDM: ON (same)";
-            } else if (replyText === "2") {
-                await setAnti('gc', true);
-                await setAnti('dm', true);
-                config.ANTI_DEL_PATH = "log";
-                fs.writeFileSync('./config.js', `module.exports = ${JSON.stringify(config, null, 2)};`);
-                responseText = "✅ AntiDelete Mode changed to DM Log.\nGroup: ON\nDM: ON (log)";
-            } else if (replyText === "3") {
-                await setAnti('gc', false);
-                await setAnti('dm', false);
-                config.ANTI_DEL_PATH = "same";
-                fs.writeFileSync('./config.js', `module.exports = ${JSON.stringify(config, null, 2)};`);
-                responseText = "❌ AntiDelete turned off for both Group and DM.";
-            } else {
-                responseText = "❌ Invalid input. Please reply with *1*, *2*, or *3*.";
-            }
-
-            await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
-            conn.ev.off("messages.upsert", handler);
-        } catch (err) {
-            console.error("AntiDelete handler error:", err);
+        if (replyText === "1") {
+          await setAnti("gc", true);
+          await setAnti("dm", true);
+          await setConfig("ANTI_DEL_PATH", "same");
+          responseText = "✅ AntiDelete Enabled.\nand Mode is Same chat\nGroup: ON\nDM: ON (same)";
+        } else if (replyText === "2") {
+          await setAnti("gc", true);
+          await setAnti("dm", true);
+          await setConfig("ANTI_DEL_PATH", "log");
+          responseText = "✅ AntiDelete Mode changed to Inbox.\nGroup: ON\nDM: ON (log)";
+        } else if (replyText === "3") {
+          await setAnti("gc", false);
+          await setAnti("dm", false);
+          await setConfig("ANTI_DEL_PATH", "same");
+          responseText = "❌ AntiDelete turned off.";
+        } else {
+          responseText = "❌ Invalid input. Please reply with *1*, *2*, or *3*.";
         }
+
+        await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
+        conn.ev.off("messages.upsert", handler);
+      } catch (err) {
+        console.error("AntiDelete handler error:", err);
+      }
     };
 
     conn.ev.on("messages.upsert", handler);
-    setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000); // 30 دقیقه
-});
+    setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000);
+  });
 
 //--------------------------------------------
 //  ANI-BAD COMMANDS
