@@ -81,114 +81,53 @@ cmd({
 
 cmd({
   pattern: "antiviewonce",
-  desc: "Configure ANTIVIEWONCE system with menu",
+  desc: "Toggle AntiViewOnce (on/off)",
   category: "owner",
   react: "🛡️",
   filename: __filename
-}, async (conn, mek, m, { from, isCreator, reply }) => {
-  try {
-    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+}, async (conn, mek, m, { args, reply, isCreator }) => {
+  if (!isCreator) return reply("🔒 Only owner can use this.");
 
-    const currentMode =
-      config.ANTIVIEW_ONCE === "all"
-        ? "All Chats"
-        : config.ANTIVIEW_ONCE === "private"
-        ? "Private Only"
-        : config.ANTIVIEW_ONCE === "group"
-        ? "Groups Only"
-        : "Disabled";
-
-    const text = `> *BEN-BOT ANTIVIEWONCE SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable AntiViewOnce => All Chats\n*2.* Enable AntiViewOnce => Private Only\n*3.* Enable AntiViewOnce => Groups Only\n*4.* Disable AntiViewOnce\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
-
-    const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
-      caption: text
-    }, { quoted: mek });
-
-    const messageID = sentMsg.key.id;
-
-    const handler = async (msgData) => {
-      try {
-        const receivedMsg = msgData.messages[0];
-        if (!receivedMsg?.message || !receivedMsg.key?.remoteJid) return;
-
-        const quotedId = receivedMsg.message?.extendedTextMessage?.contextInfo?.stanzaId;
-        const isReply = quotedId === messageID;
-        if (!isReply) return;
-
-        const replyText =
-          receivedMsg.message?.conversation ||
-          receivedMsg.message?.extendedTextMessage?.text || "";
-
-        const sender = receivedMsg.key.remoteJid;
-
-        if (replyText === "1") {
-          config.ANTIVIEW_ONCE = "all";
-          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *All Chats*." }, { quoted: receivedMsg });
-        } else if (replyText === "2") {
-          config.ANTIVIEW_ONCE = "private";
-          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Private Chats only*." }, { quoted: receivedMsg });
-        } else if (replyText === "3") {
-          config.ANTIVIEW_ONCE = "group";
-          await conn.sendMessage(sender, { text: "✅ AntiViewOnce enabled for *Groups only*." }, { quoted: receivedMsg });
-        } else if (replyText === "4") {
-          config.ANTIVIEW_ONCE = "off";
-          await conn.sendMessage(sender, { text: "❌ AntiViewOnce has been *disabled*." }, { quoted: receivedMsg });
-        } else {
-          await conn.sendMessage(sender, { text: "❌ Invalid option. Please reply with 1, 2, 3, or 4." }, { quoted: receivedMsg });
-        }
-
-        conn.ev.off("messages.upsert", handler);
-      } catch (err) {
-        console.log("AntiViewOnce handler error:", err);
-      }
-    };
-
-    conn.ev.on("messages.upsert", handler);
-
-    setTimeout(() => {
-      conn.ev.off("messages.upsert", handler);
-    }, 600000); // 10 دقیقه
-  } catch (e) {
-    reply(`❗ Error: ${e.message}`);
+  const input = (args[0] || "").toLowerCase();
+  if (input === "on") {
+    config.ANTIVIEW_ONCE = "true";
+    return reply("✅ AntiViewOnce turned ON (all chats)");
+  } else if (input === "off") {
+    config.ANTIVIEW_ONCE = "false";
+    return reply("❌ AntiViewOnce turned OFF");
+  } else {
+    return reply("⚠️ Usage:\n.antiviewonce on\n.antiviewonce off");
   }
 });
 
 cmd({
   on: "body"
-}, async (conn, m, store, { from, isGroup }) => {
+}, async (conn, m, store, { from, isGroup, isCreator }) => {
   try {
-    const mode = config.ANTIVIEW_ONCE;
+    if (config.ANTIVIEW_ONCE !== "true") return; // اگر خاموش بود، کاری نکن
+    if (!m?.message?.viewOnceMessage) return;    // فقط اگر پیام View Once بود
 
-    if (mode === "off") return;
-    if (mode === "private" && isGroup) return;
-    if (mode === "group" && !isGroup) return;
+    const viewOnce = m.message.viewOnceMessage.message;
+    const mtype = Object.keys(viewOnce)[0];
+    const content = viewOnce[mtype];
 
-    const msg = m.message;
-    if (!msg?.viewOnceMessage?.message) return;
-
-    const viewOnceContent = msg.viewOnceMessage.message;
-    const mtype = Object.keys(viewOnceContent)[0];
-    const content = viewOnceContent[mtype];
-
-    // دانلود کامل محتوا مثل vv
-    const buffer = await conn.downloadMediaMessage({ message: viewOnceContent });
+    const buffer = await conn.downloadMediaMessage({ message: viewOnce });
     if (!buffer) return;
 
-    const caption = content?.caption || "";
+    const caption = content.caption || "";
     const sendOptions = { quoted: m };
 
-    // ارسال دقیقا مثل vv
+    // بر اساس نوع پیام ارسال کن
     if (mtype === "imageMessage") {
       await conn.sendMessage(from, {
         image: buffer,
-        caption: caption,
+        caption,
         mimetype: content.mimetype || "image/jpeg"
       }, sendOptions);
     } else if (mtype === "videoMessage") {
       await conn.sendMessage(from, {
         video: buffer,
-        caption: caption,
+        caption,
         mimetype: content.mimetype || "video/mp4"
       }, sendOptions);
     } else if (mtype === "audioMessage") {
@@ -199,11 +138,22 @@ cmd({
       }, sendOptions);
     } else {
       await conn.sendMessage(from, {
-        text: "❌ Only image, video, and audio view-once messages are supported."
+        text: "⚠️ Unsupported view-once type"
       }, sendOptions);
     }
 
   } catch (err) {
     console.error("AntiViewOnce Auto Error:", err);
   }
+});
+
+
+
+cmd({
+    on: "body"
+},    
+async (conn, mek, m, { from, body, isOwner }) => {
+    if (config.AUTO_TYPING === 'true') {
+        await conn.sendPresenceUpdate('composing', from); // send typing 
+    }
 });
