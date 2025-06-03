@@ -39,7 +39,7 @@ CUSTOM_REACT: process.env.CUSTOM_REACT || "false",
 CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍",
 // chose custom react emojis by yourself 
 //ANTILINK ALL SYSTEM
-ANTIVIEW_ONCE: process.env.ANTIVIEW_ONCE || "off",
+ANTIVIEW_ONCE: process.env.ANTIVIEW_ONCE || "true",
 ANTILINK_WARN: process.env.ANTILINK_WARN || "false",
 ANTILINK_KICK: process.env.ANTILINK_KICK || "false",
 ANTILINK: process.env.ANTILINK || "false",
