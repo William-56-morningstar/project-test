@@ -38,42 +38,54 @@ function getNewsletterContext(senderJid) {
 
 
 cmd(
-    {
-        pattern: 'take',
-        alias: ['rename', 'stake'],
-        desc: 'Create a sticker with a custom pack name.',
-        category: 'convert',
-        use: '<reply media or URL>',
-        filename: __filename,
-    },
-    async (conn, mek, m, { quoted, args, q, reply, from }) => {
-        if (!mek.quoted) return reply(`*Reply to any sticker or image.*`);
-        
-        let mime = mek.quoted.mtype;
-        let pack = q || "NOTHING-BEN"; // پیش‌فرض اگر کاربر چیزی ننوشت
-
-        if (mime === "imageMessage" || mime === "stickerMessage") {
-            let media = await mek.quoted.download();
-            let sticker = new Sticker(media, {
-                pack: pack,
-                type: StickerTypes.FULL,
-                categories: ["🤩", "🎉"],
-                id: "12345",
-                quality: 75,
-                background: 'transparent',
-            });
-            const buffer = await sticker.toBuffer();
-            return conn.sendMessage(mek.chat, { sticker: buffer }, { quoted: mek });
-        } else {
-            return reply("*Uhh, Please reply to an image.*");
-        }
+  {
+    pattern: 'take',
+    alias: ['rename', 'stake'],
+    desc: 'Create a sticker with a custom pack name.',
+    category: 'convert',
+    use: '<reply media or URL>',
+    filename: __filename,
+  },
+  async (conn, mek, m, { quoted, args, q, reply, from }) => {
+    if (!mek.quoted) {
+      return await conn.sendMessage(m.chat, {
+        text: `*Reply to any sticker or image.*`,
+        contextInfo: getNewsletterContext(mek.sender)
+      }, { quoted: mek });
     }
+
+    let mime = mek.quoted.mtype;
+    let pack = q || "NOTHING-BEN";
+
+    if (mime === "imageMessage" || mime === "stickerMessage") {
+      let media = await mek.quoted.download();
+      let sticker = new Sticker(media, {
+        pack: pack,
+        type: StickerTypes.FULL,
+        categories: ["🤩", "🎉"],
+        id: "12345",
+        quality: 75,
+        background: 'transparent',
+      });
+      const buffer = await sticker.toBuffer();
+      return conn.sendMessage(mek.chat, {
+        sticker: buffer,
+        contextInfo: getNewsletterContext(mek.sender)
+      }, { quoted: mek });
+    } else {
+      return await conn.sendMessage(m.chat, {
+        text: "*Uhh, Please reply to an image.*",
+        contextInfo: getNewsletterContext(mek.sender)
+      }, { quoted: mek });
+    }
+  }
 );
 
+// STICKER COMMAND
 cmd(
   {
     pattern: 'sticker',
-    alias: ['s',],
+    alias: ['s'],
     desc: 'Convert GIF/Video to a sticker.',
     category: 'convert',
     use: '<reply media or URL>',
@@ -81,58 +93,86 @@ cmd(
   },
   async (conn, mek, m, { quoted, args, reply }) => {
     try {
-      if (!mek.quoted) return reply('*Reply to a video or GIF to convert it to a sticker!*');
+      if (!mek.quoted) {
+        return await conn.sendMessage(m.chat, {
+          text: '*Reply to a video or GIF to convert it to a sticker!*',
+          contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
+      }
 
       const mime = mek.quoted.mtype;
       if (!['videoMessage', 'imageMessage'].includes(mime)) {
-        return reply('*Please reply to a valid video or GIF.*');
+        return await conn.sendMessage(m.chat, {
+          text: '*Please reply to a valid video or GIF.*',
+          contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
       }
 
-      // Download the media file
       const media = await mek.quoted.download();
 
-      // Convert the video to a WebP buffer
       const webpBuffer = await videoToWebp(media);
 
-      // Generate sticker metadata
       const sticker = new Sticker(webpBuffer, {
         pack: config.STICKER_NAME || 'My Pack',
-        author: '', // Leave blank or customize
-        type: StickerTypes.FULL, // FULL for regular stickers
-        categories: ['🤩', '🎉'], // Emoji categories
-        id: '12345', // Optional ID
-        quality: 75, // Set quality for optimization
-        background: 'transparent', // Transparent background
+        author: '',
+        type: StickerTypes.FULL,
+        categories: ['🤩', '🎉'],
+        id: '12345',
+        quality: 75,
+        background: 'transparent',
       });
 
-      // Convert sticker to buffer and send
       const stickerBuffer = await sticker.toBuffer();
-      return conn.sendMessage(mek.chat, { sticker: stickerBuffer }, { quoted: mek });
+      return conn.sendMessage(mek.chat, {
+        sticker: stickerBuffer,
+        contextInfo: getNewsletterContext(mek.sender)
+      }, { quoted: mek });
+
     } catch (error) {
       console.error(error);
-      reply(`❌ An error occurred: ${error.message}`);
+      return conn.sendMessage(m.chat, {
+        text: `❌ An error occurred: ${error.message}`,
+        contextInfo: getNewsletterContext(mek.sender)
+      }, { quoted: mek });
     }
   }
-);    
+);
 
+// ATTP COMMAND
 cmd({
-    pattern: "attp",
-    desc: "Convert text to a GIF sticker.",
-    react: "✨",
-    category: "convert",
-    use: ".attp HI",
-    filename: __filename,
+  pattern: "attp",
+  desc: "Convert text to a GIF sticker.",
+  react: "✨",
+  category: "convert",
+  use: ".attp HI",
+  filename: __filename,
 }, async (conn, mek, m, { args, reply }) => {
-    try {
-        if (!args[0]) return reply("*Please provide text!*");
-
-        const gifBuffer = await fetchGif(`https://api-fix.onrender.com/api/maker/attp?text=${encodeURIComponent(args[0])}`);
-        const stickerBuffer = await gifToSticker(gifBuffer);
-
-        await conn.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: mek });
-    } catch (error) {
-        reply(`❌ ${error.message}`);
+  try {
+    if (!args[0]) {
+      return await conn.sendMessage(m.chat, {
+        text: "*Please provide text!*",
+        contextInfo: getNewsletterContext(m.sender)
+      }, { quoted: mek });
     }
+
+    const gifBuffer = await fetchGif(`https://api-fix.onrender.com/api/maker/attp?text=${encodeURIComponent(args[0])}`);
+    const stickerBuffer = await gifToSticker(gifBuffer);
+
+    await conn.sendMessage(
+      m.chat,
+      {
+        sticker: stickerBuffer,
+        contextInfo: getNewsletterContext(m.sender)
+      },
+      { quoted: mek }
+    );
+
+  } catch (error) {
+    return await conn.sendMessage(m.chat, {
+      text: `❌ ${error.message}`,
+      contextInfo: getNewsletterContext(m.sender)
+    }, { quoted: mek });
+  }
 });
 
 
@@ -148,7 +188,8 @@ cmd({
   try {
     if (!message.quoted || message.quoted.mtype !== "stickerMessage") {
       return await client.sendMessage(message.chat, {
-        text: "🧷 Please reply to a sticker to convert it to image."
+        text: "🧷 Please reply to a sticker to convert it to image.",
+        contextInfo: getNewsletterContext(m.sender)
       }, { quoted: message });
     }
 
@@ -162,7 +203,8 @@ cmd({
   } catch (error) {
     console.error("ToImg Error:", error);
     await client.sendMessage(message.chat, {
-      text: "❌ Failed to convert sticker:\n" + error.message
+      text: "❌ Failed to convert sticker:\n" + error.message,
+      contextInfo: getNewsletterContext(m.sender)
     }, { quoted: message });
   }
 });
@@ -180,7 +222,8 @@ cmd({
     // Input validation
     if (!message.quoted) {
         return await client.sendMessage(from, {
-            text: "✨ *Sticker/Video Converter*\n\nPlease reply to a sticker or video message.\n\nExample: `.convert` (reply to sticker or video)"
+            text: "✨ *Sticker/Video Converter*\n\nPlease reply to a sticker or video message.\n\nExample: `.convert` (reply to sticker or video)",
+            contextInfo: getNewsletterContext(message.sender)
         }, { quoted: message });
     }
 
@@ -188,13 +231,10 @@ cmd({
 
     if (type !== 'stickerMessage' && type !== 'videoMessage') {
         return await client.sendMessage(from, {
-            text: "❌ Only sticker or video messages can be converted"
+            text: "❌ Only sticker or video messages can be converted",
+            contextInfo: getNewsletterContext(message.sender)
         }, { quoted: message });
     }
-
-    await client.sendMessage(from, {
-        text: "🔄 Converting..."
-    }, { quoted: message });
 
     try {
         const mediaBuffer = await message.quoted.download();
@@ -205,7 +245,7 @@ cmd({
             await client.sendMessage(from, {
                 image: imageBuffer,
                 caption: "> Sticker converted to image",
-                contextInfo: getNewsletterContext(m.sender),
+                contextInfo: getNewsletterContext(message.sender),
                 mimetype: 'image/png'
             }, { quoted: message });
 
@@ -213,7 +253,7 @@ cmd({
             await client.sendMessage(from, {
                 video: mediaBuffer,
                 caption: "> Video extracted successfully",
-                contextInfo: getNewsletterContext(m.sender),
+                contextInfo: getNewsletterContext(message.sender),
                 mimetype: 'video/mp4'
             }, { quoted: message });
         }
@@ -221,110 +261,117 @@ cmd({
     } catch (error) {
         console.error('Conversion error:', error);
         await client.sendMessage(from, {
-            text: "❌ Conversion failed. Please try again."
+            text: "❌ Conversion failed. Please try again.",
+            contextInfo: getNewsletterContext(message.sender)
         }, { quoted: message });
     }
 });
 
 cmd({
-    pattern: 'tomp3',
-    desc: 'Convert media to audio',
-    category: 'convert',
-    react: '🎵',
-    filename: __filename
+  pattern: 'tomp3',
+  desc: 'Convert media to audio',
+  category: 'convert',
+  react: '🎵',
+  filename: __filename
 }, async (client, match, message, { from }) => {
-    // Input validation
-    if (!match.quoted) {
-        return await client.sendMessage(from, {
-            text: "*🔊 Please reply to a video/audio message*"
-        }, { quoted: message });
-    }
+  if (!match.quoted) {
+    return await client.sendMessage(from, {
+      text: "*🔊 Please reply to a video/audio message*",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 
-    if (!['videoMessage', 'audioMessage'].includes(match.quoted.mtype)) {
-        return await client.sendMessage(from, {
-            text: "❌ Only video/audio messages can be converted"
-        }, { quoted: message });
-    }
+  if (!['videoMessage', 'audioMessage'].includes(match.quoted.mtype)) {
+    return await client.sendMessage(from, {
+      text: "❌ Only video/audio messages can be converted",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 
-    if (match.quoted.seconds > 300) {
-        return await client.sendMessage(from, {
-            text: "⏱️ Media too long (max 5 minutes)"
-        }, { quoted: message });
-    }
+  if (match.quoted.seconds > 300) {
+    return await client.sendMessage(from, {
+      text: "⏱️ Media too long (max 5 minutes)",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 
-    // Send processing message and store it
+  await client.sendMessage(from, {
+    text: "🔄 Converting to audio...",
+    contextInfo: getNewsletterContext(message.sender)
+  }, { quoted: message });
+
+  try {
+    const buffer = await match.quoted.download();
+    const ext = match.quoted.mtype === 'videoMessage' ? 'mp4' : 'm4a';
+    const audio = await converter.toAudio(buffer, ext);
+
     await client.sendMessage(from, {
-        text: "🔄 Converting to audio..."
+      audio: audio,
+      mimetype: 'audio/mpeg',
+      contextInfo: getNewsletterContext(message.sender)
     }, { quoted: message });
 
-    try {
-        const buffer = await match.quoted.download();
-        const ext = match.quoted.mtype === 'videoMessage' ? 'mp4' : 'm4a';
-        const audio = await converter.toAudio(buffer, ext);
-
-        // Send result
-        await client.sendMessage(from, {
-            audio: audio,
-            mimetype: 'audio/mpeg'
-        }, { quoted: message });
-
-    } catch (e) {
-        console.error('Conversion error:', e.message);
-        await client.sendMessage(from, {
-            text: "❌ Failed to process audio"
-        }, { quoted: message });
-    }
+  } catch (e) {
+    console.error('Conversion error:', e.message);
+    await client.sendMessage(from, {
+      text: "❌ Failed to process audio",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 });
 
 cmd({
-    pattern: 'toptt',
-    desc: 'Convert media to voice message',
-    category: 'convert',
-    react: '🎙️',
-    filename: __filename
+  pattern: 'toptt',
+  desc: 'Convert media to voice message',
+  category: 'convert',
+  react: '🎙️',
+  filename: __filename
 }, async (client, match, message, { from }) => {
-    // Input validation
-    if (!match.quoted) {
-        return await client.sendMessage(from, {
-            text: "*🗣️ Please reply to a video/audio message*"
-        }, { quoted: message });
-    }
+  if (!match.quoted) {
+    return await client.sendMessage(from, {
+      text: "*🗣️ Please reply to a video/audio message*",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 
-    if (!['videoMessage', 'audioMessage'].includes(match.quoted.mtype)) {
-        return await client.sendMessage(from, {
-            text: "❌ Only video/audio messages can be converted"
-        }, { quoted: message });
-    }
+  if (!['videoMessage', 'audioMessage'].includes(match.quoted.mtype)) {
+    return await client.sendMessage(from, {
+      text: "❌ Only video/audio messages can be converted",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 
-    if (match.quoted.seconds > 60) {
-        return await client.sendMessage(from, {
-            text: "⏱️ Media too long for voice (max 1 minute)"
-        }, { quoted: message });
-    }
+  if (match.quoted.seconds > 60) {
+    return await client.sendMessage(from, {
+      text: "⏱️ Media too long for voice (max 1 minute)",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 
-    // Send processing message
+  await client.sendMessage(from, {
+    text: "🔄 Converting to voice message...",
+    contextInfo: getNewsletterContext(message.sender)
+  }, { quoted: message });
+
+  try {
+    const buffer = await match.quoted.download();
+    const ext = match.quoted.mtype === 'videoMessage' ? 'mp4' : 'm4a';
+    const ptt = await converter.toPTT(buffer, ext);
+
     await client.sendMessage(from, {
-        text: "🔄 Converting to voice message..."
+      audio: ptt,
+      mimetype: 'audio/ogg; codecs=opus',
+      ptt: true,
+      contextInfo: getNewsletterContext(message.sender)
     }, { quoted: message });
 
-    try {
-        const buffer = await match.quoted.download();
-        const ext = match.quoted.mtype === 'videoMessage' ? 'mp4' : 'm4a';
-        const ptt = await converter.toPTT(buffer, ext);
-
-        // Send result
-        await client.sendMessage(from, {
-            audio: ptt,
-            mimetype: 'audio/ogg; codecs=opus',
-            ptt: true
-        }, { quoted: message });
-
-    } catch (e) {
-        console.error('PTT conversion error:', e.message);
-        await client.sendMessage(from, {
-            text: "❌ Failed to create voice message"
-        }, { quoted: message });
-    }
+  } catch (e) {
+    console.error('PTT conversion error:', e.message);
+    await client.sendMessage(from, {
+      text: "❌ Failed to create voice message",
+      contextInfo: getNewsletterContext(message.sender)
+    }, { quoted: message });
+  }
 });
 
 
@@ -332,15 +379,23 @@ cmd({
 
 cmd({
     pattern: "topdf",
-    alias: ["pdf","topdf"],use: '.topdf',
+    alias: ["pdf", "topdf"],
+    use: '.topdf',
     desc: "Convert provided text to a PDF file.",
     react: "📄",
     category: "convert",
     filename: __filename
 },
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+async (conn, mek, m, {
+    from, quoted, body, isCmd, command, args, q, reply
+}) => {
     try {
-        if (!q) return reply("Please provide the text you want to convert to PDF. *Eg* `.topdf` *Nothing is everything*");
+        if (!q) {
+            return await conn.sendMessage(from, {
+                text: "Please provide the text you want to convert to PDF. *Eg* `.topdf` *Nothing is everything*",
+                contextInfo: getNewsletterContext(m.sender)
+            }, { quoted: mek });
+        }
 
         // Create a new PDF document
         const doc = new PDFDocument();
@@ -349,25 +404,28 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         doc.on('end', async () => {
             const pdfData = Buffer.concat(buffers);
 
-            // Send the PDF file
+            // Send the PDF file with contextInfo
             await conn.sendMessage(from, {
                 document: pdfData,
                 mimetype: 'application/pdf',
                 fileName: 'BEN_BOT.pdf',
-                caption: `
-*📄 PDF created successully!*`
+                caption: "*📄 PDF created successfully!*",
+                contextInfo: getNewsletterContext(m.sender)
             }, { quoted: mek });
         });
 
         // Add text to the PDF
         doc.text(q);
 
-        // Finalize the PDF and end the stream
+        // Finalize the PDF
         doc.end();
 
     } catch (e) {
         console.error(e);
-        reply(`Error: ${e.message}`);
+        return await conn.sendMessage(from, {
+            text: `Error: ${e.message}`,
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
     }
 });
                       
@@ -381,19 +439,31 @@ cmd({
     category: "convert",
     filename: __filename,
 }, 
-async (conn, mek, m, { args, reply }) => {
+async (conn, mek, m, { args }) => {
     try {
-        if (!args.length) return reply("❌ Please provide the text to convert to binary.");
+        if (!args.length) {
+            return await conn.sendMessage(m.chat, {
+                text: "❌ Please provide the text to convert to binary.",
+                contextInfo: getNewsletterContext(m.sender)
+            }, { quoted: mek });
+        }
 
         const textToConvert = args.join(" ");
         const binaryText = textToConvert.split('').map(char => {
             return `00000000${char.charCodeAt(0).toString(2)}`.slice(-8);
         }).join(' ');
 
-        reply(`🔑 *Binary Representation:* \n${binaryText}`);
+        await conn.sendMessage(m.chat, {
+            text: `🔑 *Binary Representation:* \n${binaryText}`,
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
+
     } catch (e) {
         console.error("Error in .binary command:", e);
-        reply("❌ An error occurred while converting to binary.");
+        await conn.sendMessage(m.chat, {
+            text: "❌ An error occurred while converting to binary.",
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
     }
 });
 
@@ -403,19 +473,31 @@ cmd({
     category: "convert",
     filename: __filename,
 }, 
-async (conn, mek, m, { args, reply }) => {
+async (conn, mek, m, { args }) => {
     try {
-        if (!args.length) return reply("❌ Please provide the binary string to decode.");
+        if (!args.length) {
+            return await conn.sendMessage(m.chat, {
+                text: "❌ Please provide the binary string to decode.",
+                contextInfo: getNewsletterContext(m.sender)
+            }, { quoted: mek });
+        }
 
         const binaryString = args.join(" ");
         const textDecoded = binaryString.split(' ').map(bin => {
             return String.fromCharCode(parseInt(bin, 2));
         }).join('');
 
-        reply(`🔓 *Decoded Text:* \n${textDecoded}`);
+        await conn.sendMessage(m.chat, {
+            text: `🔓 *Decoded Text:* \n${textDecoded}`,
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
+
     } catch (e) {
-        console.error("Error in .binarydecode command:", e);
-        reply("❌ An error occurred while decoding the binary string.");
+        console.error("Error in .dbinary command:", e);
+        await conn.sendMessage(m.chat, {
+            text: "❌ An error occurred while decoding the binary string.",
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
     }
 });
 
@@ -426,21 +508,29 @@ cmd({
     category: "convert",
     filename: __filename,
 }, 
-async (conn, mek, m, { args, reply }) => {
+async (conn, mek, m, { args }) => {
     try {
-        // Ensure the user provided some text
-        if (!args.length) return reply("❌ Please provide the text to encode into Base64.");
+        if (!args.length) {
+            return await conn.sendMessage(m.chat, {
+                text: "❌ Please provide the text to encode into Base64.",
+                contextInfo: getNewsletterContext(m.sender)
+            }, { quoted: mek });
+        }
 
         const textToEncode = args.join(" ");
-        
-        // Encode the text into Base64
         const encodedText = Buffer.from(textToEncode).toString('base64');
-        
-        // Send the encoded Base64 text
-        reply(`🔑 *Encoded Base64 Text:* \n${encodedText}`);
+
+        await conn.sendMessage(m.chat, {
+            text: `🔑 *Encoded Base64 Text:* \n${encodedText}`,
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
+
     } catch (e) {
         console.error("Error in .base64 command:", e);
-        reply("❌ An error occurred while encoding the text into Base64.");
+        await conn.sendMessage(m.chat, {
+            text: "❌ An error occurred while encoding the text into Base64.",
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
     }
 });
 
@@ -450,21 +540,29 @@ cmd({
     category: "convert",
     filename: __filename,
 }, 
-async (conn, mek, m, { args, reply }) => {
+async (conn, mek, m, { args }) => {
     try {
-        // Ensure the user provided Base64 text
-        if (!args.length) return reply("❌ Please provide the Base64 encoded text to decode.");
+        if (!args.length) {
+            return await conn.sendMessage(m.chat, {
+                text: "❌ Please provide the Base64 encoded text to decode.",
+                contextInfo: getNewsletterContext(m.sender)
+            }, { quoted: mek });
+        }
 
         const base64Text = args.join(" ");
-        
-        // Decode the Base64 text
         const decodedText = Buffer.from(base64Text, 'base64').toString('utf-8');
-        
-        // Send the decoded text
-        reply(`🔓 *Decoded Text:* \n${decodedText}`);
+
+        await conn.sendMessage(m.chat, {
+            text: `🔓 *Decoded Text:* \n${decodedText}`,
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
+
     } catch (e) {
         console.error("Error in .unbase64 command:", e);
-        reply("❌ An error occurred while decoding the Base64 text.");
+        await conn.sendMessage(m.chat, {
+            text: "❌ An error occurred while decoding the Base64 text.",
+            contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: mek });
     }
 });
 
@@ -475,25 +573,28 @@ cmd({
     category: "convert",
     filename: __filename,
 }, 
-async (conn, mek, m, { reply }) => {
+async (conn, mek, m) => {
     try {
-        // Get current date and time
         const now = new Date();
-        
-        // Get local time in Pakistan timezone (Asia/Karachi)
         const localTime = now.toLocaleTimeString("en-US", { 
             hour: "2-digit", 
             minute: "2-digit", 
             second: "2-digit", 
             hour12: true,
-            timeZone: "Asia/Kabul" // Setting Pakistan's time zone explicitly
+            timeZone: "Asia/Kabul"
         });
-        
-        // Send the local time as reply
-        reply(`🕒 Current Local Time in Afghanistan: ${localTime}`);
+
+        await conn.sendMessage(mek.chat, {
+            text: `🕒 Current Local Time in Afghanistan: ${localTime}`,
+            contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
+
     } catch (e) {
         console.error("Error in .timenow command:", e);
-        reply("❌ An error occurred. Please try again later.");
+        await conn.sendMessage(mek.chat, {
+            text: "❌ An error occurred. Please try again later.",
+            contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
     }
 });
 
@@ -503,24 +604,27 @@ cmd({
     category: "convert",
     filename: __filename,
 }, 
-async (conn, mek, m, { reply }) => {
+async (conn, mek, m) => {
     try {
-        // Get current date
         const now = new Date();
-        
-        // Get the formatted date (e.g., "Monday, January 15, 2025")
         const currentDate = now.toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",
             day: "numeric"
         });
-        
-        // Send the current date as reply
-        reply(`📅 Current Date: ${currentDate}`);
+
+        await conn.sendMessage(mek.chat, {
+            text: `📅 Current Date: ${currentDate}`,
+            contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
+
     } catch (e) {
         console.error("Error in .date command:", e);
-        reply("❌ An error occurred. Please try again later.");
+        await conn.sendMessage(mek.chat, {
+            text: "❌ An error occurred. Please try again later.",
+            contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
     }
 });
 
@@ -532,36 +636,44 @@ cmd({
     category: "convert",
     filename: __filename
 },
-async (conn, mek, m, { args, reply }) => {
+async (conn, mek, m, { args }) => {
     try {
-        // Ensure arguments are provided
         if (!args[0]) {
-            return reply("✳️ Use this command like:\n *Example:* .calculate 5+3*2");
+            return await conn.sendMessage(mek.chat, {
+                text: "✳️ Use this command like:\n *Example:* .calculate 5+3*2",
+                contextInfo: getNewsletterContext(mek.sender)
+            }, { quoted: mek });
         }
 
         const expression = args.join(" ").trim();
 
-        // Validate the input to prevent unsafe operations
         if (!/^[0-9+\-*/().\s]+$/.test(expression)) {
-            return reply("❎ Invalid expression. Only numbers and +, -, *, /, ( ) are allowed.");
+            return await conn.sendMessage(mek.chat, {
+                text: "❎ Invalid expression. Only numbers and +, -, *, /, ( ) are allowed.",
+                contextInfo: getNewsletterContext(mek.sender)
+            }, { quoted: mek });
         }
 
-        // Evaluate the mathematical expression
         let result;
         try {
             result = eval(expression);
         } catch (e) {
-            return reply("❎ Error in calculation. Please check your expression.");
+            return await conn.sendMessage(mek.chat, {
+                text: "❎ Error in calculation. Please check your expression.",
+                contextInfo: getNewsletterContext(mek.sender)
+            }, { quoted: mek });
         }
 
-        // Reply with the result
-        reply(`✅ Result of "${expression}" is: ${result}`);
+        await conn.sendMessage(mek.chat, {
+            text: `✅ Result of "${expression}" is: ${result}`,
+            contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
+
     } catch (e) {
         console.error(e);
-        reply("❎ An error occurred while processing your request.");
+        await conn.sendMessage(mek.chat, {
+            text: "❎ An error occurred while processing your request.",
+            contextInfo: getNewsletterContext(mek.sender)
+        }, { quoted: mek });
     }
 });
-
-
-
-
