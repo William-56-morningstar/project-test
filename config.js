@@ -23,7 +23,7 @@ ADMIN_EVENTS: process.env.ADMIN_EVENTS || "false",
 ANTI_LINK: process.env.ANTI_LINK || "true",
 // make anti link true,false for groups 
 ANTI_DELETE: process.env.ANTI_DELETE || "true",
-ANTI_DEL_PATH: process.env.ANTI_DEL_PATH || "log", 
+//Antidelete
 MENTION_REPLY: process.env.MENTION_REPLY || "false",
 // make true if want auto voice reply if someone menetion you 
 MENU_IMAGE_URL: process.env.MENU_IMAGE_URL || "https://files.catbox.moe/6vrc2s.jpg'",
