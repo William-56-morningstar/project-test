@@ -55,7 +55,7 @@ cmd({
 
         const dec = "✅ Successfully Added User As Temporary Owner";
         await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+            image: { url: "https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg" },
             caption: dec
         }, { quoted: mek });
     } catch (err) {
@@ -94,7 +94,7 @@ cmd({
 
         const dec = "✅ Successfully Removed User As Temporary Owner";
         await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+            image: { url: "https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg" },
             caption: dec
         }, { quoted: mek });
     } catch (err) {
@@ -135,7 +135,7 @@ cmd({
 
         // Send the message with an image and formatted caption
         await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+            image: { url: "https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg" },
             caption: listMessage
         }, { quoted: mek });
     } catch (err) {
@@ -647,7 +647,7 @@ cmd({
         const text = `> *BEN-BOT 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*\n\n> Current mode: *public*\n\nReply With:\n\n*1.* To Enable Public Mode\n*2.* To Enable Private Mode\n*3.* To Enable Inbox Mode\n*4.* To Enable Groups Mode\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
         const sentMsg = await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // تصویر منوی مد
+            image: { url: "https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg" },  // تصویر منوی مد
             caption: text
         }, { quoted: mek });
 
@@ -1038,7 +1038,7 @@ cmd({
     const text = `> *BEN-BOT ANTILINK SETTINGS*\n\n> Current Mode: *${currentMode}*\n\nReply with:\n\n*1.* Enable ANTILINK => Warn\n*2.* Enable ANTILINK => Delete\n*3.* Enable ANTILINK => Remove/Kick\n*4.* Disable All ANTILINK Modes\n\n╭────────────────\n│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing ᴛᴇᴄʜ*\n╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+      image: { url: "https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg" },
       caption: text
     }, { quoted: mek });
 
@@ -1322,7 +1322,7 @@ Reply with:
 ╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
-      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
+      image: { url: "https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg" },
       caption: menuText
     }, { quoted: mek });
 
