@@ -30,32 +30,34 @@ cmd({
   desc: "Owner Only - retrieve quoted message back to user",
   category: "owner",
   filename: __filename
-}, async (client, m, message, match, { from, isCreator }) => {
+}, async (client, m, match, { from, isCreator }) => {
   try {
     if (!isCreator) {
       return await client.sendMessage(from, {
-        text: "*📛 This is an owner command.*"
-      }, { quoted: message });
+        text: "*📛 This is an owner command.*",
+        contextInfo: getNewsletterContext(m.sender)
+      }, { quoted: m });
     }
 
     if (!match.quoted) {
       return await client.sendMessage(from, {
-        text: "*🍁 Please reply to a view once message!*"
-      }, { quoted: message });
+        text: "*🍁 Please reply to a view once message!*",
+        contextInfo: getNewsletterContext(m.sender)
+      }, { quoted: m });
     }
 
-    // بررسی اینکه واقعاً viewOnce هست
     if (!match.quoted.viewOnce) {
       return await client.sendMessage(from, {
-        text: "⚠️ Please reply to a view once message thats not view once message!"
-      }, { quoted: message });
+        text: "⚠️ Please reply to a *view once* message.",
+        contextInfo: getNewsletterContext(m.sender)
+      }, { quoted: m });
     }
 
     const buffer = await match.quoted.download();
     const mtype = match.quoted.mtype;
-    const options = { quoted: message };
 
     let messageContent = {};
+
     switch (mtype) {
       case "imageMessage":
         messageContent = {
@@ -83,15 +85,18 @@ cmd({
         break;
       default:
         return await client.sendMessage(from, {
-          text: "❌ Only image, video, and audio messages are supported"
-        }, { quoted: message });
+          text: "❌ Only image, video, and audio messages are supported.",
+          contextInfo: getNewsletterContext(m.sender)
+        }, { quoted: m });
     }
 
-    await client.sendMessage(from, messageContent, options);
+    await client.sendMessage(from, messageContent, { quoted: m });
+
   } catch (error) {
     console.error("vv Error:", error);
     await client.sendMessage(from, {
-      text: "❌ Error fetching vv message:\n" + error.message
-    }, { quoted: message });
+      text: "❌ Error fetching view once message:\n" + error.message,
+      contextInfo: getNewsletterContext(m.sender)
+    }, { quoted: m });
   }
 });
