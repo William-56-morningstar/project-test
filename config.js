@@ -23,6 +23,8 @@ ADMIN_EVENTS: process.env.ADMIN_EVENTS || "false",
 ANTI_LINK: process.env.ANTI_LINK || "true",
 // make anti link true,false for groups 
 ANTI_DELETE: process.env.ANTI_DELETE || "true",
+// set true false for anti delete     
+ANTI_DEL_PATH: process.env.ANTI_DEL_PATH || "inbox",
 //Antidelete
 MENTION_REPLY: process.env.MENTION_REPLY || "false",
 // make true if want auto voice reply if someone menetion you 
