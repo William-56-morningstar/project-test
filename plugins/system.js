@@ -357,7 +357,7 @@ cmd({
   desc: "See GitHub information",
   category: "system",
   filename: __filename
-}, async (client, message, m, args, { reply,  sender }) => {
+}, async (conn, mek, m, { args, reply, sender }) => {
   const githubRepoURL = 'https://github.com/NOTHING-MD420/project-test';
 
   try {
@@ -378,11 +378,11 @@ Packed with smart features to elevate your WhatsApp experience like never before
 *❲❒❳ ʟᴀsᴛ ᴜᴘᴅᴀᴛᴇᴅ:* ${new Date(repoData.updated_at).toLocaleDateString()}
 *❲❒❳ ᴏᴡɴᴇʀ:* ${repoData.owner?.login || "Nothing Tech"}`;
 
-    await client.sendMessage(message.chat, {
+    await conn.sendMessage(mek.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: style1,
-      contextInfo: getNewsletterContext(m.sender)
-    }, { quoted: message });
+      contextInfo: getNewsletterContext(sender)
+    }, { quoted: mek });
 
   } catch (err) {
     console.error("Repo Error:", err);
