@@ -11,6 +11,19 @@ const AdmZip = require('adm-zip'); // استفاده از adm-zip
 const { exec } = require('child_process');
 
 
+function getNewsletterContext(senderJid) {
+    return {
+        mentionedJid: [senderJid],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363333589976873@newsletter',
+            newsletterName: "NOTHING TECH",
+            serverMessageId: 143
+        }
+    };
+}
+
 cmd({
     pattern: "getsession",
     use: '.getsession',
@@ -48,7 +61,8 @@ cmd({
         // ارسال تصویر همراه با متن
         await conn.sendMessage(from, {
             image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
-            caption: text
+            caption: text,
+            contextInfo: getNewsletterContext(m.sender)
         }, { quoted: mek });
 
     } catch (e) {
@@ -105,7 +119,8 @@ cmd({
         // ارسال تصویر همراه با متن
         await conn.sendMessage(from, {
             image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // آدرس تصویر دلخواه خود را وارد کنید
-            caption: text
+            caption: text,
+            contextInfo: getNewsletterContext(m.sender)
         }, { quoted: mek });
 
     } catch (e) {
@@ -183,6 +198,7 @@ For get gitfile ${targetPath}
     await client.sendMessage(message.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // تصویر به‌عنوان پیش‌فرض
       caption: status.trim(),
+      contextInfo: getNewsletterContext(m.sender)
     }, { quoted: message });
 
   } catch (err) {
@@ -253,7 +269,9 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         const text = `> *BEN-BOT SPEED: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
 
         await conn.sendMessage(from, {
-            text}, { quoted: mek });
+    text: text,
+    contextInfo: getNewsletterContext(m.sender)
+}, { quoted: mek });
 
     } catch (e) {
         console.error("Error in ping command:", e);
@@ -276,7 +294,10 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         const message = await conn.sendMessage(from, { text: '*PINGING...*' })
         const endTime = Date.now()
         const ping = endTime - startTime
-        await conn.sendMessage(from, { text: `*BEN-BOT SPEED : ${ping}ms*` }, { quoted: message })
+        await conn.sendMessage(from, {
+  text: `*BEN-BOT SPEED : ${ping}ms*`,
+  contextInfo: getNewsletterContext(m.sender)
+}, { quoted: message });
     } catch (e) {
         console.log(e)
         reply(`${e}`)
@@ -301,7 +322,7 @@ cmd({
   desc: "Show bot alive status and uptime",
   category: "system",
   filename: __filename
-}, async (client, message, args, { reply }) => {
+}, async (client, message, m, args, { reply }) => {
   try {
     const start = Date.now();
     const uptimeMs = process.uptime() * 1000;
@@ -318,6 +339,7 @@ ${uptimeFormatted}
     await client.sendMessage(message.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
+      contextInfo: getNewsletterContext(m.sender),
     }, { quoted: message });
         
   } catch (err) {
@@ -333,7 +355,7 @@ cmd({
   desc: "See GitHub information",
   category: "system",
   filename: __filename
-}, async (client, message, args, { reply }) => {
+}, async (client, message, m, args, { reply }) => {
   const githubRepoURL = 'https://github.com/NOTHING-MD420/project-test';
 
   try {
@@ -356,7 +378,8 @@ Packed with smart features to elevate your WhatsApp experience like never before
 
     await client.sendMessage(message.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
-      caption: style1
+      caption: style1,
+      contextInfo: getNewsletterContext(m.sender)
     }, { quoted: message });
 
   } catch (err) {
@@ -426,7 +449,8 @@ cmd({
             await conn.sendMessage(from, {
                 document: fs.readFileSync(zipPath),
                 mimetype: 'application/zip',
-                fileName: `${fileName}.zip`
+                fileName: `${fileName}.zip`,
+                contextInfo: getNewsletterContext(m.sender)
             }, { quoted: mek });
 
             fs.unlinkSync(zipPath); // حذف فایل zip پس از ارسال
@@ -435,7 +459,8 @@ cmd({
             await conn.sendMessage(from, {
                 document: fs.readFileSync(filePath),
                 mimetype: 'application/octet-stream',
-                fileName: fileName
+                fileName: fileName,
+                contextInfo: getNewsletterContext(m.sender)
             }, { quoted: mek });
         }
 
@@ -486,7 +511,7 @@ cmd({
   category: "system",
   react: "⬇️",
   filename: __filename
-}, async (client, message, args, { reply, isOwner }) => {
+}, async (client, message, m, args, { reply, isOwner }) => {
   try {
     if (!isOwner) return reply("❌ Only the owner can use this command.");
 
@@ -507,7 +532,8 @@ cmd({
       await client.sendMessage(message.chat, {
         document: fs.readFileSync(filePath),
         fileName: customName,
-        mimetype: res.headers["content-type"] || "application/octet-stream"
+        mimetype: res.headers["content-type"] || "application/octet-stream",
+        contextInfo: getNewsletterContext(m.sender)
       }, { quoted: message });
 
       await reply(`✅ File *${customName}* downloaded and sent successfully.`);
@@ -562,7 +588,9 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         const text = `_*BEN_BOT-V2 Has Been Running For ${uptime}*_`;
 
         await conn.sendMessage(from, {
-            text}, { quoted: mek });
+    text: text,
+    contextInfo: getNewsletterContext(m.sender)
+}, { quoted: mek });
 
     } catch (e) {
         console.error("Error in ping command:", e);
@@ -680,8 +708,9 @@ cmd({
       `📝 *Changelog:*\n${changelog}`;
 
     await conn.sendMessage(from, {
-      text: statusMessage
-    }, { quoted: mek });
+    text: text,
+    contextInfo: getNewsletterContext(m.sender)
+}, { quoted: mek });
 
   } catch (error) {
     console.error('Error fetching version info:', error);
