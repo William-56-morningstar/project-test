@@ -1297,30 +1297,37 @@ cmd({
 
 
 
+
+
 cmd({
   pattern: "antidelete",
-  desc: "Manage AntiDelete Settings with Reply Menu",
-  react: "🔄",
-  category: "misc",
+  desc: "Configure AntiDelete System (No DB)",
+  category: "owner",
+  react: "🛡️",
   filename: __filename,
-},
-  async (conn, mek, m, { from, reply, isCreator }) => {
-    if (!isCreator) return reply("*Only the bot owner can use this command!*");
+}, async (conn, mek, m, { from, isCreator, reply }) => {
+  try {
+    if (!isCreator) return reply("_*❗This Command Can Only Be Used By My Owner !*_");
+    
+    const { cmd } = require('../command');
+    const { setAnti, getAnti } = require('../data/antidel');
+    const config = require('../config');
+    const currentStatus = await getAnti();
+    const currentMode = config.ANTI_DEL_PATH === "inbox" ? "Inbox" : "Same Chat";
+    const enabledText = currentStatus ? `✅ AntiDelete is ON (${currentMode})` : `❌ AntiDelete is OFF`;
 
-    const currentMode = (await getConfig("ANTI_DEL_PATH")) || "same";
+    const menuText = `> *BEN-BOT ANTIDELETE SETTINGS*
 
-    const menuText = `> *ANTI-DELETE 𝐌𝐎𝐃𝐄 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
-
-> Current Mode: ${currentMode === "log" ? "✅ ON (inbox)" : "✅ ON (same)"}
+> Current Status: ${enabledText}
 
 Reply with:
 
-*1.* To Enable Antidelete for All (Group,DM) Same Chat  
-*2.* To Enable Antidelete for All (Group,DM) dm Chat  
-*3.* To Disable All Antidelete and reset
+*1.* Enable AntiDelete => Same Chat  
+*2.* Enable AntiDelete => Inbox (private)  
+*3.* Disable AntiDelete & Set Inbox Mode
 
-╭────────────────◆  
-│ *POWERED BY NOTHING*  
+╭────────────────  
+│ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Nothing Tech*  
 ╰─────────────────◆`;
 
     const sentMsg = await conn.sendMessage(from, {
@@ -1341,45 +1348,40 @@ Reply with:
 
         const replyText =
           receivedMsg.message?.conversation ||
-          receivedMsg.message?.extendedTextMessage?.text || "";
+          receivedMsg.message?.extendedTextMessage?.text ||
+          "";
 
-        let responseText = "";
+        const sender = receivedMsg.key.remoteJid;
 
         if (replyText === "1") {
-          await setAnti("gc", true);
-          await setAnti("dm", true);
-          await setConfig("ANTI_DEL_PATH", "same");
-          responseText = "✅ AntiDelete Enabled.\nand Mode is Same chat\nGroup: ON\nDM: ON (same)";
+          await setAnti(true);
+          config.ANTI_DEL_PATH = "same";
+          await conn.sendMessage(sender, { text: "✅ AntiDelete Enabled.\n🔄 Mode: Same Chat" }, { quoted: receivedMsg });
         } else if (replyText === "2") {
-          await setAnti("gc", true);
-          await setAnti("dm", true);
-          await setConfig("ANTI_DEL_PATH", "log");
-          responseText = "✅ AntiDelete Mode changed to Inbox.\nGroup: ON\nDM: ON (log)";
+          await setAnti(true);
+          config.ANTI_DEL_PATH = "inbox";
+          await conn.sendMessage(sender, { text: "✅ AntiDelete Enabled.\n📩 Mode: Inbox" }, { quoted: receivedMsg });
         } else if (replyText === "3") {
-          await setAnti("gc", false);
-          await setAnti("dm", false);
-          await setConfig("ANTI_DEL_PATH", "same");
-          responseText = "❌ AntiDelete turned off.";
+          await setAnti(false);
+          config.ANTI_DEL_PATH = "inbox";
+          await conn.sendMessage(sender, { text: "❌ AntiDelete Disabled.\n📩 Mode: Inbox" }, { quoted: receivedMsg });
         } else {
-          responseText = "❌ Invalid input. Please reply with *1*, *2*, or *3*.";
+          await conn.sendMessage(sender, { text: "❗ Invalid option. Please reply with *1*, *2*, or *3*." }, { quoted: receivedMsg });
         }
 
-        await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
-
-        // 🔁 جلوگیری از افزودن لیسنر تکراری
         conn.ev.off("messages.upsert", handler);
       } catch (err) {
-        console.error("AntiDelete handler error:", err);
+        console.log("AntiDelete CMD handler error:", err);
       }
     };
 
-    // جلوگیری از لیسنر تکراری برای جلوگیری از MaxListenersExceededWarning
-    conn.ev.off("messages.upsert", handler);
     conn.ev.on("messages.upsert", handler);
+    setTimeout(() => conn.ev.off("messages.upsert", handler), 600000); // 10min
 
-    // توقف خودکار لیسنر بعد از ۳۰ دقیقه
-    setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000);
-  });
+  } catch (e) {
+    reply(`❗ Error: ${e.message}`);
+  }
+});
 
 
 //--------------------------------------------
