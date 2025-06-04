@@ -8,7 +8,7 @@ cmd({
   desc: "Generate an image using AI.",
   category: "ai",
   filename: __filename
-}, async (conn, mek, m, { q, reply }) => {
+}, async (conn, mek, m, { q, from, reply }) => {
   try {
     if (!q) return reply("Please provide a prompt for the image.\nExample: `fluxai home and dog`");
 
@@ -38,7 +38,7 @@ cmd({
   desc: "Generate an AI image based on the given meta prompt.",
   category: "ai",
   filename: __filename
-}, async (conn, mek, m, { q, reply }) => {
+}, async (conn, mek, m, { q, from, reply }) => {
   try {
     if (!q) return reply("📝 Please provide a prompt.\nExample: `.meta captain America`");
 
@@ -50,7 +50,11 @@ cmd({
       image: { url: imageUrl },
       caption: `> SUCCESSFULLY GENERATED`
     }, { quoted: m });
-
+    
+    await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+        
   } catch (error) {
     console.error("MetaAI Error:", error);
     reply(`❌ Failed to generate META image. Error: ${error.response?.data?.message || error.message}`);
@@ -64,7 +68,7 @@ cmd({
   desc: "Generate an AI image based on the given meta prompt.",
   category: "ai",
   filename: __filename
-}, async (conn, mek, m, { q, reply }) => {
+}, async (conn, mek, m, { q, from, reply }) => {
   try {
     if (!q) return reply("📝 Please provide a prompt.\nExample: `.meta captain America`");
 
@@ -76,7 +80,11 @@ cmd({
       image: { url: imageUrl },
       caption: `> SUCCESSFULLY GENERATED`
     }, { quoted: m });
-
+    
+    await conn.sendMessage(from, {
+            react: { text: "✅", key: m.key }
+        });
+        
   } catch (error) {
     console.error("MetaAI Error:", error);
     reply(`❌ Failed to generate META image. Error: ${error.response?.data?.message || error.message}`);
