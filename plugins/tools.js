@@ -7,7 +7,33 @@ const os = require("os");
 const path = require("path");
 const FormData = require("form-data");
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson } = require('../lib/functions')
+const tempMailPath = path.join(__dirname, 'lib/temp-mails.json');
 
+function saveTempMail(jid, data) {
+    let allData = {};
+    if (fs.existsSync(tempMailPath)) {
+        allData = JSON.parse(fs.readFileSync(tempMailPath));
+    }
+    allData[jid] = data;
+    fs.writeFileSync(tempMailPath, JSON.stringify(allData, null, 2));
+}
+
+function getTempMail(jid) {
+    if (!fs.existsSync(tempMailPath)) return null;
+    const allData = JSON.parse(fs.readFileSync(tempMailPath));
+    return allData[jid] || null;
+}
+
+function deleteTempMail(jid) {
+    if (!fs.existsSync(tempMailPath)) return false;
+    const allData = JSON.parse(fs.readFileSync(tempMailPath));
+    if (allData[jid]) {
+        delete allData[jid];
+        fs.writeFileSync(tempMailPath, JSON.stringify(allData, null, 2));
+        return true;
+    }
+    return false;
+}
 
 
 function getNewsletterContext(senderJid) {
@@ -41,58 +67,39 @@ cmd({
     react: "📧",
     filename: __filename
 },
-async (conn, mek, m, { from, reply, prefix }) => {
+async (conn, mek, m, { from, reply }) => {
     try {
         const response = await axios.get('https://apis.davidcyriltech.my.id/temp-mail');
         const { email, session_id, expires_at } = response.data;
 
-        // Format the expiration time and date
         const expiresDate = new Date(expires_at);
-        const timeString = expiresDate.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-        const dateString = expiresDate.toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
+        const timeString = expiresDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const dateString = expiresDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
-        // Create the complete message
+        // ذخیره در فایل
+        saveTempMail(m.sender, { session_id, email });
+
         const message = `
 📧 *TEMPORARY EMAIL GENERATED*
 
-✉️ *Email Address:*
-${email}
+✉️ *Email Address:* ${email}
+⏳ *Expires:* ${timeString} • ${dateString}
+🔑 *Session ID:* \`\`\`${session_id}\`\`\`
 
-⏳ *Expires:*
-${timeString} • ${dateString}
-
-🔑 *Session ID:*
-\`\`\`${session_id}\`\`\`
-
-📥 *Check Inbox:*
-.checkmail ${session_id}
+📥 *Check Inbox:* .checkmail
+🗑️ *Delete Mail:* .delmail
 
 _Email will expire after 24 hours_
 `;
 
-        await conn.sendMessage(
-            from,
-            { 
-                text: message,
-                contextInfo: getNewsletterContext(m.sender)
-            },
-            { quoted: mek }
-        );
+        await conn.sendMessage(from, { text: message }, { quoted: mek });
 
     } catch (e) {
         console.error('TempMail error:', e);
         reply(`❌ Error: ${e.message}`);
     }
 });
+
 cmd({
     pattern: "checkmail",
     desc: "Check your temporary email inbox",
@@ -100,23 +107,19 @@ cmd({
     react: "📬",
     filename: __filename
 },
-async (conn, mek, m, { from, reply, args }) => {
+async (conn, mek, m, { from, reply }) => {
     try {
-        const sessionId = args[0];
-        if (!sessionId) return reply('🔑 Please provide your session ID\nExample: .checkmail YOUR_SESSION_ID');
+        const stored = getTempMail(m.sender);
+        if (!stored) return reply('❌ No temporary email found. Use `.tempmail` first.');
 
-        const inboxUrl = `https://apis.davidcyriltech.my.id/temp-mail/inbox?id=${encodeURIComponent(sessionId)}`;
+        const inboxUrl = `https://apis.davidcyriltech.my.id/temp-mail/inbox?id=${encodeURIComponent(stored.session_id)}`;
         const response = await axios.get(inboxUrl);
 
-        if (!response.data.success) {
-            return reply('❌ Invalid session ID or expired email');
-        }
+        if (!response.data.success) return reply('❌ Invalid session ID or expired email');
 
         const { inbox_count, messages } = response.data;
 
-        if (inbox_count === 0) {
-            return reply('📭 Your inbox is empty');
-        }
+        if (inbox_count === 0) return reply('📭 Your inbox is empty');
 
         let messageList = `📬 *You have ${inbox_count} message(s)*\n\n`;
         messages.forEach((msg, index) => {
@@ -136,7 +139,28 @@ async (conn, mek, m, { from, reply, args }) => {
     }
 });
 
+cmd({
+    pattern: "delmail",
+    desc: "Delete your temporary email session",
+    category: "tools",
+    react: "🗑️",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const stored = getTempMail(m.sender);
+        if (!stored) return reply('❌ No temporary email found.');
 
+        const deleted = deleteTempMail(m.sender);
+        if (!deleted) return reply('⚠️ Failed to delete temp mail.');
+
+        reply('✅ Your temporary email session has been deleted.');
+
+    } catch (e) {
+        console.error('DelMail error:', e);
+        reply(`❌ Error: ${e.message}`);
+    }
+});
 
 cmd({
   pattern: "imgscan",
