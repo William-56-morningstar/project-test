@@ -1537,7 +1537,7 @@ cmd({
   alias: ["del"],
   react: "❌",
   desc: "Delete replied message (owner only)",
-  category: "group",
+  category: "owner",
   filename: __filename
 },
 async (conn, mek, m, { isOwner }) => {
