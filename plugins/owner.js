@@ -11,7 +11,7 @@ const { getAnti, setAnti } = require('../data/antidel');
 const { exec } = require('child_process');
 const FormData = require('form-data');
 const { setConfig, getConfig } = require("../lib/configdb");
-const {sleep} = require('../lib/functions')
+const {sleepp} = require('../lib/functions')
 
 
 const OWNER_PATH = path.join(__dirname, "../lib/owner.json");
