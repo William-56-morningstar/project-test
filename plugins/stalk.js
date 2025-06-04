@@ -29,13 +29,13 @@ cmd({
 
     if (!metadata || !metadata.id) return reply("❌ Channel not found or inaccessible.");
 
-    const infoText = `*┌──「 𝙎𝙏𝘼𝙇𝙆𝙄𝙉𝙂 」*\n\n` +
+    const infoText = `*╔═══━「 𝙎𝙏𝘼𝙇𝙆𝙄𝙉𝙂 」━═══╗*\n\n` +
       `▢ *🔖 Name:* ${metadata.name}\n` +
       `▢ *🆔 Jid:* ${metadata.id}\n` +
       `▢ *👥 Followers:* ${metadata.subscribers?.toLocaleString() || "N/A"}\n` +
-      `▢ *📜 Description:* ${metadata.description || "No description"}\n` +
       `▢ *📅 Created on:* ${metadata.creation_time ? new Date(metadata.creation_time * 1000).toLocaleString("fa-IR") : "Unknown"}\n` +
-      `▢ *🔗 Link:* ${q}*`;
+      `▢ *🔗 Link:* ${q}*` +
+      `▢ *📜 Description:* ${metadata.description || "No description"}\n╚═══━「 𝗡𝗢𝗧𝗛𝗜𝗡𝗚-𝗕𝗘𝗡 」━═══╝`;
 
     if (metadata.preview) {
       await conn.sendMessage(from, {
