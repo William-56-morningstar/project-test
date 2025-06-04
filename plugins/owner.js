@@ -11,7 +11,7 @@ const { getAnti, setAnti } = require('../data/antidel');
 const { exec } = require('child_process');
 const FormData = require('form-data');
 const { setConfig, getConfig } = require("../lib/configdb");
-
+const {sleep} = require('../lib/functions')
 
 
 const OWNER_PATH = path.join(__dirname, "../lib/owner.json");
@@ -1443,3 +1443,116 @@ cmd({
 
 
 
+// 1. Shutdown Bot
+cmd({
+    pattern: "shutdown",
+    desc: "Shutdown the bot.",
+    category: "owner",
+    react: "🛑",
+    filename: __filename
+},
+async (conn, mek, m, { from, isOwner, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
+    reply("🛑 Shutting down...").then(() => process.exit());
+});
+// 2. Broadcast Message to All Groups
+cmd({
+    pattern: "broadcast",
+    desc: "Broadcast a message to all groups.",
+    category: "owner",
+    react: "📢",
+    filename: __filename
+},
+async (conn, mek, m, { from, isOwner, args, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
+    if (args.length === 0) return reply("📢 Please provide a message to broadcast.");
+    const message = args.join(' ');
+    const groups = Object.keys(await conn.groupFetchAllParticipating());
+    for (const groupId of groups) {
+        await conn.sendMessage(groupId, { text: message }, { quoted: mek });
+    }
+    reply("📢 Message broadcasted to all groups.");
+});
+// 3. Set Profile Picture
+cmd({
+    pattern: "setpp",
+    desc: "Set bot profile picture.",
+    category: "owner",
+    react: "🖼️",
+    filename: __filename
+},
+async (conn, mek, m, { from, isOwner, quoted, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
+    if (!quoted || !quoted.message.imageMessage) return reply("❌ Please reply to an image.");
+    try {
+        const media = await conn.downloadMediaMessage(quoted);
+        await conn.updateProfilePicture(conn.user.jid, { url: media });
+        reply("🖼️ Profile picture updated successfully!");
+    } catch (error) {
+        reply(`❌ Error updating profile picture: ${error.message}`);
+    }
+});
+
+// 6. Clear All Chats
+cmd({
+    pattern: "clearchats",
+    desc: "Clear all chats from the bot.",
+    category: "owner",
+    react: "🧹",
+    filename: __filename
+},
+async (conn, mek, m, { from, isOwner, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
+    try {
+        const chats = conn.chats.all();
+        for (const chat of chats) {
+            await conn.modifyChat(chat.jid, 'delete');
+        }
+        reply("🧹 All chats cleared successfully!");
+    } catch (error) {
+        reply(`❌ Error clearing chats: ${error.message}`);
+    }
+});
+
+// 8. Group JIDs List
+cmd({
+    pattern: "gjid",
+    desc: "Get the list of JIDs for all groups the bot is part of.",
+    category: "owner",
+    react: "📝",
+    filename: __filename
+},
+async (conn, mek, m, { from, isOwner, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
+    const groups = await conn.groupFetchAllParticipating();
+    const groupJids = Object.keys(groups).join('\n');
+    reply(`📝 *Group JIDs:*\n\n${groupJids}`);
+});
+
+
+// delete 
+
+cmd({
+  pattern: "delete",
+  alias: ["del"],
+  react: "❌",
+  desc: "Delete replied message (owner only)",
+  category: "group",
+  filename: __filename
+},
+async (conn, mek, m, { isOwner }) => {
+  try {
+    if (!isOwner) return;
+    if (!m.quoted) return;
+    await conn.sendMessage(m.chat, {
+      delete: {
+        remoteJid: m.chat,
+        fromMe: m.quoted.key.fromMe,
+        id: m.quoted.id,
+        participant: m.quoted.participant || m.quoted.key.participant
+      }
+    });
+  } catch (e) {
+    console.error("❌ Delete error:", e.message);
+  }
+});
