@@ -1295,6 +1295,8 @@ cmd({
 //  ANI-DELETE COMMANDS
 //--------------------------------------------
 
+
+
 cmd({
   pattern: "antidelete",
   desc: "Manage AntiDelete Settings with Reply Menu",
@@ -1363,15 +1365,22 @@ Reply with:
         }
 
         await conn.sendMessage(from, { text: responseText }, { quoted: receivedMsg });
+
+        // 🔁 جلوگیری از افزودن لیسنر تکراری
         conn.ev.off("messages.upsert", handler);
       } catch (err) {
         console.error("AntiDelete handler error:", err);
       }
     };
 
+    // جلوگیری از لیسنر تکراری برای جلوگیری از MaxListenersExceededWarning
+    conn.ev.off("messages.upsert", handler);
     conn.ev.on("messages.upsert", handler);
+
+    // توقف خودکار لیسنر بعد از ۳۰ دقیقه
     setTimeout(() => conn.ev.off("messages.upsert", handler), 30 * 60 * 1000);
   });
+
 
 //--------------------------------------------
 //  ANI-BAD COMMANDS
