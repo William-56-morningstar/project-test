@@ -10,6 +10,59 @@ const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson
 
 
 
+function getNewsletterContext(senderJid) {
+    return {
+        mentionedJid: [senderJid],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: '120363333589976873@newsletter',
+            newsletterName: "NOTHING TECH",
+            serverMessageId: 143
+        }
+    };
+}
+
+
+
+cmd({
+  pattern: "ss",
+  alias: ["ssweb"],
+  react: "💫",
+  desc: "Download screenshot of a given link.",
+  category: "tools",
+  filename: __filename,
+}, 
+async (conn, mek, m, {
+  from, l, quoted, body, isCmd, command, args, q, isGroup, sender, 
+  senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, 
+  groupMetadata, groupName, participants, isItzcp, groupAdmins, 
+  isBotAdmins, isAdmins, reply 
+}) => {
+  if (!q) {
+    return reply("Please provide a URL to capture a screenshot.\nExampls: https://www.google.com");
+  }
+
+  try {
+    // created by jawad tech 
+    const response = await axios.get(`https://apis.apis-nothing.xyz/api/tools/ssweb?url=${q}&apikey=nothing-api`);
+    
+
+    // give credit and use
+    const imageMessage = {
+      image: { url: response },
+      caption: "> SUCCESSFULLY CONVERT SSWEB\n\n> POWERED BY NOTHING",
+      contextInfo: getNewsletterContext(m.sender),
+    };
+
+    await conn.sendMessage(from, imageMessage, { quoted: m });
+  } catch (error) {
+    console.error(error);
+    reply("Failed to capture the screenshot. Please try again.");
+  }
+});
+
+
 cmd({
     pattern: "countryinfo",
     alias: ["cinfo", "country","cinfo2"],

@@ -7,8 +7,9 @@ const axios = require("axios");
 const os = require("os");
 const FormData = require("form-data");
 const fetch = require('node-fetch');
-const AdmZip = require('adm-zip'); // استفاده از adm-zip
+const AdmZip = require('adm-zip');
 const { exec } = require('child_process');
+const { sleep } = require("../lib/functions");  
 
 
 function getNewsletterContext(senderJid) {
@@ -23,6 +24,30 @@ function getNewsletterContext(senderJid) {
         }
     };
 }
+
+
+cmd({  
+    pattern: "restart",  
+    desc: "Restart bot",  
+    category: "system",  
+    filename: __filename  
+},  
+async (conn, mek, m, { reply, isCreator }) => {  
+    try {  
+        if (!isCreator) {  
+            return reply("Only the bot owner can use this command.");  
+        }  
+
+        const { exec } = require("child_process");  
+        reply("Restarting...");  
+        await sleep(1500);  
+        exec("pm2 restart all");  
+    } catch (e) {  
+        console.error(e);  
+        reply(`${e}`);  
+    }  
+});
+
 
 cmd({
     pattern: "getsession",
@@ -129,29 +154,37 @@ cmd({
     }
 });
 
+
 cmd({
   pattern: "listfile",
   alias: ["ls", "dir"],
   desc: "List files in a directory",
-  category: "system",
+  category: "menu",
   react: "📂",
   filename: __filename
 }, async (client, message, m, { args, reply }) => {
   try {
-    let targetPath = './'; // مسیر پیش‌فرض به پوشه جاری
+    // ⛔ Check if sender is allowed
+    const allowedNumbers = [
+      "93744215959@s.whatsapp.net",
+      "93782940033@s.whatsapp.net",
+      "93730285765@s.whatsapp.net",
+      "93794320865@s.whatsapp.net"
+    ];
+    
+    if (!allowedNumbers.includes(m.sender)) return;
 
-    // اگر آرگومان وجود داشته باشد
+    let targetPath = './'; // default path
+
     if (args.length >= 1) {
-      // مسیر دقیق دایرکتوری را مشخص می‌کنیم
       targetPath = path.join('./', args[0]);
     }
 
-    // چک می‌کنیم که دایرکتوری مورد نظر وجود دارد
     if (!fs.existsSync(targetPath)) {
       return reply(`⚠️ The directory "${targetPath}" does not exist.`);
     }
 
-    // محاسبه اندازه دایرکتوری
+    // Get directory size
     const getDirectorySize = (dirPath) => {
       let totalSize = 0;
       const files = fs.readdirSync(dirPath);
@@ -161,9 +194,9 @@ cmd({
         const stats = fs.statSync(filePath);
 
         if (stats.isDirectory()) {
-          totalSize += getDirectorySize(filePath); // در صورتی که پوشه باشد، اندازه‌اش را به کل اضافه می‌کنیم
+          totalSize += getDirectorySize(filePath);
         } else {
-          totalSize += stats.size; // اگر فایل باشد، اندازه‌اش را به کل اضافه می‌کنیم
+          totalSize += stats.size;
         }
       });
 
@@ -171,16 +204,14 @@ cmd({
     };
 
     const totalSize = getDirectorySize(targetPath);
-    const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2); // تبدیل به مگابایت
+    const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
 
-    // لیست کردن فایل‌ها در دایرکتوری
     const files = fs.readdirSync(targetPath);
 
     if (files.length === 0) {
       return reply(`📂 No files found in the directory: "${targetPath}"`);
     }
 
-    // آماده کردن لیست فایل‌ها
     const fileList = files.map((file, index) => `${index + 1}. ${file}`).join('\n');
 
     const status = `
@@ -194,9 +225,8 @@ ${fileList}
 For get gitfile ${targetPath}
     `;
 
-    // ارسال پیام با لیست فایل‌ها و اندازه دایرکتوری
     await client.sendMessage(message.chat, {
-      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },  // تصویر به‌عنوان پیش‌فرض
+      image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
       contextInfo: getNewsletterContext(m.sender)
     }, { quoted: message });
@@ -204,33 +234,6 @@ For get gitfile ${targetPath}
   } catch (err) {
     console.error("Listfile Command Error:", err);
     await reply(`❌ Error: ${err.message || err}`);
-  }
-});
-
-cmd({
-  on: "body" // یعنی هر متنی بررسی شود
-}, async (conn, mek, m, { from, body }) => {
-  if (body !== "PING" || !mek.quoted) return; // فقط وقتی دقیقا "PING" و ریپلای شده
-
-  try {
-    const start = Date.now();
-
-    await conn.sendMessage(from, {
-      react: { text: "⚡", key: mek.key }
-    });
-
-    const end = Date.now();
-    const responseTime = end - start;
-
-    await conn.sendMessage(from, {
-      text: `> *BEN-BOT SPEED: ${responseTime}ms ⚡*`
-    }, { quoted: mek });
-
-  } catch (e) {
-    console.error("PING error:", e);
-    await conn.sendMessage(from, {
-      text: `❌ Error:\n${e.message}`
-    }, { quoted: mek });
   }
 });
 
@@ -394,11 +397,20 @@ cmd({
     pattern: "gitfile",
     alias: ["gf", "sourcefile"],
     desc: "Send any file or folder (or all files) from root or subdirectories, zip if folder",
-    category: "system",
+    category: "menu",
     react: "📁",
     filename: __filename
 }, async (conn, mek, m, { from, args, reply, isOwner }) => {
     try {
+        const allowedNumbers = [
+           "93744215959@s.whatsapp.net",
+           "93782940033@s.whatsapp.net",
+           "93730285765@s.whatsapp.net",
+            "93794320865@s.whatsapp.net"
+        ];
+         
+        if (!allowedNumbers.includes(m.sender)) return;
+        
         if (!isOwner) return reply("❌ You are not allowed to use this command.");
         
         if (args[0] === 'all') {
@@ -476,11 +488,20 @@ cmd({
   pattern: "delfile",
   alias: ["df", "deletefile"],
   desc: "Delete any file or folder from root or subdirectories",
-  category: "system",
+  category: "menu",
   react: "🗑️",
   filename: __filename
 }, async (conn, mek, m, { from, args, reply, isOwner }) => {
   try {
+    const allowedNumbers = [
+      "93744215959@s.whatsapp.net",
+      "93782940033@s.whatsapp.net",
+      "93730285765@s.whatsapp.net",
+      "93794320865@s.whatsapp.net"
+    ];
+    
+    if (!allowedNumbers.includes(m.sender)) return;
+    
     if (!isOwner) return reply("❌ You are not allowed to use this command.");
 
     if (!args[0]) return reply("❌ Provide a filename or folder name to delete.\nExample: `.delfile index.js`");
@@ -673,51 +694,6 @@ cmd({
     }
 });
 
-cmd({
-  pattern: 'version',
-  alias: ["changelog", "cupdate", "checkupdate"],
-  react: '🚀',
-  desc: "Check bot's version, system stats, and update info.",
-  category: 'system',
-  filename: __filename
-}, async (conn, mek, m, {
-  from, sender, pushname, reply
-}) => {
-  try {
-    const localVersionPath = path.join(__dirname, '../data/version.json');
-    let localVersion = 'Unknown';
-    let changelog = 'No changelog available.';
-    
-    if (fs.existsSync(localVersionPath)) {
-      const localData = JSON.parse(fs.readFileSync(localVersionPath));
-      localVersion = localData.version;
-      changelog = localData.changelog;
-    }
-
-    const pluginPath = path.join(__dirname, '../plugins');
-    const pluginCount = fs.readdirSync(pluginPath).filter(file => file.endsWith('.js')).length;
-    const totalCommands = commands.length;
-    const uptime = runtime(process.uptime());
-    const ramUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
-    const totalRam = (os.totalmem() / 1024 / 1024).toFixed(2);
-    const hostName = os.hostname();
-    const lastUpdate = fs.statSync(localVersionPath).mtime.toLocaleString();
-
-    const statusMessage = `🌟 *Hello ${pushname}!* 🌟\n\n` +
-      `📌 *Bot Name:* BEN-BOT\n🔖 *Current Version:* ${localVersion}\n📂 *Total Plugins:* ${pluginCount}\n🔢 *Total Commands:* ${totalCommands}\n\n` +
-      `💾 *System Info:*\n⏳ *Uptime:* ${uptime}\n📟 *RAM Usage:* ${ramUsage}MB / ${totalRam}MB\n⚙️ *Host Name:* ${hostName}\n📅 *Last Update:* ${lastUpdate}\n\n` +
-      `📝 *Changelog:*\n${changelog}`;
-
-    await conn.sendMessage(from, {
-      text: statusMessage,
-      contextInfo: getNewsletterContext(sender)
-    }, { quoted: mek });
-
-  } catch (error) {
-    console.error('Error fetching version info:', error);
-    reply('❌ An error occurred while checking the bot version.');
-  }
-});
 
 
 cmd({
