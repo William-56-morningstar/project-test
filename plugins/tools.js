@@ -25,40 +25,110 @@ function getNewsletterContext(senderJid) {
 
 
 
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+cmd({
+  pattern: "imgscan",
+  react: '🔍',
+  desc: "Scan and analyze images using AI",
+  category: "tools",
+  use: ".imgscan [reply to image]",
+  filename: __filename
+}, async (client, message, { reply, quoted }) => {
+  try {
+    // Check if quoted message exists and has media
+    const quotedMsg = quoted || message;
+    const mimeType = (quotedMsg.msg || quotedMsg).mimetype || '';
+    
+    if (!mimeType || !mimeType.startsWith('image/')) {
+      return reply("Please reply to an image file (JPEG/PNG)");
+    }
+
+    // Download the media
+    const mediaBuffer = await quotedMsg.download();
+    const fileSize = formatBytes(mediaBuffer.length);
+    
+    // Get file extension based on mime type
+    let extension = '';
+    if (mimeType.includes('image/jpeg')) extension = '.jpg';
+    else if (mimeType.includes('image/png')) extension = '.png';
+    else {
+      return reply("Unsupported image format. Please use JPEG or PNG");
+    }
+
+    const tempFilePath = path.join(os.tmpdir(), `imgscan_${Date.now()}${extension}`);
+    fs.writeFileSync(tempFilePath, mediaBuffer);
+
+    // Upload to Catbox
+    const form = new FormData();
+    form.append('fileToUpload', fs.createReadStream(tempFilePath), `image${extension}`);
+    form.append('reqtype', 'fileupload');
+
+    const uploadResponse = await axios.post("https://catbox.moe/user/api.php", form, {
+      headers: form.getHeaders()
+    });
+
+    const imageUrl = uploadResponse.data;
+    fs.unlinkSync(tempFilePath); // Clean up temp file
+
+    if (!imageUrl) {
+      throw "Failed to upload image to Catbox";
+    }
+
+    // Scan the image using the API
+    const scanUrl = `https://apis.davidcyriltech.my.id/imgscan?url=${encodeURIComponent(imageUrl)}`;
+    const scanResponse = await axios.get(scanUrl);
+
+    if (!scanResponse.data.success) {
+      throw scanResponse.data.message || "Failed to analyze image";
+    }
+
+    // Format the response
+    await reply(
+      `🔍 *Image Results*\n\n` +
+      `${scanResponse.data.result}`
+    );
+
+  } catch (error) {
+    console.error('Image Scan Error:', error);
+    await reply(`❌ Error: ${error.message || error}`);
+  }
+});
+
+
 cmd({
   pattern: "ss",
   alias: ["ssweb"],
   react: "💫",
-  desc: "Download screenshot of a given link.",
+  desc: "Take a screenshot of a given URL",
   category: "tools",
   filename: __filename,
 }, 
 async (conn, mek, m, {
-  from, l, quoted, body, isCmd, command, args, q, isGroup, sender, 
-  senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, 
-  groupMetadata, groupName, participants, isItzcp, groupAdmins, 
-  isBotAdmins, isAdmins, reply 
+  from, q, sender, reply
 }) => {
   if (!q) {
-    return reply("Please provide a URL to capture a screenshot.\nExampls: https://www.google.com");
+    return reply("🔗 Please provide a URL to take a screenshot.\nExample: https://www.google.com");
   }
 
   try {
-    // created by jawad tech 
-    const response = await axios.get(`https://apis.apis-nothing.xyz/api/tools/ssweb?url=${q}&apikey=nothing-api`);
-    
+    const screenshotUrl = `https://apis.apis-nothing.xyz/api/tools/ssweb?url=${encodeURIComponent(q)}&apikey=nothing-api`;
 
-    // give credit and use
-    const imageMessage = {
-      image: { url: response },
-      caption: "> SUCCESSFULLY CONVERT SSWEB\n\n> POWERED BY NOTHING",
-      contextInfo: getNewsletterContext(m.sender),
-    };
+    await conn.sendMessage(from, {
+      image: { url: screenshotUrl },
+      caption: `🖼️ Screenshot captured successfully!\n🌐 URL: ${q}\n\n🚀 Powered by NOTHING API`,
+      contextInfo: getNewsletterContext(m.sender)
+    }, { quoted: m });
 
-    await conn.sendMessage(from, imageMessage, { quoted: m });
   } catch (error) {
-    console.error(error);
-    reply("Failed to capture the screenshot. Please try again.");
+    console.error("SS Command Error:", error);
+    reply("❌ Failed to take the screenshot. Please try again.");
   }
 });
 
