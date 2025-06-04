@@ -136,7 +136,7 @@ cmd({
   category: "system",
   react: "📂",
   filename: __filename
-}, async (client, message, args, { reply }) => {
+}, async (client, message, m, { args, reply }) => {
   try {
     let targetPath = './'; // مسیر پیش‌فرض به پوشه جاری
 
@@ -322,7 +322,9 @@ cmd({
   desc: "Show bot alive status and uptime",
   category: "system",
   filename: __filename
-}, async (client, message, m, args, { reply }) => {
+}, async (client, message, m, {
+  reply, sender
+}) => {
   try {
     const start = Date.now();
     const uptimeMs = process.uptime() * 1000;
@@ -339,7 +341,7 @@ ${uptimeFormatted}
     await client.sendMessage(message.chat, {
       image: { url: "https://files.catbox.moe/6vrc2s.jpg" },
       caption: status.trim(),
-      contextInfo: getNewsletterContext(m.sender),
+      contextInfo: getNewsletterContext(sender),
     }, { quoted: message });
         
   } catch (err) {
@@ -355,7 +357,7 @@ cmd({
   desc: "See GitHub information",
   category: "system",
   filename: __filename
-}, async (client, message, m, args, { reply }) => {
+}, async (client, message, m, args, { reply,  sender }) => {
   const githubRepoURL = 'https://github.com/NOTHING-MD420/project-test';
 
   try {
@@ -682,17 +684,16 @@ cmd({
   from, sender, pushname, reply
 }) => {
   try {
-    // Read local version data
     const localVersionPath = path.join(__dirname, '../data/version.json');
     let localVersion = 'Unknown';
     let changelog = 'No changelog available.';
+    
     if (fs.existsSync(localVersionPath)) {
       const localData = JSON.parse(fs.readFileSync(localVersionPath));
       localVersion = localData.version;
       changelog = localData.changelog;
     }
 
-    // System info
     const pluginPath = path.join(__dirname, '../plugins');
     const pluginCount = fs.readdirSync(pluginPath).filter(file => file.endsWith('.js')).length;
     const totalCommands = commands.length;
@@ -708,9 +709,9 @@ cmd({
       `📝 *Changelog:*\n${changelog}`;
 
     await conn.sendMessage(from, {
-    text: text,
-    contextInfo: getNewsletterContext(m.sender)
-}, { quoted: mek });
+      text: statusMessage,
+      contextInfo: getNewsletterContext(sender)
+    }, { quoted: mek });
 
   } catch (error) {
     console.error('Error fetching version info:', error);
@@ -725,7 +726,7 @@ cmd({
   desc: "Check how many times a command keyword appears in plugins",
   category: "owner",
   filename: __filename
-}, async (client, message, args, { reply, isOwner }) => {
+}, async (client, message, m, { reply, isOwner, args }) => {
   if (!isOwner) return reply("❌ Owner only command.");
   if (!args[0]) return reply("❌ Please provide a keyword to check.\nExample: `.checkcmd qr`");
 
@@ -743,13 +744,16 @@ cmd({
     const matches = content.split(keyword).length - 1;
     if (matches > 0) {
       totalCount += matches;
-      details += `📂 *${file}* → ${matches} times\n`;
+      details += `📂 *${file}* → ${matches} time${matches > 1 ? 's' : ''}\n`;
     }
   }
 
-  if (totalCount === 0) {
-    await reply(`❌ No usage of *${keyword}* found in plugins.`);
-  } else {
-    await reply(`✅ *${keyword}* found ${totalCount} times in ${pluginFiles.length} files.\n\n${details}`);
-  }
+  const result = totalCount === 0
+    ? `❌ No usage of *${keyword}* found in plugins.`
+    : `✅ *${keyword}* found ${totalCount} time${totalCount > 1 ? 's' : ''} in ${pluginFiles.length} files.\n\n${details.trim()}`;
+
+  await client.sendMessage(message.chat, {
+    text: result,
+    contextInfo: getNewsletterContext(m.sender)
+  }, { quoted: message });
 });
