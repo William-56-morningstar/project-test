@@ -25,6 +25,185 @@ function getNewsletterContext(senderJid) {
 }
 
 cmd({
+    pattern: "ringtone",
+    alias: ["ringtones", "ring"],
+    desc: "Get a random ringtone from the API.",
+    react: "🎵",
+    category: "fun",
+    filename: __filename,
+},
+async (conn, mek, m, { from, reply, args }) => {
+    try {
+        const query = args.join(" ");
+        if (!query) {
+            return reply("Please provide a search query! Example: .ringtone Suna");
+        }
+
+        const { data } = await axios.get(`https://www.dark-yasiya-api.site/download/ringtone?text=${encodeURIComponent(query)}`);
+
+        if (!data.status || !data.result || data.result.length === 0) {
+            return reply("No ringtones found for your query. Please try a different keyword.");
+        }
+
+        const randomRingtone = data.result[Math.floor(Math.random() * data.result.length)];
+
+        await conn.sendMessage(
+            from,
+            {
+                audio: { url: randomRingtone.dl_link },
+                mimetype: "audio/mpeg",
+                fileName: `${randomRingtone.title}.mp3`,
+            },
+            { quoted: m }
+        );
+    } catch (error) {
+        console.error("Error in ringtone command:", error);
+        reply("Sorry, something went wrong while fetching the ringtone. Please try again later.");
+    }
+});
+
+
+cmd({
+    pattern: "pindl",
+    desc: "Download media from Pinterest",
+    category: "download",
+    filename: __filename
+}, async (conn, mek, m, { args, quoted, from, reply }) => {
+    try {
+        // Make sure the user provided the Pinterest URL
+        if (args.length < 1) {
+            return reply('❎ Please provide the Pinterest URL to download from.');
+        }
+
+        // Extract Pinterest URL from the arguments
+        const pinterestUrl = args[0];
+
+        // Call your Pinterest download API
+        const response = await axios.get(`https://api.giftedtech.web.id/api/download/pinterestdl?apikey=gifted&url=${encodeURIComponent(pinterestUrl)}`);
+
+        if (!response.data.success) {
+            return reply('❎ Failed to fetch data from Pinterest.');
+        }
+
+        const media = response.data.result.media;
+        const description = response.data.result.description || 'No description available'; // Check if description exists
+        const title = response.data.result.title || 'No title available';
+
+        // Select the best video quality or you can choose based on size or type
+        const videoUrl = media.find(item => item.type.includes('720p'))?.download_url || media[0].download_url;
+
+        // Prepare the new message with the updated caption
+        const desc = `╭━━━〔 *BEN-MD* 〕━━━┈⊷
+┃▸╭───────────
+┃▸┃๏ *PINS DOWNLOADER*
+┃▸└───────────···๏
+╰────────────────┈⊷
+╭━━❐━⪼
+┇๏ *Title* - ${title}
+┇๏ *Media Type* - ${media[0].type}
+╰━━❑━⪼*`;
+
+        // Send the media (video or image) to the user
+        if (videoUrl) {
+            // If it's a video, send the video
+            await conn.sendMessage(from, { video: { url: videoUrl }, caption: desc }, { quoted: mek });
+        } else {
+            // If it's an image, send the image
+            const imageUrl = media.find(item => item.type === 'Thumbnail')?.download_url;
+            await conn.sendMessage(from, { image: { url: imageUrl }, caption: desc }, { quoted: mek });
+        }
+
+    } catch (e) {
+        console.error(e);
+        await conn.sendMessage(from, { react: { text: '❌', key: mek.key } });
+        reply('❎ An error occurred while processing your request.');
+    }
+});
+
+
+cmd({
+    pattern: "tiktok",
+    alias: ["ttdl", "tt", "tiktokdl"],
+    desc: "Download TikTok video without watermark",
+    category: "download",
+    react: "🎵",
+    filename: __filename
+},
+async (conn, mek, m, { from, args, q, reply }) => {
+    try {
+        if (!q) return reply("Please provide a TikTok video link.");
+        if (!q.includes("tiktok.com")) return reply("Invalid TikTok link.");
+        
+        reply("Downloading video, please wait...");
+        
+        const apiUrl = `https://delirius-apiofc.vercel.app/download/tiktok?url=${q}`;
+        const { data } = await axios.get(apiUrl);
+        
+        if (!data.status || !data.data) return reply("Failed to fetch TikTok video.");
+        
+        const { title, like, comment, share, author, meta } = data.data;
+        const videoUrl = meta.media.find(v => v.type === "video").org;
+        
+        const caption = `🎵 *TikTok Video* 🎵\n\n` +
+                        `👤 *User:* ${author.nickname} (@${author.username})\n` +
+                        `📖 *Title:* ${title}\n` +
+                        `👍 *Likes:* ${like}\n💬 *Comments:* ${comment}\n🔁 *Shares:* ${share}`;
+        
+        await conn.sendMessage(from, {
+            video: { url: videoUrl },
+            caption: caption,
+            contextInfo: { mentionedJid: [m.sender] }
+        }, { quoted: mek });
+        
+    } catch (e) {
+        console.error("Error in TikTok downloader command:", e);
+        reply(`An error occurred: ${e.message}`);
+    }
+});
+          
+          
+          
+cmd({
+  pattern: "fb",
+  alias: ["facebook", "fbdl"],
+  desc: "Download Facebook videos",
+  category: "download",
+  filename: __filename,
+  use: "<Facebook URL>",
+}, async (conn, m, store, { from, args, q, reply }) => {
+  try {
+    // Check if a URL is provided
+    if (!q || !q.startsWith("http")) {
+      return reply("*`Need a valid Facebook URL`*\n\nExample: `.fb https://www.facebook.com/...`");
+    }
+
+    // Add a loading react
+    await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
+
+    // Fetch video URL from the API
+    const apiUrl = `https://www.velyn.biz.id/api/downloader/facebookdl?url=${encodeURIComponent(q)}`;
+    const { data } = await axios.get(apiUrl);
+
+    // Check if the API response is valid
+    if (!data.status || !data.data || !data.data.url) {
+      return reply("❌ Failed to fetch the video. Please try another link.");
+    }
+
+    // Send the video to the user
+    const videoUrl = data.data.url;
+    await conn.sendMessage(from, {
+      video: { url: videoUrl },
+      caption: "📥 Facebook Video Downloaded ✅",
+    }, { quoted: m });
+
+  } catch (error) {
+    console.error("Error:", error); // Log the error for debugging
+    reply("❌ Error fetching the video. Please try again.");
+  }
+});
+
+
+cmd({
   pattern: "ig",
   desc: "Download Instagram videos/images using API",
   react: "🎥",

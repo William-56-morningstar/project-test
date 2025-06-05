@@ -10,6 +10,181 @@ const path = require('path');
 
 
 
+cmd({
+  pattern: "broadcast",
+  category: "group",
+  desc: "Bot makes a broadcast in all groups",
+  filename: __filename,
+  use: "<text for broadcast.>"
+}, async (conn, mek, m, { q, isGroup, isAdmins, reply }) => {
+  try {
+    if (!isGroup) return reply("❌ This command can only be used in groups!");
+    if (!isAdmins) return reply("❌ You need to be an admin to broadcast in this group!");
+
+    if (!q) return reply("❌ Provide text to broadcast in all groups!");
+
+    let allGroups = await conn.groupFetchAllParticipating();
+    let groupIds = Object.keys(allGroups); // Extract group IDs
+
+    reply(`📢 Sending Broadcast To ${groupIds.length} Groups...\n⏳ Estimated Time: ${groupIds.length * 1.5} seconds`);
+
+    for (let groupId of groupIds) {
+      try {
+        await sleep(1500); // Avoid rate limits
+        await conn.sendMessage(groupId, { text: q }); // Sends only the provided text
+      } catch (err) {
+        console.log(`❌ Failed to send broadcast to ${groupId}:`, err);
+      }
+    }
+
+    return reply(`✅ Successfully sent broadcast to ${groupIds.length} groups!`);
+    
+  } catch (err) {
+    await m.error(`❌ Error: ${err}\n\nCommand: broadcast`, err);
+  }
+});
+
+
+cmd({
+    pattern: "tagadmins",
+    react: "👑",
+    alias: ["gc_tagadmins"],
+    desc: "To Tag all Admins of the Group",
+    category: "group",
+    use: '.tagadmins [message]',
+    filename: __filename
+},
+async (conn, mek, m, { from, participants, reply, isGroup, senderNumber, groupAdmins, prefix, command, args, body }) => {
+    try {
+        if (!isGroup) return reply("❌ This command can only be used in groups.");
+        
+        const botOwner = conn.user.id.split(":")[0]; // Extract bot owner's number
+        const senderJid = senderNumber + "@s.whatsapp.net";
+
+        // Ensure group metadata is fetched properly
+        let groupInfo = await conn.groupMetadata(from).catch(() => null);
+        if (!groupInfo) return reply("❌ Failed to fetch group information.");
+
+        let groupName = groupInfo.subject || "Unknown Group";
+        let admins = await getGroupAdmins(participants);
+        let totalAdmins = admins ? admins.length : 0;
+        if (totalAdmins === 0) return reply("❌ No admins found in this group.");
+
+        let emojis = ['👑', '⚡', '🌟', '✨', '🎖️', '💎', '🔱', '🛡️', '🚀', '🏆'];
+        let randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+        // Proper message extraction
+        let message = body.slice(body.indexOf(command) + command.length).trim();
+        if (!message) message = "Attention Admins"; // Default message
+
+        let teks = `▢ Group : *${groupName}*\n▢ Admins : *${totalAdmins}*\n▢ Message: *${message}*\n\n┌───⊷ *ADMIN MENTIONS*\n`;
+
+        for (let admin of admins) {
+            if (!admin) continue; // Prevent undefined errors
+            teks += `${randomEmoji} @${admin.split('@')[0]}\n`;
+        }
+
+        teks += "└──✪ BEN┃ BOT ✪──";
+
+        conn.sendMessage(from, { text: teks, mentions: admins }, { quoted: mek });
+
+    } catch (e) {
+        console.error("TagAdmins Error:", e);
+        reply(`❌ *Error Occurred !!*\n\n${e.message || e}`);
+    }
+});
+
+
+
+cmd({
+    pattern: "online",
+    alias: ["whosonline", "onlinemembers"],
+    desc: "Check who's online in the group (Admins & Owner only)",
+    category: "group",
+    react: "🟢",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, isGroup, isAdmins, isCreator, fromMe, reply }) => {
+    try {
+        // Check if the command is used in a group
+        if (!isGroup) return reply("❌ This command can only be used in a group!");
+
+        // Check if user is either creator or admin
+        if (!isCreator && !isAdmins && !fromMe) {
+            return reply("❌ Only bot owner and group admins can use this command!");
+        }
+
+        // Inform user that we're checking
+        await reply("🔄 Scanning for online members... This may take 15-20 seconds.");
+
+        const onlineMembers = new Set();
+        const groupData = await conn.groupMetadata(from);
+        const presencePromises = [];
+
+        // Request presence updates for all participants
+        for (const participant of groupData.participants) {
+            presencePromises.push(
+                conn.presenceSubscribe(participant.id)
+                    .then(() => {
+                        // Additional check for better detection
+                        return conn.sendPresenceUpdate('composing', participant.id);
+                    })
+            );
+        }
+
+        await Promise.all(presencePromises);
+
+        // Presence update handler
+        const presenceHandler = (json) => {
+            for (const id in json.presences) {
+                const presence = json.presences[id]?.lastKnownPresence;
+                // Check all possible online states
+                if (['available', 'composing', 'recording', 'online'].includes(presence)) {
+                    onlineMembers.add(id);
+                }
+            }
+        };
+
+        conn.ev.on('presence.update', presenceHandler);
+
+        // Longer timeout and multiple checks
+        const checks = 3;
+        const checkInterval = 5000; // 5 seconds
+        let checksDone = 0;
+
+        const checkOnline = async () => {
+            checksDone++;
+            
+            if (checksDone >= checks) {
+                clearInterval(interval);
+                conn.ev.off('presence.update', presenceHandler);
+                
+                if (onlineMembers.size === 0) {
+                    return reply("⚠️ Couldn't detect any online members. They might be hiding their presence.");
+                }
+                
+                const onlineArray = Array.from(onlineMembers);
+                const onlineList = onlineArray.map((member, index) => 
+                    `${index + 1}. @${member.split('@')[0]}`
+                ).join('\n');
+                
+                const message = `🟢 *Online Members* (${onlineArray.length}/${groupData.participants.length}):\n\n${onlineList}`;
+                
+                await conn.sendMessage(from, { 
+                    text: message,
+                    mentions: onlineArray
+                }, { quoted: mek });
+            }
+        };
+
+        const interval = setInterval(checkOnline, checkInterval);
+
+    } catch (e) {
+        console.error("Error in online command:", e);
+        reply(`An error occurred: ${e.message}`);
+    }
+});
+
 
 cmd({
     pattern: "remove",
@@ -1103,11 +1278,10 @@ cmd({
 },
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isCreator ,isDev, isAdmins, reply}) => {
 try{
-const msr = (await fetchJson('https://raw.githubusercontent.com/JawadYT36/KHAN-DATA/refs/heads/main/MSG/mreply.json')).replyMsg
 
-if (!isGroup) return reply(msr.only_gp)
-if (!isAdmins) { if (!isDev) return reply(msr.you_adm),{quoted:mek }} 
-if (!isBotAdmins) return reply(msr.give_adm)
+if (!isGroup) return reply("𝐓𝐡𝐢𝐬 𝐅𝐞𝐚𝐭𝐮𝐫𝐞 𝐈𝐬 𝐎𝐧𝐥𝐲 𝐅𝐨𝐫 𝐆𝐫𝐨𝐮𝐩❗");
+if (!isAdmins) return reply("𝐓𝐡𝐢𝐬 𝐅𝐞𝐚𝐭𝐮𝐫𝐞 𝐈𝐬 𝐎𝐧𝐥𝐲 𝐅𝐨𝐫 𝐆𝐫𝐨𝐮𝐩 admin❗");
+if (!isBotAdmins) return reply("you is not admin of 𝐆𝐫𝐨𝐮𝐩❗");
 await conn.groupRevokeInvite(from)
  await conn.sendMessage(from , { text: `*Group link Reseted* ⛔`}, { quoted: mek } )
 } catch (e) {
