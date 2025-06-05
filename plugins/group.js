@@ -7,6 +7,206 @@ const fs = require('fs');
 const { writeFileSync } = require('fs');
 const path = require('path');
 
+
+
+cmd({
+  pattern: "newgc",
+  category: "group",
+  desc: "Create a new group and add participants.",
+  filename: __filename,
+}, async (conn, mek, m, { from, isGroup, body, sender, groupMetadata, participants, reply }) => {
+  try {
+    if (!body) {
+      return reply(`Usage: !newgc group_name;number1,number2,...`);
+    }
+
+    const [groupName, numbersString] = body.split(";");
+    
+    if (!groupName || !numbersString) {
+      return reply(`Usage: !newgc group_name;number1,number2,...`);
+    }
+
+    const participantNumbers = numbersString.split(",").map(number => `${number.trim()}@s.whatsapp.net`);
+
+    const group = await conn.groupCreate(groupName, participantNumbers);
+    console.log('created group with id: ' + group.id); // Use group.id here
+
+    const inviteLink = await conn.groupInviteCode(group.id); // Use group.id to get the invite link
+
+    await conn.sendMessage(group.id, { text: 'hello there' });
+
+    reply(`Group created successfully with invite link: https://chat.whatsapp.com/${inviteLink}\nWelcome message sent.`);
+  } catch (e) {
+    return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
+  }
+});
+
+
+
+
+cmd({
+    pattern: "updategname",
+    alias: ["upgname", "gname"],
+    react: "📝",
+    desc: "Change the group name.",
+    category: "group",
+    filename: __filename
+},           
+async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, args, q, reply }) => {
+    try {
+        if (!isGroup) return reply("❌ This command can only be used in groups.");
+        if (!isAdmins) return reply("❌ Only group admins can use this command.");
+        if (!isBotAdmins) return reply("❌ I need to be an admin to update the group name.");
+        if (!q) return reply("❌ Please provide a new group name.");
+
+        await conn.groupUpdateSubject(from, q);
+        reply(`✅ Group name has been updated to: *${q}*`);
+    } catch (e) {
+        console.error("Error updating group name:", e);
+        reply("❌ Failed to update the group name. Please try again.");
+    }
+});
+
+
+cmd({
+    pattern: "unlockgc",
+    alias: ["unlock"],
+    react: "🔓",
+    desc: "Unlock the group (Allows new members to join).",
+    category: "group",
+    filename: __filename
+},           
+async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply("❌ This command can only be used in groups.");
+        if (!isAdmins) return reply("❌ Only group admins can use this command.");
+        if (!isBotAdmins) return reply("❌ I need to be an admin to unlock the group.");
+
+        await conn.groupSettingUpdate(from, "unlocked");
+        reply("✅ Group has been unlocked. New members can now join.");
+    } catch (e) {
+        console.error("Error unlocking group:", e);
+        reply("❌ Failed to unlock the group. Please try again.");
+    }
+});
+
+
+cmd({
+    pattern: "leave",
+    alias: ["left", "leftgc", "leavegc"],
+    desc: "Leave the group",
+    react: "🎉",
+    category: "group",
+    filename: __filename
+},
+async (conn, mek, m, {
+    from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply
+}) => {
+    try {
+
+        if (!isGroup) {
+            return reply("This command can only be used in groups.");
+        }
+        
+
+        const botOwner = conn.user.id.split(":")[0]; 
+        if (senderNumber !== botOwner) {
+            return reply("Only the bot owner can use this command.");
+        }
+
+        reply("Leaving group...");
+        await sleep(1500);
+        await conn.groupLeave(from);
+        reply("Goodbye! 👋");
+    } catch (e) {
+        console.error(e);
+        reply(`❌ Error: ${e}`);
+    }
+});
+
+
+
+cmd({
+  pattern: "poll",
+  category: "group",
+  desc: "Create a poll with a question and options (format: question:option1,option2,...).",
+  filename: __filename,
+}, async (conn, mek, m, { from, reply, body }) => {
+  try {
+    if (!body || !body.includes(":")) {
+      return reply("❌ *Invalid format!*\n\nUse:\n`poll Question:Option1,Option2,Option3`");
+    }
+
+    const [questionPart, optionsPart] = body.split(":");
+    const question = questionPart.trim();
+    const options = optionsPart.split(",").map(opt => opt.trim()).filter(opt => opt);
+
+    if (options.length < 2) {
+      return reply("❌ *You must provide at least 2 options!*");
+    }
+
+    await conn.sendMessage(from, {
+      poll: {
+        name: question,
+        values: options,
+        selectableCount: 1 // optional: can be removed if you want default behavior
+      }
+    }, { quoted: mek });
+
+  } catch (e) {
+    console.error("Poll command error:", e);
+    reply(`❌ *An error occurred while creating the poll.*\n\n_Error:_ ${e.message}`);
+  }
+});
+
+
+cmd({
+    pattern: "lockgc",
+    react: "🔒",
+    desc: "Lock the group (Prevents new members from joining).",
+    category: "group",
+    filename: __filename
+},           
+async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply("❌ This command can only be used in groups.");
+        if (!isAdmins) return reply("❌ Only group admins can use this command.");
+        if (!isBotAdmins) return reply("❌ I need to be an admin to lock the group.");
+
+        await conn.groupSettingUpdate(from, "locked");
+        reply("✅ Group has been locked. New members cannot join.");
+    } catch (e) {
+        console.error("Error locking group:", e);
+        reply("❌ Failed to lock the group. Please try again.");
+    }
+});
+    
+    
+
+cmd({
+    pattern: "descgc",
+    react: "📜",
+    desc: "Change the group description.",
+    category: "group",
+    filename: __filename
+},           
+async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, args, q, reply }) => {
+    try {
+        if (!isGroup) return reply("❌ This command can only be used in groups.");
+        if (!isAdmins) return reply("❌ Only group admins can use this command.");
+        if (!isBotAdmins) return reply("❌ I need to be an admin to update the group description.");
+        if (!q) return reply("❌ Please provide a new group description.");
+
+        await conn.groupUpdateDescription(from, q);
+        reply("✅ Group description has been updated.");
+    } catch (e) {
+        console.error("Error updating group description:", e);
+        reply("❌ Failed to update the group description. Please try again.");
+    }
+});
+
+
+
 cmd({
     pattern: "jid",
     alias: ["id", "chatid", "gjid"],  
