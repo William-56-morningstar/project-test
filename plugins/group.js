@@ -9,6 +9,282 @@ const path = require('path');
 
 
 
+
+
+cmd({
+    pattern: "remove",
+    alias: ["kick", "removeuser"],
+    desc: "Removes a member from the group",
+    category: "admin",
+    react: "❌",
+    filename: __filename
+},
+async (conn, mek, m, {
+    from, q, isGroup, isBotAdmins, isAdmins, sender, reply, quoted
+}) => {
+    if (!isGroup) return reply("❌ This command can only be used in groups.");
+    if (!isAdmins) return reply("❌ Only group admins can use this command.");
+    if (!isBotAdmins) return reply("❌ I need to be an admin to remove someone.");
+
+    let target;
+
+    // Get target from quoted message
+    if (quoted) {
+        target = quoted.sender;
+    }
+    // Or from @mention
+    else if (q && q.includes("@")) {
+        const mention = q.match(/@(\d{5,})/);
+        if (mention) {
+            target = `${mention[1]}@s.whatsapp.net`;
+        }
+    }
+    // Otherwise, return error
+    else {
+        return reply("❌ Please reply to a message or mention a user to remove.\n\nExample:\n.remove @628xxx\n(remove via reply or tag)");
+    }
+
+    // Prevent removing self or bot
+    if (target === sender) return reply("❌ You can't remove yourself.");
+    if (target === conn.user.id) return reply("❌ I can't remove myself.");
+
+    try {
+        await conn.groupParticipantsUpdate(from, [target], "remove");
+        await reply(`✅ Successfully removed @${target.split("@")[0]}`, { mentions: [target] });
+    } catch (e) {
+        console.error("❌ Remove Error:", e);
+        reply("❌ Failed to remove the member.");
+    }
+});
+
+
+// Command to list all pending group join requests
+cmd({
+    pattern: "requestlist",
+    desc: "Shows pending group join requests",
+    category: "group",
+    react: "📋",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        await conn.sendMessage(from, {
+            react: { text: '⏳', key: m.key }
+        });
+
+        if (!isGroup) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ This command can only be used in groups.");
+        }
+        if (!isAdmins) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ Only group admins can use this command.");
+        }
+        if (!isBotAdmins) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ I need to be an admin to view join requests.");
+        }
+
+        const requests = await conn.groupRequestParticipantsList(from);
+        
+        if (requests.length === 0) {
+            await conn.sendMessage(from, {
+                react: { text: 'ℹ️', key: m.key }
+            });
+            return reply("ℹ️ No pending join requests.");
+        }
+
+        let text = `📋 *Pending Join Requests (${requests.length})*\n\n`;
+        requests.forEach((user, i) => {
+            text += `${i+1}. @${user.jid.split('@')[0]}\n`;
+        });
+
+        await conn.sendMessage(from, {
+            react: { text: '✅', key: m.key }
+        });
+        return reply(text, { mentions: requests.map(u => u.jid) });
+    } catch (error) {
+        console.error("Request list error:", error);
+        await conn.sendMessage(from, {
+            react: { text: '❌', key: m.key }
+        });
+        return reply("❌ Failed to fetch join requests.");
+    }
+});
+
+// Command to accept all pending join requests
+cmd({
+    pattern: "acceptall",
+    desc: "Accepts all pending group join requests",
+    category: "group",
+    react: "✅",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        await conn.sendMessage(from, {
+            react: { text: '⏳', key: m.key }
+        });
+
+        if (!isGroup) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ This command can only be used in groups.");
+        }
+        if (!isAdmins) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ Only group admins can use this command.");
+        }
+        if (!isBotAdmins) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ I need to be an admin to accept join requests.");
+        }
+
+        const requests = await conn.groupRequestParticipantsList(from);
+        
+        if (requests.length === 0) {
+            await conn.sendMessage(from, {
+                react: { text: 'ℹ️', key: m.key }
+            });
+            return reply("ℹ️ No pending join requests to accept.");
+        }
+
+        const jids = requests.map(u => u.jid);
+        await conn.groupRequestParticipantsUpdate(from, jids, "approve");
+        
+        await conn.sendMessage(from, {
+            react: { text: '👍', key: m.key }
+        });
+        return reply(`✅ Successfully accepted ${requests.length} join requests.`);
+    } catch (error) {
+        console.error("Accept all error:", error);
+        await conn.sendMessage(from, {
+            react: { text: '❌', key: m.key }
+        });
+        return reply("❌ Failed to accept join requests.");
+    }
+});
+
+// Command to reject all pending join requests
+cmd({
+    pattern: "rejectall",
+    desc: "Rejects all pending group join requests",
+    category: "group",
+    react: "❌",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        await conn.sendMessage(from, {
+            react: { text: '⏳', key: m.key }
+        });
+
+        if (!isGroup) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ This command can only be used in groups.");
+        }
+        if (!isAdmins) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ Only group admins can use this command.");
+        }
+        if (!isBotAdmins) {
+            await conn.sendMessage(from, {
+                react: { text: '❌', key: m.key }
+            });
+            return reply("❌ I need to be an admin to reject join requests.");
+        }
+
+        const requests = await conn.groupRequestParticipantsList(from);
+        
+        if (requests.length === 0) {
+            await conn.sendMessage(from, {
+                react: { text: 'ℹ️', key: m.key }
+            });
+            return reply("ℹ️ No pending join requests to reject.");
+        }
+
+        const jids = requests.map(u => u.jid);
+        await conn.groupRequestParticipantsUpdate(from, jids, "reject");
+        
+        await conn.sendMessage(from, {
+            react: { text: '👎', key: m.key }
+        });
+        return reply(`✅ Successfully rejected ${requests.length} join requests.`);
+    } catch (error) {
+        console.error("Reject all error:", error);
+        await conn.sendMessage(from, {
+            react: { text: '❌', key: m.key }
+        });
+        return reply("❌ Failed to reject join requests.");
+    }
+});
+
+cmd({
+    pattern: "out",
+    desc: "Removes all members with specific country code from the group",
+    category: "group",
+    react: "❌",
+    filename: __filename
+},
+async (conn, mek, m, {
+    from, q, isGroup, isBotAdmins, reply, groupMetadata, senderNumber
+}) => {
+    // Check if the command is used in a group
+    if (!isGroup) return reply("❌ This command can only be used in groups.");
+
+    // Get the bot owner's number dynamically from conn.user.id
+    const botOwner = conn.user.id.split(":")[0];
+    if (senderNumber !== botOwner) {
+        return reply("❌ Only the bot owner can use this command.");
+    }
+
+    // Check if the bot is an admin
+    if (!isBotAdmins) return reply("❌ I need to be an admin to use this command.");
+
+    if (!q) return reply("❌ Please provide a country code. Example: .out 92");
+
+    const countryCode = q.trim();
+    if (!/^\d+$/.test(countryCode)) {
+        return reply("❌ Invalid country code. Please provide only numbers (e.g., 92 for +92 numbers)");
+    }
+
+    try {
+        const participants = await groupMetadata.participants;
+        const targets = participants.filter(
+            participant => participant.id.startsWith(countryCode) && 
+                         !participant.admin // Don't remove admins
+        );
+
+        if (targets.length === 0) {
+            return reply(`❌ No members found with country code +${countryCode}`);
+        }
+
+        const jids = targets.map(p => p.id);
+        await conn.groupParticipantsUpdate(from, jids, "remove");
+        
+        reply(`✅ Successfully removed ${targets.length} members with country code +${countryCode}`);
+    } catch (error) {
+        console.error("Out command error:", error);
+        reply("❌ Failed to remove members. Error: " + error.message);
+    }
+});
+
+
 cmd({
   pattern: "newgc",
   category: "group",
@@ -70,7 +346,6 @@ async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, args, q, reply }) =
 
 cmd({
     pattern: "unlockgc",
-    alias: ["unlock"],
     react: "🔓",
     desc: "Unlock the group (Allows new members to join).",
     category: "group",
