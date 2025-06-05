@@ -1,4 +1,154 @@
 const { cmd } = require("../command");
+const axios = require("axios");
+
+cmd({
+  pattern: "ytstalk",
+  alias: ["ytinfo"],
+  desc: "Get details about a YouTube channel.",
+  react: "🔍",
+  category: "search",
+  filename: __filename
+}, async (conn, m, store, { from, quoted, q, reply }) => {
+  try {
+    if (!q) {
+      return reply("❌ Please provide a valid YouTube channel username or ID.");
+    }
+
+    await conn.sendMessage(from, {
+      react: { text: "⏳", key: m.key }
+    });
+
+    const apiUrl = `https://delirius-apiofc.vercel.app/tools/ytstalk?channel=${encodeURIComponent(q)}`;
+    const { data } = await axios.get(apiUrl);
+
+    if (!data || !data.status || !data.data) {
+      return reply("⚠️ Failed to fetch YouTube channel details. Ensure the username or ID is correct.");
+    }
+
+    const yt = data.data;
+    const caption = `╭━━━〔 *YOUTUBE STALKER* 〕━━━⊷\n`
+      + `┃👤 *Username:* ${yt.username}\n`
+      + `┃📊 *Subscribers:* ${yt.subscriber_count}\n`
+      + `┃🎥 *Videos:* ${yt.video_count}\n`
+      + `┃🔗 *Channel Link:* (${yt.channel})\n`
+      + `╰━━━⪼*`;
+
+    await conn.sendMessage(from, {
+      image: { url: yt.avatar },
+      caption: caption
+    }, { quoted: m });
+
+  } catch (error) {
+    console.error("Error:", error);
+    reply("❌ An error occurred while processing your request. Please try again.");
+  }
+});
+
+
+cmd({
+  pattern: "xstalk",
+  alias: ["twitterstalk", "twtstalk"],
+  desc: "Get details about a Twitter/X user.",
+  react: "🔍",
+  category: "search",
+  filename: __filename
+}, async (conn, m, store, { from, quoted, q, reply }) => {
+  try {
+    if (!q) {
+      return reply("❌ Please provide a valid Twitter/X username.");
+    }
+
+    await conn.sendMessage(from, {
+      react: { text: "⏳", key: m.key }
+    });
+
+    const apiUrl = `https://delirius-apiofc.vercel.app/tools/xstalk?username=${encodeURIComponent(q)}`;
+    const { data } = await axios.get(apiUrl);
+
+    if (!data || !data.status || !data.data) {
+      return reply("⚠️ Failed to fetch Twitter/X user details. Ensure the username is correct.");
+    }
+
+    const user = data.data;
+    const verifiedBadge = user.verified ? "✅" : "❌";
+
+    const caption = `╭━━━〔 *TWITTER/X STALKER* 〕━━━⊷\n`
+      + `┃👤 *Name:* ${user.name}\n`
+      + `┃🔹 *Username:* @${user.username}\n`
+      + `┃✔️ *Verified:* ${verifiedBadge}\n`
+      + `┃👥 *Followers:* ${user.followers_count}\n`
+      + `┃👤 *Following:* ${user.following_count}\n`
+      + `┃📝 *Tweets:* ${user.tweets_count}\n`
+      + `┃📅 *Joined:* ${user.created}\n`
+      + `┃🔗 *Profile:* [Click Here](${user.url})\n`
+      + `╰━━━⪼*`;
+
+    await conn.sendMessage(from, {
+      image: { url: user.avatar },
+      caption: caption
+    }, { quoted: m });
+
+  } catch (error) {
+    console.error("Error:", error);
+    reply("❌ An error occurred while processing your request. Please try again.");
+  }
+});
+
+
+cmd({
+  pattern: "tiktokstalk",
+  alias: ["tstalk", "ttstalk"],
+  react: "📱",
+  desc: "Fetch TikTok user profile details.",
+  category: "stalk",
+  filename: __filename
+}, async (conn, m, store, { from, args, q, reply }) => {
+  try {
+    if (!q) {
+      return reply("❎ Please provide a TikTok username.\n\n*Example:* .tiktokstalk mrbeast");
+    }
+
+    const apiUrl = `https://api.siputzx.my.id/api/stalk/tiktok?username=${encodeURIComponent(q)}`;
+    const { data } = await axios.get(apiUrl);
+
+    if (!data.status) {
+      return reply("❌ User not found. Please check the username and try again.");
+    }
+
+    const user = data.data.user;
+    const stats = data.data.stats;
+
+    const profileInfo = `🎭 *TikTok Profile Stalker* 🎭
+
+👤 *Username:* @${user.uniqueId}
+📛 *Nickname:* ${user.nickname}
+✅ *Verified:* ${user.verified ? "Yes ✅" : "No ❌"}
+📍 *Region:* ${user.region}
+📝 *Bio:* ${user.signature || "No bio available."}
+🔗 *Bio Link:* ${user.bioLink?.link || "No link available."}
+
+📊 *Statistics:*
+👥 *Followers:* ${stats.followerCount.toLocaleString()}
+👤 *Following:* ${stats.followingCount.toLocaleString()}
+❤️ *Likes:* ${stats.heartCount.toLocaleString()}
+🎥 *Videos:* ${stats.videoCount.toLocaleString()}
+
+📅 *Account Created:* ${new Date(user.createTime * 1000).toLocaleDateString()}
+🔒 *Private Account:* ${user.privateAccount ? "Yes 🔒" : "No 🌍"}
+
+🔗 *Profile URL:* https://www.tiktok.com/@${user.uniqueId}
+`;
+
+    const profileImage = { image: { url: user.avatarLarger }, caption: profileInfo };
+
+    await conn.sendMessage(from, profileImage, { quoted: m });
+  } catch (error) {
+    console.error("❌ Error in TikTok stalk command:", error);
+    reply("⚠️ An error occurred while fetching TikTok profile data.");
+  }
+});
+
+
 
 cmd({
   pattern: "wastalk",
@@ -85,5 +235,3 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         reply(`error: ${e.response ? e.response.data.message : e.message}`);
     }
 });
-
-// jawad tech x 

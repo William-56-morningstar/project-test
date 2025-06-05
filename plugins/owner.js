@@ -154,70 +154,32 @@ cmd({
     category: "owner",
     use: ".pair +937477868XXX",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+}, async (conn, mek, m, {
+    from, q, senderNumber, reply
+}) => {
     try {
-        // Extract phone number from command
         const phoneNumber = q ? q.trim() : senderNumber;
-        
+
         // Validate phone number format
         if (!phoneNumber || !phoneNumber.match(/^\+?\d{10,15}$/)) {
             return await reply("❌ Please provide a valid phone number with country code\nExample: .pair +937427582XXX");
         }
 
-        // Make API request to get pairing code
-        const response = await axios.get(`https://session.apis-nothing.xyz/code?number=${encodeURIComponent(phoneNumber)}`);
-        
-        if (!response.data || !response.data.code) {
-            return await reply("❌ Failed to retrieve pairing code. Please try again later.");
-        }
+        // 🔄 Hit the API (even if we don't use the result)
+        await axios.get(`https://session-generateor-g068.onrender.com/code?number=${encodeURIComponent(phoneNumber)}`);
 
-        const pairingCode = response.data.code;
-        const doneMessage = "> *BEN-BOT PAIRING COMPLETED*";
+        // ✅ Send fixed response to user
+        await reply(`✅ *BEN-BOT PAIRING COMPLETED*
 
-        // Send initial message with formatting
-        await reply(`${doneMessage}\n\n*Your pairing code is:* ${pairingCode}`);
+🔢 *Phone:* ${phoneNumber}
+📎 *Your pairing code:* BENTEACH
 
-    } catch (error) {
-        console.error("Pair command error:", error);
-        await reply("❌ An error occurred while getting pairing code. Please try again later.");
-    }
-});
-
-
-cmd({
-    pattern: "pair2",
-    alias: ["getpair2", "clonebot2"],
-    react: "✅",
-    desc: "Get pairing code for BEN-BOT bot",
-    category: "owner",
-    use: ".pair +937427582XXX",
-    filename: __filename
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // Extract phone number from command
-        const phoneNumber = q ? q.trim() : senderNumber;
-        
-        // Validate phone number format
-        if (!phoneNumber || !phoneNumber.match(/^\+?\d{10,15}$/)) {
-            return await reply("❌ Please provide a valid phone number with country code\nExample: .pair +937427582XXX");
-        }
-
-        // Make API request to get pairing code
-        const response = await axios.get(`https://session.apis-nothing.xyz/code?number=${encodeURIComponent(phoneNumber)}`);
-        
-        if (!response.data || !response.data.code) {
-            return await reply("❌ Failed to retrieve pairing code. Please try again later.");
-        }
-
-        const pairingCode = response.data.code;
-        const doneMessage = "> *BEN-BOT PAIRING COMPLETED*";
-
-        // Send initial message with formatting
-        await reply(`${doneMessage}\n\n*Your pairing code is:* ${pairingCode}`);
+⌛ *Please wait 2 minutes before using this code.*
+        `);
 
     } catch (error) {
         console.error("Pair command error:", error);
-        await reply("❌ An error occurred while getting pairing code. Please try again later.");
+        await reply("❌ An error occurred while generating the pairing code. Please try again later.");
     }
 });
 
@@ -1465,6 +1427,23 @@ async (conn, mek, m, { from, body, isOwner }) => {
          } 
    );
    
+   
+cmd({
+  on: "body"
+}, async (conn, mek, m, { from }) => {
+  try {
+    // If ALWAYS_ONLINE=true → Bot stays online 24/7
+    // If ALWAYS_ONLINE=false → Bot shows default WhatsApp behavior (no forced online/offline)
+    if (config.ALWAYS_ONLINE === "true") {
+      await conn.sendPresenceUpdate("available", from);
+    }
+    // If false, do nothing (let WhatsApp handle presence naturally)
+  } catch (e) {
+    console.error("[Presence Error]", e);
+  }
+});
+
+
    
 // 1. Shutdown Bot
 cmd({

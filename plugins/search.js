@@ -1,5 +1,138 @@
 const axios = require("axios");
-const { cmd } = require("../command");
+const config = require('../config');
+const { cmd, commands } = require("../command");
+const { fetchJson } = require("../lib/functions");
+const { translate } = require("@vitalets/google-translate-api");
+const l = console.log
+const dl = require('@bochilteam/scraper')  
+const ytdl = require('yt-search');
+const fs = require('fs-extra')
+var videotime = 60000 // 1000 min
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson} = require('../lib/functions')
+
+cmd({
+    pattern: "yts",
+    alias: ["ytsearch", "song"],
+    use: '.yts nothing',
+    react: "🔎",
+    desc: "Search and get details from youtube.",
+    category: "search",
+    filename: __filename
+
+},
+
+async(conn, mek, m,{from, l, quoted, body, isCmd, umarmd, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
+try{
+if (!q) return reply('*Please give me words to search*')
+try {
+let yts = require("yt-search")
+var arama = await yts(q);
+} catch(e) {
+    l(e)
+return await conn.sendMessage(from , { text: '*Error !!*' }, { quoted: mek } )
+}
+var mesaj = '';
+arama.all.map((video) => {
+mesaj += ' *🖲️' + video.title + '*\n🔗 ' + video.url + '\n\n'
+});
+await conn.sendMessage(from , { text:  mesaj }, { quoted: mek } )
+} catch (e) {
+    l(e)
+  reply('*Error !!*')
+}
+});
+
+
+
+cmd({
+    pattern: "weather",
+    desc: "🌤 Get weather information for a location",
+    react: "🌤",
+    category: "search",
+    filename: __filename
+},
+async (conn, mek, m, { from, q, reply }) => {
+    try {
+        if (!q) return reply("❗ Please provide a city name. Usage: .weather [city name]");
+        
+        const apiKey = '2d61a72574c11c4f36173b627f8cb177'; 
+        const city = q;
+        const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+        const response = await axios.get(url);
+        const data = response.data;
+
+        const weather = `
+🌍 *Weather in ${data.name}, ${data.sys.country}*
+
+🌡️ *Temperature*: ${data.main.temp}°C
+🌡️ *Feels Like*: ${data.main.feels_like}°C
+🌡️ *Min*: ${data.main.temp_min}°C | Max: ${data.main.temp_max}°C
+💧 *Humidity*: ${data.main.humidity}%
+☁️ *Condition*: ${data.weather[0].main} - ${data.weather[0].description}
+💨 *Wind Speed*: ${data.wind.speed} m/s
+🔽 *Pressure*: ${data.main.pressure} hPa
+        `.trim();
+
+        const imageUrl = 'https://cdn.apis-nothing.xyz/uploads/IMG-20250503-WA0012.jpg';
+
+        await conn.sendMessage(mek.chat, {
+            image: { url: imageUrl },
+            caption: weather
+        }, { quoted: mek });
+
+    } catch (e) {
+        console.error(e);
+        if (e.response && e.response.status === 404) {
+            return reply("🚫 City not found. Please check the spelling and try again.");
+        }
+        return reply("⚠️ An error occurred while fetching the weather information. Please try again later.");
+    }
+});
+
+
+
+cmd({
+  pattern: "wikipedia",
+  alias: ["wiki"],
+  react: "📖",
+  desc: "Fetch Wikipedia information and translate to English.",
+  category: "search",
+  filename: __filename
+}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, reply }) => {
+  try {
+    if (!q) {
+      return reply("Please provide a search query for Wikipedia.");
+    }
+
+    await reply("Searching Wikipedia...");
+
+    const response = await fetchJson(`https://api.siputzx.my.id/api/s/wikipedia?query=${encodeURIComponent(q)}`);
+
+    if (!response.status || !response.data) {
+      return reply("No results found for your query.");
+    }
+
+    const { wiki, thumb } = response.data;
+
+    // Translate the Wikipedia text to English
+    const translated = await translate(wiki, { to: "en" });
+
+    let message = `📖 *Wikipedia Result*\n\n📝 *Query:* ${q}\n\n${translated.text}`;
+
+    if (thumb) {
+      await conn.sendMessage(m.chat, {
+        image: { url: thumb },
+        caption: message
+      });
+    } else {
+      await reply(message);
+    }
+
+  } catch (error) {
+    console.error(error);
+    reply("An error occurred: " + error.message);
+  }
+});
 
 
 cmd({
