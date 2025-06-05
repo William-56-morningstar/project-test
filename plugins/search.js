@@ -1,7 +1,6 @@
 const axios = require("axios");
 const config = require('../config');
 const { cmd, commands } = require("../command");
-const { fetchJson } = require("../lib/functions");
 const { translate } = require("@vitalets/google-translate-api");
 const l = console.log
 const dl = require('@bochilteam/scraper')  
