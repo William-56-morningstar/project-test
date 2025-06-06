@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { getConfig } = require("./lib/configdb");
 require('dotenv').config();
 
 function convertToBool(text, fault = 'true') {
@@ -39,7 +40,7 @@ CUSTOM_REACT: process.env.CUSTOM_REACT || "false",
 CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍",
 // chose custom react emojis by yourself 
 //ANTILINK ALL SYSTEM
-PREFIX: process.env.PREFIX || ".",
+PREFIX: getConfig("PREFIX") || process.env.PREFIX || ".",
 ANTIVIEW_ONCE: process.env.ANTIVIEW_ONCE || "true",
 ANTILINK_WARN: process.env.ANTILINK_WARN || "false",
 ANTILINK_KICK: process.env.ANTILINK_KICK || "false",
