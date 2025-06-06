@@ -62,7 +62,7 @@ AUTO_REACT: process.env.AUTO_REACT || "false",
 // make this true or false for auto react on all msgs
 ANTI_BAD: process.env.ANTI_BAD || "false",
 // false or true for anti bad words  
-MODE: process.env.MODE || "public",
+MODE: getConfig("MODE") || process.env.MODE || "public",
 // make bot public-private-inbox-group 
 // make anti link true,false for groups 
 AUTO_VOICE: process.env.AUTO_VOICE || "false",
@@ -71,12 +71,8 @@ AUTO_STICKER: process.env.AUTO_STICKER || "false",
 // make true for automatic stickers 
 AUTO_REPLY: process.env.AUTO_REPLY || "false",
 // make true or false automatic text reply 
-ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
-// maks true for always online 
-PUBLIC_MODE: process.env.PUBLIC_MODE || "true",
-// make false if want private mod
-AUTO_TYPING: process.env.AUTO_TYPING || "false",
-// true for automatic show typing   
+ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false", 
+AUTO_TYPING: process.env.AUTO_TYPING || "false",   
 READ_CMD: process.env.READ_CMD || "false",
 // true if want mark commands as read 
 DEV: process.env.DEV || "93744215959",
