@@ -1,21 +1,13 @@
 FROM node:lts-buster
 
-RUN apt-get update && \
-    apt-get install -y build-essential clang python3 make g++ && \
-    apt-get upgrade -y
+WORKDIR /app
 
+COPY package*.json ./
 
-RUN git clone https://github.com/NOTHING-MD420/project-test.git
-
-WORKDIR /project-test/root/igNothing
-
-RUN npm install && npm install -g pm2
-
+RUN npm install && npm install -g pm2 qrcode-terminal
 
 COPY . .
 
-
-EXPOSE 9090
-
+EXPOSE 3000
 
 CMD ["npm", "start"]
