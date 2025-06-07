@@ -1,3 +1,7 @@
+// OH MY BABY 🍼
+// DON'T COPY MY CMD AND CODES🇦🇫
+// POWERED BY NOTHING TECH
+
 const fs = require('fs');
 const { getConfig } = require("./lib/configdb");
 require('dotenv').config();
