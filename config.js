@@ -22,7 +22,7 @@ module.exports = {
   ALIVE_IMG: process.env.ALIVE_IMG || "https://i.postimg.cc/Y2GSGtfG/IMG-20250502-WA0012-1.jpg'",
   LIVE_MSG: process.env.LIVE_MSG || "> ᴀʟᴡᴀʏꜱ ᴏɴʟɪɴᴇ ʙᴇɴ-ʙᴏᴛ⚡",
   DEV: process.env.DEV || "93744215959",
-  MODE: getConfig("MODE") || process.env.MODE || "public",
+  MODE: process.env.MODE || "public",
   AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
   AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY || "false",
   AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
