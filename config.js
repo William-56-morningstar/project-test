@@ -36,6 +36,7 @@ module.exports = {
   ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
   READ_MESSAGE: process.env.READ_MESSAGE || "false",
   READ_CMD: process.env.READ_CMD || "false",
+  ANTI_CALL: getConfig("ANTI_CALL") || "false",
   ANTI_LINK: process.env.ANTI_LINK || "false",
   ANTILINK_WARN: process.env.ANTILINK_WARN || "false",
   ANTILINK_KICK: process.env.ANTILINK_KICK || "false",
