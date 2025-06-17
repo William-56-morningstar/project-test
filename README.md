@@ -1,4 +1,4 @@
-**[SESSION_DOCS](https://session.apis-nithing.xyz)**
+**[SESSION_DOCS](https://ben-auth.onrender.com)**
 
 - After obtaining your session ID, you can now use below depoly bot.
   
@@ -6,4 +6,4 @@
 
 **[WA_CHANNEL](https://whatsapp.com/channel/0029Vasu3qP9RZAUkVkvSv32)**
 
-**[HEROKU DEPLOY URL](https://dashboard.heroku.com/new?template=https://github.com/NOTHING-MD420/ben-bot-v2)**
+**[HEROKU DEPLOY URL](https://dashboard.heroku.com/new?template=https://github.com/NOTHING-MD420/project-test)**
